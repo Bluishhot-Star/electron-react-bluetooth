@@ -4,6 +4,7 @@ import './App.css';
 import { useState } from 'react';
 import axios from 'axios';
 
+
 // Variable & State
 const author = "KASSID";
 
@@ -13,6 +14,7 @@ function App() {
     <div className="App">
       {/* <ResultPage/> */}
       <LoginForm/>
+      {/* <SignUpForm/> */}
     </div>
   );
 }
@@ -145,7 +147,7 @@ function ResultPage(){
 
 const LoginForm = () =>{
   const [values, setValues] = useState({
-    id: "",
+    loginId: "",
     password: "",
   });
 
@@ -154,32 +156,38 @@ const LoginForm = () =>{
   const handleSubmit = async (event)=>{
     event.preventDefault();
 
-    try {
-      const response = await axios.post("/auth/sign-in", values);
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-      setError("다시 시도해주세요.");
-    }
+    axios.post("/auth/sign-in", 
+    {
+      loginId: values.loginId,
+      password: values.password,
+    },{withCredentials : true})
+    .then((res)=>{
+      console.log(res);
+    })
+    .catch((error)=>{
+      console.log(error);alert("ERROR");
+    })
   };
 
   return(
     <div className="login-page-container">
       <div className="logo"><p>The SpiroKit</p></div>
       <form onSubmit={handleSubmit}>
-        <div className="field">
-          <label htmlFor="email">아이디</label>
+        <div className="login-field">
+          <label htmlFor="loginId">아이디</label>
           <input
-            type="text" name='user-id'
-            onChange={(e)=>setValues({...values, email: e.target.value})}
-            value={values.email}
+            type="text" name='loginId'
+            onChange={(e)=>setValues({...values, loginId: e.target.value})}
+            placeholder='아이디'
+            value={values.loginId}
           />
         </div>
-        <div className="field">
+        <div className="login-field">
           <label htmlFor="password">비밀번호</label>
           <input
-            type="password" name='user-pwd'
+            type="password" name='password'
             onChange={(e)=>setValues({...values, password: e.target.value})}
+            placeholder='비밀번호'
             value={values.password}
           />
         </div>
@@ -192,49 +200,216 @@ const LoginForm = () =>{
   );
 }
 
+
 const SignUpForm = () =>{
   const [values, setValues] = useState({
-    id: "",
-    password: "",
+    countryId: "",
+    organizationId: "",
+    manager: {
+      name: "",
+      tel: "",
+      loginId: "",
+      password: "",
+      reEnterPassword: ""
+  }
   });
 
   const [error, setError] = useState(undefined);
-
+  const [validity, setValidity] = useState([-1, -1, -1]);
   const handleSubmit = async (event)=>{
     event.preventDefault();
 
-    try {
-      const response = await axios.post("/auth/sign-in", values);
-      console.log(response.data);
-    } catch (error) {
-      console.error(error);
-      setError("다시 시도해주세요.");
-    }
+    axios.post("/auth/sign-in", 
+    {
+      countryId: "",
+      organizationId: "",
+      manager: {
+        name: "",
+        tel: "",
+        loginId: "",
+        password: "",
+        reEnterPassword: ""
+      }
+    },{withCredentials : true})
+    .then((res)=>{
+      console.log(res);
+    })
+    .catch((error)=>{
+      console.log(error);alert("ERROR");
+    })
   };
+  const hypenTel = (target) => {
+    target.value = target.value
+      .replace(/[^0-9]/g, '')
+      .replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, `$1-$2-$3`);
+  }
+  const reportLoginID = (e)=>{
+    let regExp = /^[a-zA-Z0-9]{5,20}$/;
+    return regExp.test(e.target.value);
+  }
+  const reportPassword = (e)=>{
+    let regExp = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W]).{8,20}$/;
+    return regExp.test(e.target.value);
+  }
+  const reportReEnterPassword = (e)=>{
+    if(values.manager.password === e.target.value) return true;
+    else false;
+  }
+  const ValidityFunc = {
+    0:reportLoginID,
+    1:reportPassword,
+    2:reportReEnterPassword
+  }
+
+  const setInput = (e, num, func)=>{
+    if(e.target.value.length === 0){
+      if(e.target.classList.contains("incorrect")){
+        e.target.classList.remove("incorrect")
+      }
+      let copy = [...validity];
+      copy[num] = -1;
+      setValidity(copy);
+      return;
+    };
+
+    if(!func(e)){
+      console.log(e.target.classList)
+      if(e.target.classList.contains("incorrect"))return;
+      e.target.classList+="incorrect"
+      let copy = [...validity];
+      copy[num] = false;
+      setValidity(copy);
+    }
+    else{
+      if(e.target.classList.contains("incorrect")){
+        e.target.classList.remove("incorrect")
+      }
+      let copy = [...validity];
+      copy[num] = true;
+      setValidity(copy);
+    }
+  }
 
   return(
-    <div className="login-page-container">
-      <div className="logo"><p>The SpiroKit</p></div>
+    <div className="signUp-page-container">
+      <div className="signUp-title"><p>회원가입</p></div>
       <form onSubmit={handleSubmit}>
-        <div className="field">
-          <label htmlFor="email">아이디</label>
+      <div className="signUp-field">
+          <label htmlFor="name">이름
+            <p className='hint'>이름을 입력하세요.</p>
+          </label>
           <input
-            type="text" name='user-id'
-            onChange={(e)=>setValues({...values, email: e.target.value})}
-            value={values.email}
+            type="text" placeholder='이름' name='name'
+            onChange={(e)=>{
+              let copy = values.manager
+              copy.name = e.target.value
+              setValues({...values, manager: copy})}}
+            value={values.manager.name}
           />
         </div>
-        <div className="field">
-          <label htmlFor="password">비밀번호</label>
+        <div className="signUp-field">
+          <label htmlFor="loginId">아이디
+            {
+            validity[0] === true || validity[0] === -1 ?
+            <p className='hint'>5글자 이상 20글자 이하인 영문과 숫자를 사용하여 입력하세요.</p>
+            : <p className='hint hint-incorrect'>올바른 아이디 형식이 아닙니다.</p>
+            }
+          </label>
           <input
-            type="password" name='user-pwd'
-            onChange={(e)=>setValues({...values, password: e.target.value})}
-            value={values.password}
+            type="text" placeholder='아이디' name='loginId'
+            onInput={
+              (e)=>{
+              setInput(e, 0, ValidityFunc[0]);
+            }
+          
+          }
+            onChange={(e)=>{
+              let copy = values.manager
+              copy.loginId = e.target.value
+              setValues({...values, manager: copy})}}
+            value={values.manager.loginId}
           />
         </div>
-        {error ? <p className='error'>{error}</p> : <p></p>}
-        <button type='submit' className='loginBtn'>로그인</button>
-        <button>회원가입</button>
+        {/* <p className='hint'>이름을 입력하세요.</p> */}
+        <div className="signUp-field">
+          <label htmlFor="password">비밀번호
+          {
+            validity[1] === true || validity[1] === -1 ?
+            <p className='hint'>8글자 이상 20글자 이하인 영문과 숫자, 특수문자를 포함하여 입력하세요.</p>
+            : <p className='hint hint-incorrect'>올바른 비밀번호 형식이 아닙니다.</p>
+          }
+          </label>
+          <input
+            type="password" placeholder='비밀번호' name='user-pwd'
+            onInput={(e)=>{
+              setInput(e, 1, ValidityFunc[1]);
+            }}
+            onChange={(e)=>{
+              let copy = values.manager
+              copy.password = e.target.value
+              setValues({...values, manager: copy})}}
+            value={values.manager.password}
+          />
+        </div>
+        <div className="signUp-field">
+          <label htmlFor="reEnterPassword">
+            {
+              validity[2] === true || validity[2] === -1 ?
+              <></>
+              : <p className='hint hint-incorrect'>비밀번호를 일치하게 입력해주세요.</p>
+            }
+          </label>
+          <input
+            type="password" name='reEnterPassword'
+            onInput={(e)=>{
+              setInput(e, 2, ValidityFunc[2]);
+            }}
+            onChange={(e)=>{
+              let copy = values.manager
+              copy.reEnterPassword = e.target.value
+              setValues({...values, manager: copy})}}
+            value={values.manager.reEnterPassword}
+          />
+        </div>
+        <div className="signUp-field">
+          <label htmlFor="tel">전화번호</label>
+          <input
+            type="tel" name='tel'
+            // pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+            onInput={(e)=>hypenTel(e.target)}
+            onChange={(e)=>{
+              let copy = values.manager
+              copy.tel = e.target.value
+              setValues({...values, manager: copy})}}
+            value={values.manager.tel}
+          />
+        </div>
+        <div className="signUp-field">
+          <label htmlFor="countryId">나라</label>
+          <input
+            type="text" name='countryId'
+            onChange={(e)=>setValues({...values, countryId: e.target.value})}
+            value={values.countryId}
+          />
+        </div>
+        <div className="signUp-field">
+          <label htmlFor="organizationId">기관</label>
+          <input
+            type="text" name='organizationId'
+            onChange={(e)=>setValues({...values, organizationId: e.target.value})}
+            value={values.organizationId}
+          />
+        </div>
+        <div className="signUp-field">
+          <label htmlFor="tel">직책</label>
+          <input
+            type="tel" name='user-id'
+            // onChange={(e)=>setValues({...values, email: e.target.value})}
+            // value={values.email}
+          />
+        </div>
+        {/* {error ? <p className='error'>{error}</p> : <p></p>} */}
+        <button type='submit' className='signUpBtn'>회원가입</button>
       </form>
       
     </div>

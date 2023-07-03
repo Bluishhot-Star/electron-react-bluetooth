@@ -223,7 +223,6 @@
   box-shadow: 0px 0px 5px #aaa;
   background: #fff;
   
-  /* position: relative; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -240,58 +239,172 @@
   font-size: 1.5rem;
 }
 
-form{
+.login-page-container form{
   width: 80%;
   height: 45%;
   display: flex;
   flex-direction: column;
-  /* background: #000; */
   align-items: center;
 }
-.field{
+.login-field{
   width: 100%;
   height: 30%;
   max-width: 350px;
   /* background: #aaa; */
   margin-bottom: 10px;
   display: flex;
-  border-bottom: 1px solid #000;
 }
-.field label{
+.login-field label{
   display: inline-block;
-  margin-right: 10px;
-  width: 80px;
+  width: 100px;
   text-align: left;
   font-weight: bold;
   display: flex;
   align-items: center;
   /* background: #ccc; */
 }
-.field input{
+.login-field input{
   all: unset;
-  height: 100%;
+  height: 90%;
   width: -webkit-fill-available;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  padding: 0 5px;
+  overflow: hidden;
+}
+.login-field input::placeholder{
+  font-size: 0.9rem;
+
 }
 
-form button{
-  all:unset;
-  width: 90%;
-  height: 30%;
-  text-align: center;
-  color: rgb(75, 117, 214);
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-form p{
+.login-page-container form p{
   width: 90%;
   height: 25%;
   margin: 0;
   color: rgb(255, 118, 118);
 }
-form .loginBtn{
+.login-page-container form button{
+  all:unset;
+  width: 90%;
+  height: 30%;
+  margin-bottom: 10px;
+  text-align: center;
+  border: 1px solid rgb(77, 174, 226);
+  border-radius: 100vh;
+  color: rgb(77, 174, 226);
+  font-size: 2.3vh;
+}
+.login-page-container form button:active{
+  opacity: .3;
+}
+
+/* 회원가입 페이지 */
+
+
+.signUp-page-container{
+  width: 60%;
+  height: 95%;
+  min-width: 450px;
+  max-width: 750px;
+  max-height: 800px;
+  border-radius: 5px;
+  box-shadow: 0px 0px 5px #aaa;
+  background: #fff;
+  /* padding: 10px; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+.signUp-title{
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+}
+
+.signUp-page-container form{
+  width: 85%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  /* background: #000; */
+  align-items: center;
+}
+
+
+
+
+.signUp-field{
+  width: 100%;
+  height: 10%;
+  max-width: 500px;
+  /* background: #aaa; */
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.signUp-field label{
+  display: inline-block;
+  margin-right: 10px;
+  width: 80px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  font-size: .9rem;
+  /* background: #ccc; */
+}
+.signUp-field .hint{
+  display: block;
+  position: absolute;
+  bottom: -1rem;
+  left: 80px;
+  margin: 0;
+  font-size: .55rem;
+  color: #aaa;
+}
+.signUp-field input{
+  all: unset;
+  height: 80%;
+  width: -webkit-fill-available;
+  border: 1px solid #eee;
+  padding: 0 10px;
+  border-radius: 10px;
+}
+
+.signUp-field input::placeholder{
+  font-size: 2vh;
+}
+
+.signUp-field input:focus{
+  border: 1px solid rgb(75, 204, 214);
+}
+.signUp-field .incorrect:focus{
+  border: 1px solid red;
+}
+.signUp-field .incorrect{
+  border: 1px solid red;
+}
+.signUp-field .hint-incorrect{
+  color: red;
+}
+
+.signUp-page-container .signUpBtn{
+  all:unset;
+  width: 100%;
+  max-width: 500px;
+  height: 7%;
+  text-align: center;
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+  margin-bottom: 10px;
   border: 1px solid rgb(75, 204, 214);
   border-radius: 20px;
   color: rgb(75, 204, 214);
+}
+
+.signUp-page-container .signUpBtn:active{
+  opacity: .3;
 }
 
 
@@ -327,23 +440,13 @@ form .loginBtn{
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+input::placeholder{
+  color: #bbb;
+}
+input:focus{
+  border: 1px solid rgb(75, 204, 214);
+}
 button:active{
   opacity: 0.3;
-  /* background: #000; */
 }
 
