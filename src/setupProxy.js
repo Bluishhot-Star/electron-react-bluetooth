@@ -7,4 +7,16 @@ module.exports = function(app){
       changeOrigin: true,
     })
   )
+  app.use(
+    createProxyMiddleware('/countries',{
+      target:'https://spirokit-api.net/v1',
+      changeOrigin: true,        
+    })
+  )
+  app.use(
+    createProxyMiddleware('/organizations',{
+      target:'https://spirokit-api.net/v1',
+      changeOrigin: true,        
+    })
+  )
 };

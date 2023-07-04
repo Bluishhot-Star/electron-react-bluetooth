@@ -1,7 +1,7 @@
 /*eslint-disable*/  // Lint제거 (warning 메세지 제거)
 
 import './App.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 
@@ -13,8 +13,8 @@ function App() {
   return (
     <div className="App">
       {/* <ResultPage/> */}
-      <LoginForm/>
-      {/* <SignUpForm/> */}
+      {/* <LoginForm/> */}
+      <SignUpForm/>
     </div>
   );
 }
@@ -205,9 +205,9 @@ const SignUpForm = () =>{
   const [values, setValues] = useState({
     countryId: "",
     organizationId: "",
+    roleId: "",
     manager: {
-      name: "",
-      tel: "",
+      name:"",
       loginId: "",
       password: "",
       reEnterPassword: ""
@@ -218,26 +218,30 @@ const SignUpForm = () =>{
   const [validity, setValidity] = useState([-1, -1, -1]);
   const handleSubmit = async (event)=>{
     event.preventDefault();
+    console.log(country);
+    console.log(selectOValue);
+    console.log(selectRValue);
+    console.log(values);
 
-    axios.post("/auth/sign-in", 
-    {
-      countryId: "",
-      organizationId: "",
-      manager: {
-        name: "",
-        tel: "",
-        loginId: "",
-        password: "",
-        reEnterPassword: ""
-      }
-    },{withCredentials : true})
-    .then((res)=>{
-      console.log(res);
-    })
-    .catch((error)=>{
-      console.log(error);alert("ERROR");
-    })
+    
+    // ***************(TODO)**************
+    // 아이디 중복 기능
+    // 코드 깔끔하게 정리
+    // select option --> 드롭다운 형식으로 새로만들기
+    // post할때 values 그대로 해도 괜찮은지 (가장 마지막에 서버CALLBACK 보면될듯?)
+    // ***********************************
+
+    // axios.post("/auth/sign-up", 
+    // values,{withCredentials : true})
+    // .then((res)=>{
+    //   console.log(res);
+    // })
+    // .catch((error)=>{
+    //   console.log(error);alert("ERROR");
+    // })
+    
   };
+  
   const hypenTel = (target) => {
     target.value = target.value
       .replace(/[^0-9]/g, '')
@@ -273,7 +277,6 @@ const SignUpForm = () =>{
     };
 
     if(!func(e)){
-      console.log(e.target.classList)
       if(e.target.classList.contains("incorrect"))return;
       e.target.classList+="incorrect"
       let copy = [...validity];
@@ -289,6 +292,91 @@ const SignUpForm = () =>{
       setValidity(copy);
     }
   }
+
+  //나라 UUID
+  const [country, setCountry] = useState("");
+  //나라 선택
+  const [selectCValue, setSelectCValue] = useState("");
+  //기관 선택
+  const [selectOValue, setSelectOValue] = useState("");
+  //직책 선택
+  const [selectRValue, setSelectRValue] = useState("");
+  //기관 리스트
+  const [organizations,setOrganizations] = useState([]);
+  //직책 리스트
+  const [roles, setRoles] = useState([]);
+  //나라 UUID 선택
+  const onChangeCSelect = (event) =>{
+    setSelectCValue(event.target.value);
+    setSelectOValue("");
+    setSelectRValue("");
+  }
+  //기관 UUID 선택
+  const onChangeOSelect = (event) =>{
+    setSelectOValue(event.target.value); //기관UUID 저장
+    setSelectRValue("");
+  }
+  //직책 UUID 선택
+  const onChangeRSelect = (event) =>{
+    console.log(event.target.value);
+    setSelectRValue(event.target.value);
+  }
+  //나라 json
+  useEffect(() => {
+    axios.get('/countries')
+    .then((res) => {
+      if(selectCValue === "") return;
+
+      let countriesUUID = res.data.response.filter(function(e){
+        return e.code === selectCValue;
+      })
+      // UUID 정보 저장
+      console.log(countriesUUID[0]);
+      setCountry(countriesUUID[0].id);
+    }).catch((error) => {
+      console.log(error);
+      alert("에러");
+    })
+  },[selectCValue])
+
+  //기관 json
+  useEffect(()=>{
+    if(country === "") return;
+    axios.get(`/countries/${country}/organizations`)
+    .then((res) => {
+      //기관 리스트 저장
+      setOrganizations(res.data.response);
+    }).catch((error) => {
+      console.log(error);
+      alert("에러1");
+    })
+  },[country])
+
+  //직책 json
+  useEffect(()=>{
+    if(selectOValue === "") return;
+    console.log(selectCValue);
+    console.log(selectOValue);
+    axios.get(`/organizations/${selectOValue}/roles`)
+    .then((res)=>{
+      console.log(res)
+      setRoles(res.data.response);
+    }).catch((error) => {
+      console.log(error);
+      alert("에러11");
+  })
+  },[selectOValue])
+
+  useEffect(()=>{
+    if(selectRValue === "")return;
+    console.log("Hello")
+    setValues({
+      ...values,
+      countryId: country,
+      organizationId: selectOValue,
+      roleId: selectRValue,
+    })
+  },[selectRValue])
 
   return(
     <div className="signUp-page-container">
@@ -386,27 +474,51 @@ const SignUpForm = () =>{
         </div>
         <div className="signUp-field">
           <label htmlFor="countryId">나라</label>
-          <input
+          {/* <input
             type="text" name='countryId'
             onChange={(e)=>setValues({...values, countryId: e.target.value})}
             value={values.countryId}
-          />
+          /> */}
+          <select value={selectCValue} onChange={onChangeCSelect}>
+            <option value="">나라</option>
+            {/* <option value="">나라가 없습니다.</option> */}
+            <option value="MN">몽골</option>
+            <option value="KZ">카자흐스탄</option>
+            <option value="KR">한국</option>
+            <option value="VN">베트남</option>
+          </select>
         </div>
         <div className="signUp-field">
           <label htmlFor="organizationId">기관</label>
-          <input
+          {/* <input
             type="text" name='organizationId'
             onChange={(e)=>setValues({...values, organizationId: e.target.value})}
             value={values.organizationId}
-          />
+          /> */}
+          <select value={selectOValue} onChange={onChangeOSelect}>
+            <option value="">기관</option>
+            {organizations.map((item)=>(
+              <option value={item.id} key={item.id}>
+                  {item.name}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="signUp-field">
           <label htmlFor="tel">직책</label>
-          <input
+          {/* <input
             type="tel" name='user-id'
             // onChange={(e)=>setValues({...values, email: e.target.value})}
             // value={values.email}
-          />
+          /> */}
+          <select value={selectRValue} onChange={onChangeRSelect}>
+            <option value="">직책</option>
+            {roles.map((item)=>(
+              <option value={item.id} key={item.name}>
+                  {item.name}
+              </option>
+            ))}
+          </select>
         </div>
         {/* {error ? <p className='error'>{error}</p> : <p></p>} */}
         <button type='submit' className='signUpBtn'>회원가입</button>
@@ -415,3 +527,17 @@ const SignUpForm = () =>{
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+

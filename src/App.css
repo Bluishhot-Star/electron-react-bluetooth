@@ -371,6 +371,21 @@
   padding: 0 10px;
   border-radius: 10px;
 }
+.signUp-field select{
+  /* all: unset; */
+  /* -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none; */
+  height: 80%;
+  width: -webkit-fill-available;
+  border: 1px solid #eee;
+  padding: 0 10px;
+  border-radius: 10px;
+  align-items: center;
+}
+.signUp-field option{
+  background: #fff;
+}
 
 .signUp-field input::placeholder{
   font-size: 2vh;
