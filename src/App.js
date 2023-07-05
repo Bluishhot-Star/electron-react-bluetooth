@@ -167,12 +167,12 @@ const LoginForm = () =>{
     .then((res)=>{
       // 쿠키에 토큰 저장
       accessExpires.setMinutes(accessExpires.getMinutes() + 14);
-      setCookie("accessToken", res.data.response.accessToken,{expires : accessExpires,secure:"true"});
+      setCookie("accessToken", res.data.response.accessToken,{expires : accessExpires, secure:"ture", httpOnly:"true"});
       refreshExpires.setDate(refreshExpires.getDate()+7);
-      setCookie("refreshToken",res.data.response.refreshToken,{expires : refreshExpires,secure:"true"});
+      setCookie("refreshToken",res.data.response.refreshToken,{expires : refreshExpires, secure:"true", httpOnly:"true"});
       setTimeout(()=>{
-          refresh(null);
-      },(1000*60*14));
+          refresh();
+      },(1000*30));
     })
     .catch((error)=>{
       console.log(error);alert("ERROR");

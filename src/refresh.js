@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Cookies } from 'react-cookie';
 
-export const refresh = function(callback){
+export const refresh = function(){
     const cookies = new Cookies();
     const accessExpires = new Date();
     axios.get("/auth/renewal" , {
