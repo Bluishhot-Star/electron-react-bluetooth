@@ -3,18 +3,19 @@
 import './App.css';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import { refresh } from './refresh';
+import { useCookies } from 'react-cookie';
 
 // Variable & State
 const author = "KASSID";
 
 function App() {
-  const { ipcRenderer } = window.require("electron"); 
+  //const { ipcRenderer } = window.require("electron"); 
   return (
     <div className="App">
       {/* <ResultPage/> */}
-      {/* <LoginForm/> */}
-      <SignUpForm/>
+      <LoginForm/>
+      {/*<SignUpForm/>*/}
     </div>
   );
 }
@@ -150,9 +151,11 @@ const LoginForm = () =>{
     loginId: "",
     password: "",
   });
+  const [cookies, setCookie, remoteCookie] = useCookies();
 
   const [error, setError] = useState(undefined);
-
+  const accessExpires = new Date();
+  const refreshExpires = new Date();
   const handleSubmit = async (event)=>{
     event.preventDefault();
 
@@ -162,7 +165,14 @@ const LoginForm = () =>{
       password: values.password,
     },{withCredentials : true})
     .then((res)=>{
-      console.log(res);
+      // 쿠키에 토큰 저장
+      accessExpires.setMinutes(accessExpires.getMinutes() + 14);
+      setCookie("accessToken", res.data.response.accessToken,{expires : accessExpires,secure:"true"});
+      refreshExpires.setDate(refreshExpires.getDate()+7);
+      setCookie("refreshToken",res.data.response.refreshToken,{expires : refreshExpires,secure:"true"});
+      setTimeout(()=>{
+          refresh(null);
+      },(1000*60*14));
     })
     .catch((error)=>{
       console.log(error);alert("ERROR");
