@@ -363,6 +363,19 @@
   font-size: .55rem;
   color: #aaa;
 }
+.signUp-field .idCheck{
+  display: block;
+  position: absolute;
+  bottom: -1rem;
+  right: 0px;
+  margin: 0;
+  font-size: .7rem;
+  color: rgb(75, 117, 214);
+}
+.signUp-field .idCheck:active{
+  opacity: .3;
+}
+
 .signUp-field input{
   all: unset;
   height: 80%;
@@ -386,7 +399,10 @@
 .signUp-field option{
   background: #fff;
 }
-
+.signUp-field .blocked{
+  background: #eee;
+  color: #aaa;
+}
 .signUp-field input::placeholder{
   font-size: 2vh;
 }
@@ -421,15 +437,56 @@
 .signUp-page-container .signUpBtn:active{
   opacity: .3;
 }
+.signUp-page-container .signUpBtn:disabled{
+  background: #ddd;
+  color: #bbb;
+  border: 1px solid #ddd;
+}
 
+/* Alert */
+.alert-container{
+  position: fixed;
+  left: 50%;
+  bottom: 0%;
+  width: 35vw;
+  height: 15vh;
+  border-radius: .7vw;
+  z-index: 1;
+  transform: translate(-50%, -10%);
+  background: #efefef;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
 
+.alert-container .alert-title{
+  color: rgb(75, 204, 214);
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 1vh;
+}
+.alert-container .alert-contents{
+  display: flex;
+  height: -webkit-fill-available;
+  align-items: center;
+}
+.alert-container p{
+  display: inline-block;
+  width: 100%;
+  white-space: pre-line;
+  text-align: center;
+  margin: 0;
+}
+.signUp-page-container .alert-container{
+  transition: .5s;
+}
+.alert-container{
+  opacity: 0;
+}
 
-
-
-
-
-
-
+.signUp-page-container .visible{
+  opacity: 1;
+}
 
 
 

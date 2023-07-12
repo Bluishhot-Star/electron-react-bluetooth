@@ -19,4 +19,10 @@ module.exports = function(app){
       changeOrigin: true,        
     })
   )
+  app.use(
+    createProxyMiddleware('/examinees',{
+      target:'https://spirokit-api.net/v1',
+      changeOrigin: true,        
+    })
+  )
 };

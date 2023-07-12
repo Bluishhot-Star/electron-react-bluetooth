@@ -53,11 +53,11 @@ function createWindow () {
           nodeIntegration: true,
           contextIsolation: false,
           enableRemoteModule: true,
+          // devTools: false,
           webviewTag: true,
           preload: path.join(__dirname, 'preload.js')
         }
       })
-    
       mainWindow.webContents.on("select-bluetooth-device", (event, deviceList, callback) => {
         event.preventDefault();
         selectBluetoothCallback = callback
