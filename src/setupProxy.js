@@ -25,4 +25,10 @@ module.exports = function(app){
       changeOrigin: true,        
     })
   )
+  app.use(
+    createProxyMiddleware('/managers',{
+      target:'https://spirokit-api.net/v1',
+      changeOrigin: true,        
+    })
+  )
 };

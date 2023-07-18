@@ -294,9 +294,31 @@
   color: rgb(77, 174, 226);
   font-size: 2.3vh;
 }
+.login-page-container form .login-signUpBtn{
+  all:unset;
+  width: 90%;
+  height: 30%;
+  margin-bottom: 10px;
+  text-align: center;
+  align-items: center;
+  border: 1px solid rgb(77, 174, 226);
+  border-radius: 100vh;
+  color: rgb(77, 174, 226);
+  font-size: 2.3vh;
+}
 .login-page-container form button:active{
   opacity: .3;
 }
+.login-page-container form .login-signUpBtn:active{
+  opacity: .3;
+}
+.loginLink{
+  all: unset;
+  color: #000;
+  width: 50px;
+  height: 20px;
+}
+
 
 /* 회원가입 페이지 */
 
@@ -314,8 +336,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
-
+.backBtn{
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+}
 
 .signUp-title{
   color: rgb(75, 117, 214);
@@ -396,9 +423,7 @@
   border-radius: 10px;
   align-items: center;
 }
-.signUp-field option{
-  background: #fff;
-}
+
 .signUp-field .blocked{
   background: #eee;
   color: #aaa;
@@ -484,25 +509,684 @@
   opacity: 0;
 }
 
-.signUp-page-container .visible{
+.visible{
   opacity: 1;
+}
+.login-page-container .alert-container{
+  transition: .5s;
+  font-size: 2.4vh;
+}
+
+
+/* 환자 리스트 */
+
+.memberList-page-container{
+  width: 100%;
+  height : 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 40px 1fr;
+  grid-column-gap: 10px;
+}
+.memberList-page-nav{
+  grid-column: 1/-1;
+  width: 100%;
+  height: 40px;
+  align-items: center;
+}
+.memberList-page-nav p{
+  display: block;
+  text-align: center;
+  margin: 1vh 0 0;
+  font-size: 1.1rem;
+}
+.memberList-page-left-container{
+  position: relative;
+}
+.patient-list-container{
+  width: 100%;
+  height: 100%;
+  padding: 5%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+
+}
+.patient-list-container .add-patient-btn-container{
+  position: relative;
+  height: 5vh;
+  margin-bottom: 2vh;
+}
+.patient-list-container .add-patient-btn{
+  position: absolute;
+  right: 0;
+  width: fit-content;
+  font-size: 2.3vh;
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+  text-align: right;
+  cursor: pointer;
+}
+.patient-list-container .add-patient-btn:active{
+  opacity: .3;
+}
+
+.patient-list-container .search-patient-container{
+  height: 6vh;
+  border: 1px solid rgb(75, 117, 214);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+}
+.patient-list-container .search-patient-container .searchIcon{
+  margin-left: 2vh;
+  cursor: pointer;
+}
+.patient-list-container .search-patient-container .searchIcon:active{
+  opacity: .3;
+}
+.patient-list-container .search-patient-container input{
+  all: unset;
+  width: -webkit-fill-available;
+  padding-left: 2vh;
+}
+.patient-list-container .search-patient-container input::placeholder{
+  color: #ccc;
+  font-size: 2.4vh;
+}
+.patient-list{
+  width: 100%;
+  margin-top: 5%;
+  height: 80%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+  display: grid;
+  position: relative;
+  grid-template-columns: 1fr;
+  grid-template-rows: 5vh 1fr;
+  overflow: hidden;
+}
+.patient-list .patient-list-column{
+  border-bottom: .5px solid #333;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+.patient-list-column-name{
+  font-size: 1.7vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+}
+.patient-list .patient-item-container{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin-top: 5vh;
+  overflow: scroll;
+  scrollbar-width: none;
+}
+.patient-list .patient-item-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera*/
+}
+.patient-item{
+  width: 100%;
+  height: 5vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  cursor: pointer;
+}
+.patient-item:hover{
+  background: #eee;
+}
+.patient-item div{
+  width: 100%;
+  display: flex;
+  padding: 0 1vh;
+  align-items: center;
+  justify-content: center;
+  font-size: 2vh;
+  text-overflow: ellipsis;
 }
 
 
 
 
 
+.memberList-page-right-container{
+  position: relative;
+}
+.curtain{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eee;
+  border-radius: 5px;
+  z-index: 100;
+  color: #aaa;
+  font-weight: bold;
+}
+.patient-personal-container{
+  width: 100%;
+  height: 100%;
+  padding: 5%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+}
+.patient-personal-container .measure-btn-container{
+  position: relative;
+  height: 5vh;
+  margin-bottom: 2vh;
+}
+.patient-personal-container .measure-btn{
+  position: absolute;
+  right: 0;
+  width: fit-content;
+  font-size: 2.3vh;
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+  text-align: right;
+  cursor: pointer;
+}
+.patient-personal-container .measure-btn:active{
+  opacity: .3;
+}
+.patient-personal-container .measure-date-container{
+  height: 6vh;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  justify-content: space-between;
+}
+.measure-date-container .measure-selected-date-container{
+  height: 100%;
+}
+.measure-date-container .measure-selected-date-container>div:nth-child(1){
+  font-weight: bold;
+}
+.measure-selected-date{
+  display: flex;
+}
+.measure-selected-date div{
+  font-size: 2vh;
+  margin-right: .5vh;
+}
+.measure-select-date-btn-container{
+  position: absolute;
+  right: 0;
+  width: fit-content;
+  font-size: 2.3vh;
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+  text-align: right;
+  cursor: pointer;
+  display: flex;
+}
+
+.measure-select-date-btn-container .calenderIcon{
+  margin-right: 1vh;
+  cursor: pointer;
+}
+.measure-list{
+  width: 100%;
+  margin-top: 5%;
+  height: 80%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+  display: grid;
+  position: relative;
+  grid-template-columns: 1fr;
+  grid-template-rows: 5vh 1fr;
+  overflow: hidden;
+}
+.measure-list .measure-item-container{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  /* margin-top: 5vh; */
+  overflow: scroll;
+  scrollbar-width: none;
+}
+.measure-list .measure-item-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera*/
+}
+.measure-item-container .measure-item{
+  width: 100%;
+  height: 5vh;
+  display: grid;
+  grid-template-columns: 1fr 3fr 1fr;
+  cursor: pointer;
+}
+.measure-item:hover{
+  background: #eee;
+}
+.measure-item div:first-child{
+  width: 100%;
+  display: flex;
+  padding: 0 1vh;
+  align-items: center;
+  justify-content: center;
+  font-size: 2vh;
+  color: #aaa;
+}
+.measure-item .measure-item-date{
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  font-size: 2vh;
+}
+.measure-item-right-chevron{
+  font-size: 1.7vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.memberList-selected{
+  background: #eee;
+}
+
+/* 기간 선택 Modal */
+.dateSelector-bg{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, .5);
+  z-index: 50;
+}
+.dateSelector-container{
+  position: fixed;
+  left: 50%;
+  bottom: 50%;
+  width: 400px;
+  height: 250px;
+  border-radius: .7vw;
+  z-index: 1;
+  transform: translate(-50%, 50%);
+  background: #fff;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+}
+.dateSelector-logo{
+  position: absolute;
+  top: 0;
+  font-size: 1.2rem;
+  color: rgb(77, 174, 226);
+  font-weight: bold;
+}
+.dateInput-container{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.dateSelect-Btn-container{
+  position: absolute;
+  bottom: 30px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 10px;
+}
+.dateInputItem-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+}
+.dateInputItem-container label{
+  width: 90%;
+}
+.dateInputItem-container input{
+  all: unset;
+  border: 1px solid #ddd;
+  background: #fff;
+  padding: 0 5px;
+  border-radius: 5px;
+  width: 150px;
+  margin-top: 10px;
+  height: 2rem;
+}
+.dateInputItem-container input:focus{
+  border: 1px solid rgb(75, 117, 214);
+}
+.date-resetBtn{
+  all: unset;
+  position: absolute;
+  width: 1rem;
+  right: 5px;
+  top: 5px;
+  cursor: pointer;
+}
+.date-resetBtn:active{
+  opacity: 0.3;
+}
+.dateSelect-Btn{
+  all: unset;
+  border: 1px solid #333;
+  text-align: center;
+  width: 162px;
+  margin-top: 10px;
+  height: 2rem;
+  border-radius: 50px;
+  font-weight: bold;
+  font-size: .8rem;
+  cursor: pointer;
+}
+.dateSelect-Btn:active{
+  opacity: .3;
+}
+.dateSelect-enter, .dateSelect-enter:active, .dateSelect-enter:focus{
+  border: 1px solid rgb(75, 117, 214);
+  color: rgb(75, 117, 214);
+} 
+.dateSelect-cancel:active, .dateSelect-cancel:focus{
+  border: 1px solid #333;
+}
+
+
+/* 환자 추가 */
+
+.add-patient-page-container{
+  width: 100%;
+  height : 100%;
+  display: grid;
+  grid-template-rows: 35px 1fr 4fr;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 10px;
+}
+.add-patient-page-container .inner{
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+}
+
+.add-patient-page-nav{
+  grid-column: 1/-1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.add-patient-page-nav p{
+  display: block;
+  text-align: center;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.add-complete-btn{
+  width: 15vw;
+  height: 100%;
+  border: 1px solid rgb(77, 174, 226);
+  color: rgb(77, 174, 226);
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5vw;
+  opacity: 1;
+  background: #fff;
+  cursor: pointer;
+}
+.add-complete-btn:disabled{
+  opacity: 0.2;
+}
+.add-complete-btn p{
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+
+.add-patient-backBtn{
+  position: absolute;
+  display: flex;
+  top: 0;
+  left: 0;
+  height: 100%;
+  align-items: center;
+  cursor: pointer;
+}
 
 
 
+.add-patient-page-top-container{
+  grid-column: 1/-1;
+}
+.add-patient-page-top-container .inner{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.add-patient-page-top-container .input-container{
+  width: 100%;
+  height: 100%;
+  /* background: #000; */
+  display: flex;
+  align-items: center;
+  padding: 8%;
+  position: relative;
+}
+.admin-chevronDown{
+  position: absolute;
+  right: 10%;
+  top: 50%;
+  transform: translate(0, -50%);
+  font-size: 2vh;
+}
+.add-patient-page-top-container .input-container label{
+  display: block;
+  padding: 0;
+  margin-right: 2vh;
+  font-size: 2.2vh;
+  width: 15vh;
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+}
+.add-patient-page-top-container .input-container input{
+  all: unset;
+  border: 1px solid #ccc;
+  width: -webkit-fill-available;
+  height: 6vh;
+  border-radius: 1.3vh;
+  padding: 0 5px;
+}
+
+
+.add-patient-page-top-container .input-container select{
+  all: unset;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 80%;
+  width: -webkit-fill-available;
+  border: 1px solid #eee;
+  padding: 0 10px;
+  border-radius: 10px;
+  align-items: center;
+  font-size: 2.2vh;
+  cursor: pointer;
+}
+.add-patient-page-top-container .input-container select{
+}
+.add-patient-page-top-container .input-container select:focus{
+  border: 1px solid rgb(75, 117, 214);
+}
+
+
+.add-patient-page-bottom-container .inner{
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(1fr,6);
+  padding: 5%;
+}
+.add-patient-page-bottom-container .info-container{
+  display: flex;
+}
+.add-patient-page-bottom-container .info-container p{
+  margin: 0;
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+}
+
+.add-patient-page-bottom-container .info-input-container{
+  display: grid;
+  grid-template-columns: 16vh 1fr;
+  grid-gap: 3vh;
+  align-items: center;
+  height: 100%;
+  position: relative;
+}
+.add-patient-page-bottom-container .info-input-container label{
+  font-size: 2.2vh;
+  font-weight: bold;
+}
+.add-patient-page-bottom-container .info-input-container input{
+  all: unset;
+  border: 1px solid #ddd;
+  padding: 0 5px;
+  border-radius: 5px;
+  height: 60%;
+}
+.add-patient-page-bottom-container .info-input-container input:focus{
+  border: 1px solid rgb(75, 117, 214);
+}
+.add-patient-page-bottom-container .info-input-container input[type=number]{
+  padding-right: 20%;
+}
+.add-patient-page-bottom-container .info-input-container .radio-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 1vh;
+  height: 100%;
+  align-items: center;
+}
+.radioBtn{
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.radioBtn label{
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+}
+.add-patient-page-bottom-container .info-input-container .radio-container input{
+  all: unset;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 60%;
+  border-radius: 100vh;
+  border: 1px solid #ddd;
+  background: #f5f5f5;
+  cursor: pointer;
+}
+.add-patient-page-bottom-container .info-input-container input:disabled{
+  background: #ddd;
+}
+.add-patient-page-bottom-container .info-input-container input:disabled::placeholder{
+  color: #ddd;
+}
+.add-patient-page-bottom-container .info-input-container .radio-container input:disabled{
+  opacity: .2;
+}
+.add-patient-page-bottom-container .info-input-container .radio-container input:disabled + label{
+  opacity: .2;
+}
+.add-patient-page-bottom-container .info-input-container .radio-container input:active{
+  opacity: .2;
+}
+.add-patient-page-bottom-container .info-input-container .radio-container input:active + label{
+  opacity: .2;
+}
+.add-patient-page-bottom-container .info-input-container .radio-container input:checked{
+  border: 1px solid rgb(75, 117, 214);
+  background: #f9f9f9;
+}
+.add-patient-page-bottom-container .info-input-container .radio-container input:checked+label{
+  color: rgb(75, 117, 214);
+}
+.inputMeasure{
+  position: absolute;
+  width: 12%;
+  height: 60%;
+  right: 0;
+  border-left: 1px solid #ddd ;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(75, 117, 214);
+}
+.add-patient-page-top-container .input-container .unselect{
+  color: #bbb;
+}
 
 
 
+/* measure Setting */
+.measure-setting-page-container{
+  width: 100%;
+  height : 100%;
+  display: grid;
+  grid-template-rows: 35px 1fr;
+  grid-template-columns: 1fr;
+  grid-gap: 10px;
+}
+.measure-setting-page-container .inner{
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+}
 
+.measure-setting-page-nav{
+  grid-column: 1/-1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.measure-setting-page-nav p{
+  display: block;
+  text-align: center;
+  font-size: 1.1rem;
+  margin: 0;
+}
 
+.measure-setting-backBtn{
+  position: absolute;
+  display: flex;
+  top: 0;
+  left: 0;
+  height: 100%;
+  align-items: center;
+  cursor: pointer;
+}
 
-
-
+.measure-setting-page-main-container .inner{
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(1fr,7);
+  padding: 5%;
+}
 
 
 
@@ -517,6 +1201,13 @@ input::placeholder{
 }
 input:focus{
   border: 1px solid rgb(75, 204, 214);
+}
+input[type="number"]{
+  padding-right: 12vh;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
 }
 button:active{
   opacity: 0.3;

@@ -12,7 +12,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 axios.interceptors.response.use(
   (res)=>{
-      return res;
+    return res;
   },
   async (err)=>{
     if(err.response.status===401){
