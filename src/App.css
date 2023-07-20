@@ -1020,8 +1020,6 @@
   font-size: 2.2vh;
   cursor: pointer;
 }
-.add-patient-page-top-container .input-container select{
-}
 .add-patient-page-top-container .input-container select:focus{
   border: 1px solid rgb(75, 117, 214);
 }
@@ -1153,6 +1151,9 @@
   height: 100%;
   border-radius: 5px;
   border: #ccc 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .measure-setting-page-nav{
@@ -1170,7 +1171,6 @@
   font-size: 1.1rem;
   margin: 0;
 }
-
 .measure-setting-backBtn{
   position: absolute;
   display: flex;
@@ -1180,18 +1180,128 @@
   align-items: center;
   cursor: pointer;
 }
-
-.measure-setting-page-main-container .inner{
+.measure-setting-page-main-container form{
+  width: 50%;
+  height: 80%;
   display: grid;
   grid-template-columns: 1fr;
-  grid-template-rows: repeat(1fr,7);
-  padding: 5%;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-gap: 3vh;
+}
+
+.measure-setting-page-main-container .info-input-container{
+  display: grid;
+  grid-template-columns: 20vh 1fr;
+  align-items: center;
+  position: relative;
+}
+.measure-setting-page-main-container .info-input-container select{
+  all: unset;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 100%;
+  width: -webkit-fill-available;
+  border: 1px solid #eee;
+  padding: 0 10px;
+  border-radius: 10px;
+  align-items: center;
+  font-size: 2.2vh;
+  cursor: pointer;
+}
+.measure-setting-page-main-container .info-input-container select:focus{
+  border: 1px solid rgb(75, 117, 214);
+}
+
+.measure-admin-chevronDown{
+  position: absolute;
+  right: 10px;
+}
+.measure-setting-page-main-container .info-input-container label{
+  font-size: 2.2vh;
+  font-weight: bold;
+}
+.measure-setting-page-main-container .info-input-container input{
+  all: unset;
+  border: 1px solid #ddd;
+  padding: 0 5px;
+  border-radius: 5px;
+  height: 100%;
+}
+
+.measure-setting-page-main-container .info-input-container input:disabled{
+  background: #ddd;
+}
+.measure-setting-page-main-container .info-input-container input:disabled::placeholder{
+  color: #ddd;
 }
 
 
-
-
-
+.measure-setting-page-main-container .info-input-container .radio-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 1vh;
+  height: 100%;
+  align-items: center;
+}
+.radioBtn{
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.radioBtn label{
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+}
+.measure-setting-page-main-container .info-input-container .radio-container input{
+  all: unset;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 100vh;
+  border: 1px solid #ddd;
+  background: #f5f5f5;
+  cursor: pointer;
+}
+.measure-setting-page-main-container .info-input-container input:focus{
+  border: 1px solid rgb(75, 117, 214);
+}
+.measure-setting-page-main-container .info-input-container .radio-container input:disabled{
+  opacity: .2;
+}
+.measure-setting-page-main-container .info-input-container .radio-container input:disabled + label{
+  opacity: .2;
+}
+.measure-setting-page-main-container .info-input-container .radio-container input:active{
+  opacity: .2;
+}
+.measure-setting-page-main-container .info-input-container .radio-container input:active + label{
+  opacity: .2;
+}
+.measure-setting-page-main-container .info-input-container .radio-container input:checked{
+  border: 1px solid rgb(75, 117, 214);
+  background: #f9f9f9;
+}
+.measure-setting-page-main-container .info-input-container .radio-container input:checked+label{
+  color: rgb(75, 117, 214);
+}
+.measure-setting-page-main-container .measure-btn{
+  width: 100%;
+  height: 5vh;
+  border: 1px solid rgb(77, 174, 226);
+  color: rgb(77, 174, 226);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5vw;
+  opacity: 1;
+  background: #fff;
+  cursor: pointer;
+}
 
 
 

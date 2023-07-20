@@ -144,103 +144,132 @@ const MeasureSetting = ()=>{
         </div>
         <div className="measure-setting-page-main-container">
           <div className="inner">
-          <div className="info-container">
-            <p>기본 정보</p>
-          </div>
-          <div className="input-container">
-              <label htmlFor="">담당자 선택</label>
-              {/* <FontAwesomeIcon htmlFor="adminSelect" className='admin-chevronDown' icon={faChevronDown} style={{color: "#4b75d6",}} /> */}
-              <select
-              id='adminSelect'
-              ref={mangerIdRef}
-              // onChange={(e)=>{
-              //   let copy = examinee.managerId;
-              //   copy = e.target.value;
-              //   setExaminee({...examinee, managerId: copy});
-              // }}
-              >
-                <option value="">담당자명</option>
-                {managers.map((item)=>(
-                  <option value={item.id} key={item.id}>
-                      {item.name}
-                  </option>
-                ))}
-              </select>
-              <FontAwesomeIcon className='admin-chevronDown' icon={faChevronDown} style={{color: "#4b75d6",}} />
-            </div>
-            <div className="info-input-container">
-              <label htmlFor="">흡연경험</label>
-              <div className="radio-container">
-                <div className='radioBtn' >
-                  <input ref={expTrueRef} 
-                  // onChange={(e)=>{smokeChange(e,"experience")}} 
-                  value="true" type="radio" name="experience" id="expTrue"/>
-                  <label htmlFor="expTrue">있음</label>
-                </div>
-                <div className='radioBtn'>
-                  <input ref={expFalseRef} 
-                  // onChange={(e)=>{smokeChange(e,"experience")}} 
-                  value="false" type="radio" name="experience" id="expFalse" />
-                  <label htmlFor="expFalse">없음</label>
+            <form>
+
+              <div className="info-input-container">
+                <label htmlFor="">담당의</label>
+                {/* <FontAwesomeIcon htmlFor="adminSelect" className='admin-chevronDown' icon={faChevronDown} style={{color: "#4b75d6",}} /> */}
+                <select
+                id='adminSelect'
+                ref={mangerIdRef}
+                // onChange={(e)=>{
+                //   let copy = examinee.managerId;
+                //   copy = e.target.value;
+                //   setExaminee({...examinee, managerId: copy});
+                // }}
+                >
+                  <option value="">담당자명</option>
+                  {managers.map((item)=>(
+                    <option value={item.id} key={item.id}>
+                        {item.name}
+                    </option>
+                  ))}
+                </select>
+                <FontAwesomeIcon className='measure-admin-chevronDown' icon={faChevronDown} style={{color: "#4b75d6",}} />
+              </div>
+              <div className="info-input-container">
+                <label htmlFor="">검사 종류</label>
+                <div className="radio-container">
+                  <div className='radioBtn' >
+                    <input ref={expTrueRef} 
+                    // onChange={(e)=>{smokeChange(e,"experience")}} 
+                    value="true" type="radio" name="experience" id="expTrue"/>
+                    <label htmlFor="expTrue">FVC</label>
+                  </div>
+                  <div className='radioBtn'>
+                    <input ref={expFalseRef} 
+                    // onChange={(e)=>{smokeChange(e,"experience")}} 
+                    value="false" type="radio" name="experience" id="expFalse" />
+                    <label htmlFor="expFalse">SVC</label>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="info-input-container">
-              <label htmlFor="">현재 흡연 여부</label>
-              <div className="radio-container">
-                <div className='radioBtn' >
-                  <input ref={smokingTrueRef} 
-                  // onChange={(e)=>{smokeChange(e,"smoking")}} 
-                  value="true" type="radio" name="smoking" id="smokingTrue"/>
-                  <label htmlFor="smokingTrue">흡연</label>
-                </div>
-                <div className='radioBtn'>
-                  <input ref={smokingFalseRef} 
-                  // onChange={(e)=>{smokeChange(e,"smoking")}} 
-                  value="false" type="radio" name="smoking" id="smokingFalse" />
-                  <label htmlFor="smokingFalse">금연</label>
+              <div className="info-input-container">
+                <label htmlFor="">약물 적용 여부</label>
+                <div className="radio-container">
+                  <div className='radioBtn' >
+                    <input ref={smokingTrueRef} 
+                    // onChange={(e)=>{smokeChange(e,"smoking")}} 
+                    value="true" type="radio" name="smoking" id="smokingTrue"/>
+                    <label htmlFor="smokingTrue">예</label>
+                  </div>
+                  <div className='radioBtn'>
+                    <input ref={smokingFalseRef} 
+                    // onChange={(e)=>{smokeChange(e,"smoking")}} 
+                    value="false" type="radio" name="smoking" id="smokingFalse" />
+                    <label htmlFor="smokingFalse">아니오</label>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="info-input-container">
-              <label htmlFor="">흡연 시작나이</label>
-              <input ref={startAgeRef} type="text"
-              // value={examinee.smoke.startAge} 
-              placeholder='0'
-              onInput={(e)=>{numberInput(e.target)}}
-              // onChange={(e)=>{
-              //   let copy = examinee.smoke;
-              //   copy.startAge = e.target.value;
-              //   setExaminee({...examinee, smoke: copy})
-              // }}
-              />  
-            </div>
-            <div className="info-input-container">
-              <label htmlFor="">하루 흡연량(갑)</label>
-              <input ref={amountRef} type="text" 
-              // value={examinee.smoke.amountDay} 
-              placeholder='0'
-              onInput={(e)=>{numberInput(e.target)}}
-              // onChange={(e)=>{
-              //   let copy = examinee.smoke;
-              //   copy.amountDay = e.target.value;
-              //   setExaminee({...examinee, smoke: copy})
-              // }}
-              />  
-            </div>
-            <div className="info-input-container">
-              <label htmlFor="">금연한 나이</label>
-              <input disabled ref={stopAgeRef} type="text" 
-              // value={examinee.smoke.stopAge} 
-              placeholder='0'
-              onInput={(e)=>{numberInput(e.target)}}
-              // onChange={(e)=>{
-              //   let copy = examinee.smoke;
-              //   copy.stopAge = e.target.value;
-              //   setExaminee({...examinee, smoke: copy})
-              // }}
-              />  
-            </div>
+              <div className="info-input-container">
+                <label htmlFor="">적용 약물 종류</label>
+                <select
+                id='adminSelect'
+                ref={mangerIdRef}
+                // onChange={(e)=>{
+                //   let copy = examinee.managerId;
+                //   copy = e.target.value;
+                //   setExaminee({...examinee, managerId: copy});
+                // }}
+                >
+                  <option value="">약물 종류</option>
+                  {managers.map((item)=>(
+                    <option value={item.id} key={item.id}>
+                        {item.name}
+                    </option>
+                  ))}
+                </select>
+                <FontAwesomeIcon className='measure-admin-chevronDown' icon={faChevronDown} style={{color: "#4b75d6",}} />
+              </div>
+              <div className="info-input-container">
+                <label htmlFor="">약물 투여 기구</label>
+                <select
+                id='adminSelect'
+                ref={mangerIdRef}
+                // onChange={(e)=>{
+                //   let copy = examinee.managerId;
+                //   copy = e.target.value;
+                //   setExaminee({...examinee, managerId: copy});
+                // }}
+                >
+                  <option value="">투여 기구</option>
+                  {managers.map((item)=>(
+                    <option value={item.id} key={item.id}>
+                        {item.name}
+                    </option>
+                  ))}
+                </select>
+                <FontAwesomeIcon className='measure-admin-chevronDown' icon={faChevronDown} style={{color: "#4b75d6",}} />
+              </div>
+              
+              <div className="info-input-container">
+                <label htmlFor="">적용 약물 양</label>
+                <input ref={stopAgeRef} type="text" 
+                // value={examinee.smoke.stopAge} 
+                placeholder='0'
+                onInput={(e)=>{numberInput(e.target)}}
+                // onChange={(e)=>{
+                //   let copy = examinee.smoke;
+                //   copy.stopAge = e.target.value;
+                //   setExaminee({...examinee, smoke: copy})
+                // }}
+                />
+              </div>
+              <div className="info-input-container">
+                <label htmlFor="">약물 적용 횟수</label>
+                <input ref={stopAgeRef} type="text" 
+                // value={examinee.smoke.stopAge} 
+                placeholder='0'
+                onInput={(e)=>{numberInput(e.target)}}
+                // onChange={(e)=>{
+                //   let copy = examinee.smoke;
+                //   copy.stopAge = e.target.value;
+                //   setExaminee({...examinee, smoke: copy})
+                // }}
+                />
+              </div>
+              <button ref={addBtnRef} className="measure-btn"><p>추가 완료</p></button>
+            </form>
           </div>
         </div>
       </div>
