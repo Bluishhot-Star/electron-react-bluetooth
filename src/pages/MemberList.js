@@ -12,7 +12,7 @@ const MemberList = ()=>{
   const [examinees, setExaminees] = useState([]);
   const [date, setDate] = useState([]);
   const [examinee, setExaminee] = useState("");
-
+  const [birth, setBirth] = useState("");
   const cookies = new Cookies();
   let navigator = useNavigate();
 
@@ -38,18 +38,36 @@ const MemberList = ()=>{
     let temp = document.getElementById(clicked);
     temp.classList.remove("memberList-selected")
   }
-  const click = (index,exId) =>{
+  const click = (index,exId, birth) =>{
     setCurtainStat(false)
     if(clicked !== ""){removeCSS();}
     setClicked("memberItem"+index);
+    setBirth(birth);
+    console.log(birth);
+
     axios.get(`/examinees/${exId}/measurements/date?from=&to=` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
     }).then((res)=>{
-      console.log(res);
       setDate(res.data.response);
       setExaminee(exId);
+    }).catch((err)=>{
+      console.log(err);
+    })
+  }
+
+  const report = (date)=>{
+    axios.get(`/examinees/${examinee}/measurements/report?type=FVC&date=${date}` , {
+      headers: {
+        Authorization: `Bearer ${cookies.get('accessToken')}`
+      }
+    }).then((res)=>{
+      console.log(res.data.response);
+      let data = res.data.response;
+      data["birth"] = birth;
+      data["id"] = examinee;
+      navigator('/memberList/resultPage', {state: data})
     }).catch((err)=>{
       console.log(err);
     })
@@ -65,7 +83,6 @@ const MemberList = ()=>{
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }})
       .then((res)=>{
-        console.log("HEEL")
         setExaminees(res.data.response);
       }).catch((err)=>{
         console.log(err);
@@ -135,7 +152,7 @@ const [dateSelectorStat, setDateSelectorStat] = useState(false);
                 {
                   examinees.map((item, index)=>{
                     return(
-                    <div id={"memberItem"+index} className="patient-item" key={item.chartNumber} onClick={(e)=>click(index,item.id)}>
+                    <div id={"memberItem"+index} className="patient-item" key={item.chartNumber} onClick={(e)=>{click(index,item.id,item.birthday);}}>
                       <div className="patient-item-chartNumber">{item.chartNumber}</div>
                       <div className="patient-item-name">{item.name}</div>
                       <div className="patient-item-gender">{item.gender}</div>
@@ -174,9 +191,9 @@ const [dateSelectorStat, setDateSelectorStat] = useState(false);
             </div>
             <div className="measure-list">
               <div className="measure-item-container">
-                {date.map((item, key)=>(
+                {date.map((item, index)=>(
                   // <Link key={item} to={`/ss/${examinee}/${item}`}>
-                  <div key={item} className="measure-item">
+                  <div key={item} className="measure-item" onClick={()=>{report(item);}}>
                     <div>검사일시</div>
                     <div className='measure-item-date'>{item}</div>
                     <div className="measure-item-right-chevron">

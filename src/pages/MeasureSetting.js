@@ -8,7 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 const MeasureSetting = ()=>{
   const submitMSetting = ()=>{
-    console.log("Hello")
+    
   }
   const cookies = new Cookies();
 
@@ -30,43 +30,67 @@ const MeasureSetting = ()=>{
       console.log(err);
     })
   },[])
+  const [medications, setMedications] = useState([]);
+  useEffect(()=>{
+    axios.get('/medications',{
+      headers: {
+        Authorization: `Bearer ${cookies.get('accessToken')}`
+    }}).then((res)=>{
+      console.log(res.data.response);
+      setMedications(res.data.response);
+    }).catch((err)=>{
+      console.log(err);
+    })
+  },[])
+  const [mediTools, setMediTools] = useState([]);
+  useEffect(()=>{
+    axios.get('/medication-tools',{
+      headers: {
+        Authorization: `Bearer ${cookies.get('accessToken')}`
+    }}).then((res)=>{
+      console.log(res.data.response);
+      setMediTools(res.data.response);
+    }).catch((err)=>{
+      console.log(err);
+    })
+  },[])
   
   // 각종 useRef
   const mangerIdRef = useRef();
-  const birthdayRef = useRef();
-  const expTrueRef = useRef();
-  const expFalseRef = useRef();
-  const smokingTrueRef = useRef();
-  const smokingFalseRef = useRef();
-  const startAgeRef = useRef();
-  const amountRef = useRef();
-  const stopAgeRef = useRef();
+  const FVCTypeRef = useRef();
+  const SVCTypeRef = useRef();
+  const mediTrueRef = useRef();
+  const mediFalseRef = useRef();
+  const mediTypeRef = useRef();
+  const mediToolsRef = useRef();
+  const mediAmountRef = useRef();
+  const mediCountRef = useRef();
 
-  // smoke 상황별 버튼 활성화
+  // medication 상황별 버튼 활성화
   // useEffect(()=>{
   //   if(examinee.smoke.experience === "false"){
-  //     smokingTrueRef.current.checked = false;
-  //     smokingFalseRef.current.checked = false;
-  //     smokingTrueRef.current.disabled = true;
-  //     smokingFalseRef.current.disabled = true;
+  //     mediTrueRef.current.checked = false;
+  //     mediFalseRef.current.checked = false;
+  //     mediTrueRef.current.disabled = true;
+  //     mediFalseRef.current.disabled = true;
   //     startAgeRef.current.disabled = true;
   //     amountRef.current.disabled = true;
   //     let copy = examinee.smoke;
-  //     copy.smoking = "";
+  //     copy.medi = "";
   //     copy.startAge = "";
   //     copy.stopAge = "";
   //     copy.amountDay = "";
   //     setExaminee({...examinee, smoke: copy});
   //   }
   //   else{
-  //     smokingTrueRef.current.disabled = false;
-  //     smokingFalseRef.current.disabled = false;
+  //     mediTrueRef.current.disabled = false;
+  //     mediFalseRef.current.disabled = false;
   //     startAgeRef.current.disabled = false;
   //     amountRef.current.disabled = false;
   //   }
   // },[examinee.smoke.experience])
   // useEffect(()=>{
-  //   if(examinee.smoke.smoking === "false"){
+  //   if(examinee.smoke.medi === "false"){
   //     stopAgeRef.current.disabled = false;
   //   }
   //   else{
@@ -75,7 +99,7 @@ const MeasureSetting = ()=>{
   //     copy.stopAge = "";
   //     setExaminee({...examinee, smoke: copy});
   //   }
-  // },[examinee.smoke.smoking])
+  // },[examinee.smoke.medi])
 
   // 담당자 명 기본값 css
   // useEffect(()=>{
@@ -104,12 +128,12 @@ const MeasureSetting = ()=>{
   //     return;
   //   }
   //   if(examinee.smoke.experience === "true"){
-  //     if(!(examinee.smoke.smoking !== ""&&examinee.smoke.amountDay !== ""&&examinee.smoke.startAge !== "")){
+  //     if(!(examinee.smoke.medi !== ""&&examinee.smoke.amountDay !== ""&&examinee.smoke.startAge !== "")){
   //       console.log("ch2");
   //       setAddBtnStatus(false);
   //       return;
   //     }
-  //     if(examinee.smoke.smoking === "false"){
+  //     if(examinee.smoke.medi === "false"){
   //       if(!(examinee.smoke.stopAge !== "")){
   //         console.log("ch3");
   //         setAddBtnStatus(false);
@@ -171,13 +195,13 @@ const MeasureSetting = ()=>{
                 <label htmlFor="">검사 종류</label>
                 <div className="radio-container">
                   <div className='radioBtn' >
-                    <input ref={expTrueRef} 
+                    <input ref={FVCTypeRef} 
                     // onChange={(e)=>{smokeChange(e,"experience")}} 
                     value="true" type="radio" name="experience" id="expTrue"/>
                     <label htmlFor="expTrue">FVC</label>
                   </div>
                   <div className='radioBtn'>
-                    <input ref={expFalseRef} 
+                    <input ref={SVCTypeRef} 
                     // onChange={(e)=>{smokeChange(e,"experience")}} 
                     value="false" type="radio" name="experience" id="expFalse" />
                     <label htmlFor="expFalse">SVC</label>
@@ -188,16 +212,16 @@ const MeasureSetting = ()=>{
                 <label htmlFor="">약물 적용 여부</label>
                 <div className="radio-container">
                   <div className='radioBtn' >
-                    <input ref={smokingTrueRef} 
-                    // onChange={(e)=>{smokeChange(e,"smoking")}} 
-                    value="true" type="radio" name="smoking" id="smokingTrue"/>
-                    <label htmlFor="smokingTrue">예</label>
+                    <input ref={mediTrueRef} 
+                    // onChange={(e)=>{smokeChange(e,"medi")}} 
+                    value="true" type="radio" name="medi" id="mediTrue"/>
+                    <label htmlFor="mediTrue">예</label>
                   </div>
                   <div className='radioBtn'>
-                    <input ref={smokingFalseRef} 
-                    // onChange={(e)=>{smokeChange(e,"smoking")}} 
-                    value="false" type="radio" name="smoking" id="smokingFalse" />
-                    <label htmlFor="smokingFalse">아니오</label>
+                    <input ref={mediFalseRef} 
+                    // onChange={(e)=>{smokeChange(e,"medi")}} 
+                    value="false" type="radio" name="medi" id="mediFalse" />
+                    <label htmlFor="mediFalse">아니오</label>
                   </div>
                 </div>
               </div>
@@ -205,7 +229,7 @@ const MeasureSetting = ()=>{
                 <label htmlFor="">적용 약물 종류</label>
                 <select
                 id='adminSelect'
-                ref={mangerIdRef}
+                ref={mediTypeRef}
                 // onChange={(e)=>{
                 //   let copy = examinee.managerId;
                 //   copy = e.target.value;
@@ -213,7 +237,7 @@ const MeasureSetting = ()=>{
                 // }}
                 >
                   <option value="">약물 종류</option>
-                  {managers.map((item)=>(
+                  {medications.map((item)=>(
                     <option value={item.id} key={item.id}>
                         {item.name}
                     </option>
@@ -225,7 +249,7 @@ const MeasureSetting = ()=>{
                 <label htmlFor="">약물 투여 기구</label>
                 <select
                 id='adminSelect'
-                ref={mangerIdRef}
+                ref={mediToolsRef}
                 // onChange={(e)=>{
                 //   let copy = examinee.managerId;
                 //   copy = e.target.value;
@@ -233,7 +257,7 @@ const MeasureSetting = ()=>{
                 // }}
                 >
                   <option value="">투여 기구</option>
-                  {managers.map((item)=>(
+                  {mediTools.map((item)=>(
                     <option value={item.id} key={item.id}>
                         {item.name}
                     </option>
@@ -244,7 +268,7 @@ const MeasureSetting = ()=>{
               
               <div className="info-input-container">
                 <label htmlFor="">적용 약물 양</label>
-                <input ref={stopAgeRef} type="text" 
+                <input ref={mediAmountRef} type="text" 
                 // value={examinee.smoke.stopAge} 
                 placeholder='0'
                 onInput={(e)=>{numberInput(e.target)}}
@@ -257,7 +281,7 @@ const MeasureSetting = ()=>{
               </div>
               <div className="info-input-container">
                 <label htmlFor="">약물 적용 횟수</label>
-                <input ref={stopAgeRef} type="text" 
+                <input ref={mediCountRef} type="text" 
                 // value={examinee.smoke.stopAge} 
                 placeholder='0'
                 onInput={(e)=>{numberInput(e.target)}}
