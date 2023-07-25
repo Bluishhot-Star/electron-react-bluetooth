@@ -5,7 +5,7 @@ import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faSearch, faCalendar, faChevronRight } from '@fortawesome/free-solid-svg-icons'
-
+import { debounce } from 'lodash'
 import {
   registerables,
   Chart as ChartJS,
@@ -43,7 +43,7 @@ function ResultPage(){
     console.log(state.info[0].content);
   }
   
-  const update = ()=>{
+  const updateData = ()=>{
     let patientDate = location.state;
     patientDate['update'] = true;
     navigator('/memberList/addPatient', {state: patientDate})
@@ -77,8 +77,9 @@ function ResultPage(){
       }).catch((err)=>{
         console.log(err);
       })
-
-    //time-volume
+  },[])
+  useEffect(()=>{
+    ///time-volume
     axios.get(`/examinees/${location.state.id}/measurements/graph?graph-type=time-volume&date=${location.state.date}&type=FVC`,{
       headers: {
         Authorization:`Bearer ${cookies.get('accessToken')}`
@@ -89,7 +90,8 @@ function ResultPage(){
       .catch((err)=>{
         console.log(err);
       })
-    
+  },[])
+  useEffect(()=>{       
     //SVC time-volume
     axios.get(`/examinees/${location.state.id}/measurements/graph?graph-type=time-volume&date=${location.state.date}&type=SVC`,{
       headers: {
@@ -102,6 +104,7 @@ function ResultPage(){
       console.log(err);
     })
   },[])
+
 
   const selectGraph=(mId)=>{
   // volumeFlow.filter((volume)=>volume.measurementId === mId).map((item)=>(
@@ -121,7 +124,7 @@ function ResultPage(){
     datasets: [{
       label: "WEEEK",
       data: [
-        {x: 0.030999999999999996, y: 0.23858681948280724},
+        {x: 0.030999999999999996, y: 0.23858681948280723},
         {x: 0.030999999999999996, y: 0.23858681948280724},
         {x: 0.030999999999999996, y: 0.23858681948280724}],
       borderColor: 'rgb(255,255,255)',
@@ -129,14 +132,25 @@ function ResultPage(){
       tension: 0.4
     },]
   })
+  window.addEventListener('beforeprint', () => {
+    chartRef.current.resize(600, 600);
+  });
+  window.addEventListener('afterprint', () => {
+    chartRef.current.resize();
+  });
   const graphOption={
     plugins:{
       legend: {
           display: false
       },
+      resizeDelay:0,
     },
-    responsive: false,
-    interaction: false,
+    responsive: true,
+    animation:{
+      // duration:0
+    },
+    maintainAspectRatio: false,
+    interaction: false, 
     elements: {
       point: {
         radius: 0,
@@ -146,21 +160,21 @@ function ResultPage(){
       x: {
         axios: 'x',
         ticks:{
-          max: 0.0,
-          min: 12.0,
+          // max: 0.0,
+          // min: 12.0,
           stepSize : 1
         }
       },
       y: {
         axios: 'y',
-        max: 16.8,
-        min: -9.6,
+        // max: 16,
+        // min: -9,
         ticks: {
           beginAtZero: true,
-          stepSize : 2.1,
+          stepSize : 1,
           fontSize : 10,
           textStrokeColor: 10,
-          precision: 2,
+          precision: 1,
         },
       },
     },
@@ -168,43 +182,123 @@ function ResultPage(){
 
     }
   }
-  useEffect(()=>{
-    let time = setTimeout(()=>{
-      console.log("!#!##")
-      let temp  = [];
-      volumeFlow.forEach(item => {
-        temp.push(item.graph);
-      })
-      console.log(temp);
-      let dataset = []
 
-      temp.forEach((item,index)=>{
-        dataset.push(
-          {
-            label: "WEEEK",
-            data: item,
-            borderColor: `rgb(${0*(index+5)},${30*(index+1)},${70*(index+3)})`,
-            borderWidth: 2,
-            showLine: true,
-            tension: 0.4
-          }
-        )
-      })
-      let data = {
-        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-        datasets: dataset,
-        
-      }
-      setGraphData(data);
+  const [first, setFirst] = useState({x:window.innerWidth, y: window.innerHeight})
+  const [second, setSecond] = useState({x:window.innerWidth, y: window.innerHeight})
+  const [temp, setTemp] = useState(false);
+
+  const handleResize = debounce(()=>{
+    console.log(second);
+    setTemp(false);
+    setSecond({
+      x: window.innerWidth,
+      y: window.innerHeight,
     })
+  })
+
+  useEffect(()=>{
+    let time = setTimeout(() => {
+      setTemp(true);
+    },1000);
+  },[graphData])
+
+  useEffect(()=>{
+    setFirst(second)
+  },[second])
+
+  useEffect(()=>{
+    let time = setTimeout(() => {
+      if (first["x"]===second["x"] && first["y"]==second["y"]){
+        console.log("OOOOOOHHH")
+        setTemp(true);
+        if(chartRef.current){
+          console.log("HELLO")
+          chartRef.current.resize();
+        };
+      }
+      else{
+        setTemp(false)
+        console.log("HEllt")
+      };
+    }, 300);
+    return()=>{clearTimeout(time)}
+  })
+  
+  useEffect(()=>{
+    setFirst({
+      x: window.innerWidth,
+      y: window.innerHeight,
+    })
+  },[])
+
+
+  useEffect(()=>{
+    window.addEventListener("resize", handleResize)
+    return()=>{
+      window.removeEventListener("resize", handleResize)
+    }
+  },[])
+  
+  const graphColor = []
+
+  let grapTemp = [];
+
+  useEffect(()=>
+  {
+    console.log("!#!##")
+
+    let time = setTimeout(()=>{
+      console.log("!#!##!@!@")
+
+      volumeFlow.forEach(item => {
+        grapTemp.push(item.graph);
+      })
+      
+      let time2 = setTimeout(() => {
+        let dataset = []
+        grapTemp.forEach((item,index)=>{
+          dataset.push(
+            {
+              label: "WEEEK",
+              data: item,
+              borderColor: `rgb(${0*(index+5)},${30*(index+1)},${70*(index+3)})`,
+              borderWidth: 2.5,
+              showLine: true,
+              tension: 0.4
+            }
+          )
+        })
+        let time3 = setTimeout(() => {
+          let data = {
+            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            datasets: dataset,
+          }
+          let time4 = setTimeout(() => {
+            setGraphData(data);
+          }, 50);
+          return()=>{
+            clearTimeout(time4);
+          }
+        }, 50);
+        return()=>{
+          clearTimeout(time3);
+        }
+      }, 50);
+      return()=>{
+        clearTimeout(time2);
+      }
+    },50)
+
     return()=>{
       clearTimeout(time);
     }
-  },[])
-
-  const graphStyle = {width:"100%" ,height:"80%"}
+  },[volumeFlow])
 
 
+
+  const graphStyle = {width:"0px" ,height:"0px", transition:"none"}
+
+  const chartRef = useRef();
 
 
 
@@ -249,7 +343,7 @@ function ResultPage(){
               <div className="content">{state.smoke.period === 0 ? "-" : state.smoke.period}</div>
               {/* <div className="space"></div> */}
             </div>
-            <button onClick={update}>환자정보 수정</button>
+            <button onClick={updateData}>환자정보 수정</button>
             {/* <div className="button-container"></div> */}
           </div>
         </div>
@@ -263,10 +357,10 @@ function ResultPage(){
           </div>
           <div className="graph-container">
             <div className="graph">
-              {graphData?<Scatter style={graphStyle} data={graphData} options={graphOption}/>:<p>Hello</p>}
+              {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingG'>화면 조정 중..</p>}
             </div>
             <div className="graph">
-            {graphData?<Scatter style={graphStyle} data={graphData} options={graphOption}/>:<p>Hello</p>}
+            {temp?<Scatter style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingG'>화면 조정 중..</p>}
             </div>
           </div>
           <div className="history-container">

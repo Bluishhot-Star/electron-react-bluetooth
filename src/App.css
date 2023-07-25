@@ -177,22 +177,27 @@
   /* height: 50%; */
   /* background: yellowgreen; */
   display: grid;
-  grid-gap: 10px;
-  grid-template-columns: 1fr 1fr;
+  /* grid-gap: 1px; */
+  width: 100%;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: 100%;
+  align-items: center;
   margin-bottom: 10px;
 }
 .graph-container .graph{
   /* background: #000; */
-  width: 100%;
+  width: 99.2%;
+  height: 99.9%;
   border-radius: 7px;
   border: #ccc 1px solid;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0 20px;
+  transition: none;
 }
 .graph-container .graph canvas{
-  width: 100px;
+  transition: none;
 }
 
 .history-container{

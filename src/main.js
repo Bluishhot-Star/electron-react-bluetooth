@@ -92,7 +92,7 @@ function createWindow () {
     
       
       mainWindow.loadURL("http://localhost:3000") 
-  // mainWindow.loadFile('index.html')
+      
       resolve(mainWindow);
     }
     catch(error){
