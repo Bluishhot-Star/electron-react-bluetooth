@@ -58,15 +58,14 @@ const MemberList = ()=>{
   }
 
   const report = (date)=>{
-    axios.get(`/examinees/${examinee}/measurements/report?type=FVC&date=${date}` , {
+    axios.get(`/examinees/${examinee}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
     }).then((res)=>{
       console.log(res.data.response);
       let data = res.data.response;
-      data["birth"] = birth;
-      data["id"] = examinee;
+      data["date"] = date;
       navigator('/memberList/resultPage', {state: data})
     }).catch((err)=>{
       console.log(err);
@@ -153,10 +152,10 @@ const [dateSelectorStat, setDateSelectorStat] = useState(false);
                   examinees.map((item, index)=>{
                     return(
                     <div id={"memberItem"+index} className="patient-item" key={item.chartNumber} onClick={(e)=>{click(index,item.id,item.birthday);}}>
-                      <div className="patient-item-chartNumber">{item.chartNumber}</div>
-                      <div className="patient-item-name">{item.name}</div>
-                      <div className="patient-item-gender">{item.gender}</div>
-                      <div className="patient-item-birthday">{item.birthday}</div>
+                      <div className="patient-item-chartNumber"><p>{item.chartNumber}</p></div>
+                      <div className="patient-item-name"><p>{item.name}</p></div>
+                      <div className="patient-item-gender"><p>{item.gender == "MALE" ? "남자" : "여자"}</p></div>
+                      <div className="patient-item-birthday"><p>{item.birthday}</p></div>
                     </div>
                     )
                   })
@@ -182,11 +181,11 @@ const [dateSelectorStat, setDateSelectorStat] = useState(false);
                   <div className="measure-selected-date-end">{inspectionDate.end ? inspectionDate.end : "0000-00-00"}</div>
                 </div>
               </div>
-              <div className="measure-select-date-btn-container">
-              <FontAwesomeIcon className='calenderIcon' icon={faCalendar} style={{color: "#4b75d6",}} />
-                <div onClick={()=>{
+              <div className="measure-select-date-btn-container" onClick={()=>{
                   setDateSelectorStat(!dateSelectorStat)
-                }} className="measure-select-date-btn">기간선택</div>
+                }}>
+              <FontAwesomeIcon className='calenderIcon' icon={faCalendar} style={{color: "#4b75d6",}} />
+                <div className="measure-select-date-btn">기간선택</div>
               </div>
             </div>
             <div className="measure-list">

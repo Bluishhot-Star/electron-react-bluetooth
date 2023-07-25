@@ -2,7 +2,7 @@ import { useState, useRef, useEffect} from 'react';
 import axios from 'axios';
 import {Cookies, useCookies } from 'react-cookie';
 
-import { Routes, Route, Link, useNavigate } from 'react-router-dom'
+import { Routes, Route, Link, useNavigate,useLocation } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronDown } from '@fortawesome/free-solid-svg-icons'
@@ -27,18 +27,29 @@ const AddPatient = ()=>{
   });
   const submitAddP = ()=>{
     console.log("GH")
-
+    //PATCH 부분
+    // if(location.state.update){
+    //   axios.patch('/examinees',examinee,{withCredentials : true})
+    //   .then((res)=>{
+    //     console.log(res);
+    //   })
+    //   .catch((error)=>{
+    //     console.log(error);alert("ERROR");
+    //   })
+    // }
     //POST 부분
-
-    // axios.post('/examinees',examinee,{withCredentials : true})
-    // .then((res)=>{
-    //   console.log(res);
-    // })
-    // .catch((error)=>{
-    //   console.log(error);alert("ERROR");
-    // })
+    // else{
+    //   axios.post('/examinees',examinee,{withCredentials : true})
+    //   .then((res)=>{
+    //     console.log(res);
+    //   })
+    //   .catch((error)=>{
+    //     console.log(error);alert("ERROR");
+    //   })
+    // }
     navigator(-1);
   }
+  const location = useLocation();
   const cookies = new Cookies();
 
   // 숫자Input 강제성
@@ -89,39 +100,59 @@ const AddPatient = ()=>{
   const startAgeRef = useRef();
   const amountRef = useRef();
   const stopAgeRef = useRef();
+  const maleRef = useRef();
+  const femaleRef = useRef();
 
   // smoke 상황별 버튼 활성화
   useEffect(()=>{
-    if(examinee.smoke.experience === "false"){
-      smokingTrueRef.current.checked = false;
-      smokingFalseRef.current.checked = false;
-      smokingTrueRef.current.disabled = true;
-      smokingFalseRef.current.disabled = true;
-      startAgeRef.current.disabled = true;
-      amountRef.current.disabled = true;
-      let copy = examinee.smoke;
-      copy.smoking = "";
-      copy.startAge = "";
-      copy.stopAge = "";
-      copy.amountDay = "";
-      setExaminee({...examinee, smoke: copy});
-    }
-    else{
-      smokingTrueRef.current.disabled = false;
-      smokingFalseRef.current.disabled = false;
-      startAgeRef.current.disabled = false;
-      amountRef.current.disabled = false;
-    }
+    let time = setTimeout(()=>{
+      if(examinee.smoke.experience === false || examinee.smoke.experience === "false"){
+        console.log("HERERER");
+        console.log(examinee);
+        smokingTrueRef.current.checked = false;
+        smokingFalseRef.current.checked = false;
+        smokingTrueRef.current.disabled = true;
+        smokingFalseRef.current.disabled = true;
+        startAgeRef.current.disabled = true;
+        amountRef.current.disabled = true;
+        stopAgeRef.current.disabled = true;
+        let copy = examinee.smoke;
+        copy.smoking = "";
+        copy.startAge = "";
+        copy.stopAge = "";
+        copy.amountDay = "";
+        setExaminee({...examinee, smoke: copy});
+      }
+      else{
+        console.log("HERE1");
+        console.log(examinee);
+        smokingTrueRef.current.disabled = false;
+        smokingFalseRef.current.disabled = false;
+        startAgeRef.current.disabled = false;
+        amountRef.current.disabled = false;
+      }
+    },100)
+    return()=>{clearTimeout(time)}
   },[examinee.smoke.experience])
+
   useEffect(()=>{
-    if(examinee.smoke.smoking === "false"){
-      stopAgeRef.current.disabled = false;
-    }
-    else{
-      stopAgeRef.current.disabled = true;
-      let copy = examinee.smoke;
-      copy.stopAge = "";
-      setExaminee({...examinee, smoke: copy});
+    let time = setTimeout(()=>{
+      if(examinee.smoke.experience === false || examinee.smoke.experience === "false")return;
+      if(examinee.smoke.smoking === false || examinee.smoke.smoking === "false"){
+        console.log("HERE11")
+        stopAgeRef.current.disabled = false;
+      }
+      else{
+        console.log("HERE2")
+        stopAgeRef.current.disabled = true;
+        let copy = examinee.smoke;
+        copy.stopAge = "";
+        setExaminee({...examinee, smoke: copy});
+      }
+    },200)
+
+    return()=>{
+      clearTimeout(time);
     }
   },[examinee.smoke.smoking])
 
@@ -189,6 +220,61 @@ const AddPatient = ()=>{
   // useNavigate
   const navigator = useNavigate();
 
+  //환자 정보 수정하기
+  const [addUpdate,setAddUpdate] = useState(false);
+
+  useEffect(()=>{
+    if(location.state){
+      axios.get(`/examinees/${location.state.id}`,{
+        headers: {
+          Authorization: `Bearer ${cookies.get('accessToken')}`
+      }}).then((res)=>{
+        const exData = res.data.response;
+        setAddUpdate(location.state.update);
+        //흡연 경혐
+        if(exData.smoke.experience){
+          expTrueRef.current.checked = true;
+        }else{
+          expFalseRef.current.checked = true;
+        }
+        //현재 흡연 여부
+        if(exData.smoke.smoking){
+          smokingTrueRef.current.checked = true;
+        }else{
+          smokingFalseRef.current.checked = true;
+        }
+        //성별
+        if(exData.gender === "MALE"){
+          maleRef.current.checked = true;
+        }else{
+          femaleRef.current.checked = true;
+        }
+        setExaminee({
+          ...examinee,
+          managerId:exData.manager.id,
+          chartNumber:exData.chartNumber,
+          name:exData.name,
+          birthday:exData.birthday,
+          gender:exData.gender,
+          info: {
+            height: exData.inform.height,
+            weight: exData.inform.weight,
+          },
+          smoke: {
+            experience: exData.smoke.experience,
+            smoking: exData.smoke.smoking, 
+            amountDay: exData.smoke.amountDay,
+            startAge: exData.smoke.startAge,
+            stopAge: exData.smoke.stopAge
+          }
+      });
+      }).catch((err)=>{
+        console.log(err);
+      })
+      
+    }
+  },[])
+
   return(
     <>
       <div className="add-patient-page-container">
@@ -197,14 +283,13 @@ const AddPatient = ()=>{
           <div className='add-patient-backBtn' onClick={()=>{navigator(-1)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
           </div>
-          <p onClick={()=>{console.log(examinee)}}>환자 정보 추가</p>
+          <p onClick={()=>{console.log(examinee)}}>{addUpdate === true ? "환자 정보 수정" : "환자 정보 추가"}</p>
           <button ref={addBtnRef} className="add-complete-btn"
           onClick={(e)=>{
-            console.log(1)
             e.preventDefault();
             console.log(examinee);
             submitAddP();
-          }}><p>추가 완료</p></button>
+          }}><p>{addUpdate === true ? "수정 완료" : "추가 완료"}</p></button>
         </div>
         <div className="add-patient-page-top-container">
           <div className="inner">
@@ -223,6 +308,7 @@ const AddPatient = ()=>{
               <select
               id='adminSelect'
               ref={mangerIdRef}
+              value={examinee.managerId}
               onChange={(e)=>{
                 let copy = examinee.managerId;
                 copy = e.target.value;
@@ -257,11 +343,11 @@ const AddPatient = ()=>{
               <label htmlFor="">성별</label>
               <div className="radio-container">
                 <div className='radioBtn' >
-                  <input onChange={genderChange} value="MALE" type="radio" name="gender" id="man"/>
+                  <input ref={maleRef} onChange={genderChange} value="MALE" type="radio" name="gender" id="man"/>
                   <label htmlFor="man">남</label>
                 </div>
                 <div className='radioBtn'>
-                  <input onChange={genderChange} value="FEMALE" type="radio" name="gender" id="woman" />
+                  <input ref={femaleRef} onChange={genderChange} value="FEMALE" type="radio" name="gender" id="woman" />
                   <label htmlFor="woman">여</label>
                 </div>
               </div>
@@ -353,7 +439,7 @@ const AddPatient = ()=>{
             </div>
             <div className="info-input-container">
               <label htmlFor="">금연한 나이</label>
-              <input disabled ref={stopAgeRef} type="text" value={examinee.smoke.stopAge} placeholder='0'
+              <input ref={stopAgeRef} type="text" value={examinee.smoke.stopAge} placeholder='0'
               onInput={(e)=>{numberInput(e.target)}}
               onChange={(e)=>{
                 let copy = examinee.smoke;

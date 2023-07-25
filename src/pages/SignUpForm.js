@@ -288,7 +288,7 @@ const SignUpForm = () =>{
         console.log(error);
         alert("에러");
       })
-    },300)
+    },200)
     
     return()=>{
       clearTimeout(time);
@@ -359,8 +359,8 @@ const SignUpForm = () =>{
       }
       setTimeout(()=>{
         setBtnStatus(true);
-      },200)
-    },300)
+      },100)
+    },200)
     
     return()=>{
       clearTimeout(time)

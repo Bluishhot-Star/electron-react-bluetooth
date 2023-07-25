@@ -186,6 +186,13 @@
   width: 100%;
   border-radius: 7px;
   border: #ccc 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+}
+.graph-container .graph canvas{
+  width: 100px;
 }
 
 .history-container{
@@ -560,7 +567,7 @@
   position: absolute;
   right: 0;
   width: fit-content;
-  font-size: 2.3vh;
+  font-size: min(2.3vh, 1rem);
   color: rgb(75, 117, 214);
   font-weight: bold;
   text-align: right;
@@ -571,11 +578,14 @@
 }
 
 .patient-list-container .search-patient-container{
+  width: 100%;
   height: 6vh;
   border: 1px solid rgb(75, 117, 214);
   border-radius: 5px;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 9fr;
   align-items: center;
+  grid-gap: 10px;
 }
 .patient-list-container .search-patient-container .searchIcon{
   margin-left: 2vh;
@@ -586,12 +596,13 @@
 }
 .patient-list-container .search-patient-container input{
   all: unset;
-  width: -webkit-fill-available;
-  padding-left: 2vh;
+  display: block;
+  width: 100%;
+  /* padding-left: 2vh; */
 }
 .patient-list-container .search-patient-container input::placeholder{
   color: #ccc;
-  font-size: 2.4vh;
+  font-size: min(2.4vh, 1rem);
 }
 .patient-list{
   width: 100%;
@@ -611,7 +622,7 @@
   grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 .patient-list-column-name{
-  font-size: 1.7vh;
+  font-size: min(2vh,0.9rem);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -631,24 +642,30 @@
 }
 .patient-item{
   width: 100%;
-  height: 5vh;
+  height: 30px;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: 25% 25% 25% 25%;
   cursor: pointer;
 }
 .patient-item:hover{
   background: #eee;
 }
 .patient-item div{
+  display: inline-block;
   width: 100%;
   display: flex;
   padding: 0 1vh;
   align-items: center;
   justify-content: center;
-  font-size: 2vh;
-  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space:nowrap;
 }
-
+.patient-item div p{
+  font-size: min(2.1vh,0.9rem);
+  overflow: hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
 
 
 
@@ -685,7 +702,7 @@
   position: absolute;
   right: 0;
   width: fit-content;
-  font-size: 2.3vh;
+  font-size: min(2.3vh, 1rem);
   color: rgb(75, 117, 214);
   font-weight: bold;
   text-align: right;
@@ -712,23 +729,25 @@
   display: flex;
 }
 .measure-selected-date div{
-  font-size: 2vh;
+  font-size: min(2vh, 1rem);
   margin-right: .5vh;
 }
 .measure-select-date-btn-container{
   position: absolute;
   right: 0;
   width: fit-content;
-  font-size: 2.3vh;
+  font-size: min(2.3vh, 1rem);
   color: rgb(75, 117, 214);
   font-weight: bold;
   text-align: right;
   cursor: pointer;
   display: flex;
 }
-
+.measure-select-date-btn-container:active{
+  opacity: .3;
+}
 .measure-select-date-btn-container .calenderIcon{
-  margin-right: 1vh;
+  margin-right: .7vh;
   cursor: pointer;
 }
 .measure-list{
@@ -756,9 +775,9 @@
 }
 .measure-item-container .measure-item{
   width: 100%;
-  height: 5vh;
+  height: min(5vh,35px);
   display: grid;
-  grid-template-columns: 1fr 3fr 1fr;
+  grid-template-columns: min(25%,110px) 3fr min(15%,50px);
   cursor: pointer;
 }
 .measure-item:hover{
@@ -770,17 +789,17 @@
   padding: 0 1vh;
   align-items: center;
   justify-content: center;
-  font-size: 2vh;
+  font-size: min(2vh, .9rem);
   color: #aaa;
 }
 .measure-item .measure-item-date{
   display: flex;
   align-items: center;
   justify-content: start;
-  font-size: 2vh;
+  font-size: min(2.2vh, .9rem);
 }
 .measure-item-right-chevron{
-  font-size: 1.7vh;
+  font-size: min(2vh, 1rem);
   display: flex;
   align-items: center;
   justify-content: center;

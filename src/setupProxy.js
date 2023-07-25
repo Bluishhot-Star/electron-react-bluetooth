@@ -21,7 +21,7 @@ module.exports = function(app){
   )
   app.use(
     createProxyMiddleware('/examinees',{
-      target:'https://dev.spirokit-api.net/v1',
+      target:'https://spirokit-api.net/v1',
       changeOrigin: true,        
     })
   )
