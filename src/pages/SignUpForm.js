@@ -22,25 +22,38 @@ const SignUpForm = () =>{
   const [validity, setValidity] = useState([-1, -1, -1, -1, -1]);
   const handleSubmit = async (event)=>{
     event.preventDefault();
-    console.log(country);
-    console.log(selectOValue);
-    console.log(selectRValue);
-    console.log(values);
-
+    console.log({
+      "loginId": values["manager"]["loginId"],
+      "roleId": values["roleId"],
+      "name": values["manager"]["name"],
+      "password": values["manager"]["password"],
+      "tel": values["manager"]["tel"],
+      "confirmPassword": values["manager"]["reEnterPassword"],
+    });
     
     // ***************(TODO)**************
     // select option --> 드롭다운 형식으로 새로만들기
     // post할때 values 그대로 해도 괜찮은지 (가장 마지막에 서버CALLBACK 보면될듯?)
     // ***********************************
 
-    // axios.post("/auth/sign-up", 
-    // values,{withCredentials : true})
-    // .then((res)=>{
-    //   console.log(res);
-    // })
-    // .catch((error)=>{
-    //   console.log(error);alert("ERROR");
-    // })
+    axios.post("/auth/sign-up",
+    {
+      "loginId": values["manager"]["loginId"],
+      "roleId": values["roleId"],
+      "name": values["manager"]["name"],
+      "password": values["manager"]["password"],
+      "confirmPassword": values["manager"]["reEnterPassword"],
+      // "tel": values["manager"]["tel"],
+    }
+    ,{withCredentials : true})
+    .then((res)=>{
+      console.log(res);
+      navigator(-1);
+    })
+    .catch((error)=>{
+      console.log(error);
+      alert("ERROR");
+    })
     
   };
   
@@ -111,6 +124,10 @@ const SignUpForm = () =>{
     }
   }
 
+
+  // 알림창 상태
+  const [alertState, setAlertState] = useState(true);
+
   //아이디 체크 메세지창
   const idChkAlert = useRef();
   const [idChkAlertVisible, setIdChkAlertVisible] = useState(false);
@@ -123,8 +140,11 @@ const SignUpForm = () =>{
         setIdChkAlertVisible(false);
     }, 2000)
     }
+    else{
+      // setAlertState(false);
+    }
   },[idChkAlertVisible])  
-
+  
   //아이디 중복 상태
   const [isIdDuplicated, setIsIdDuplicated] = useState(true);
   //아이디 중복 메세지창
@@ -141,14 +161,17 @@ const SignUpForm = () =>{
         setIdDupAlertVisible(false);
     }, 2000)
     }
+    else{
+      // setAlertState(false);
+    }
   },[idDupAlertVisible])
 
-  //아이디 중복 메세지창
+  //아이디값 오류 메세지창
   const idValAlert = useRef();
-  //아이디 중복 메세지창 onOff 상태
+  //아이디값 오류 메세지창 onOff 상태
   const [idValAlertVisible, setIdValAlertVisible] = useState(false);
 
-  //아이디 중복 메세지창 css 변화
+  //아이디값 오류 메세지창 css 변화
   useEffect(()=>{
     if(idValAlertVisible == true){
       idValAlert.current.classList.add("visible");
@@ -157,15 +180,19 @@ const SignUpForm = () =>{
         setIdValAlertVisible(false);
     }, 2000)
     }
+    else {
+      // setAlertState(false);
+    }
   },[idValAlertVisible])
 
   //아이디 중복확인
   const checkId = () =>{
     if(values.manager.loginId === "" || validity[1]===false){
       setIdChkAlertVisible(true);
+      setAlertState(true);
       return;
     }
-    axios.post('/auth/duplicate-check',{
+    axios.post('/auth/check-id',{
       loginId: values.manager.loginId,
     },{withCredentials : true})
     .then((res) => {
@@ -231,6 +258,8 @@ const SignUpForm = () =>{
   const [selectOValue, setSelectOValue] = useState("");
   //직책 선택 값
   const [selectRValue, setSelectRValue] = useState("");
+  //나라 리스트
+  const [countries, setCountries] = useState([]);
   //기관 리스트
   const [organizations,setOrganizations] = useState([]);
   //직책 리스트
@@ -269,21 +298,23 @@ const SignUpForm = () =>{
   //나라 json
   useEffect(() => {
     let time = setTimeout(()=>{
-      axios.get('/countries')
+      axios.get('/countries?status=enabled')
       .then((res) => {
+        console.log(res.data.response);
+        setCountries(res.data.response);
         if(selectCValue === ""){
           selectO.current.disabled = true;
           selectR.current.disabled = true;
           return;
         };
         selectO.current.disabled = false;
-        let countriesUUID = res.data.response.filter(function(e){
-          return e.code === selectCValue;
+        let countriesAlpha2 = res.data.response.filter(function(e){
+          return e.alpha2 === selectCValue;
         })
         // UUID 정보 저장
-        console.log(countriesUUID[0]);
+        console.log(countriesAlpha2[0]);
 
-        setCountry(countriesUUID[0].id);
+        setCountry(countriesAlpha2[0].alpha2);
       }).catch((error) => {
         console.log(error);
         alert("에러");
@@ -298,7 +329,7 @@ const SignUpForm = () =>{
   //기관 json
   useEffect(()=>{
     if(country === "") return;
-    axios.get(`/countries/${country}/organizations`)
+    axios.get(`/countries/${country}/clinics?status=enabled`)
     .then((res) => {
       //기관 리스트 저장
       setOrganizations(res.data.response);
@@ -317,7 +348,7 @@ const SignUpForm = () =>{
     selectR.current.disabled = false;
     console.log(selectCValue);
     console.log(selectOValue);
-    axios.get(`/organizations/${selectOValue}/roles`)
+    axios.get(`/clinics/${selectOValue}/roles`)
     .then((res)=>{
       console.log(res)
       setRoles(res.data.response);
@@ -368,9 +399,18 @@ const SignUpForm = () =>{
   })
 
   useEffect(()=>{
-    if(btnStatus){signUpBtn.current.disabled=false}
+    if(btnStatus){
+      console.log(signUpBtn.current.innerText);
+      signUpBtn.current.innerText = "유효성 확인중...";
+      setTimeout(()=>{
+        signUpBtn.current.innerText = "회원가입";
+        signUpBtn.current.disabled = false
+        setAlertState(false);
+      },2300)
+    }
     else{
       signUpBtn.current.disabled = true;
+      setAlertState(true);
     }
   },[btnStatus])
 
@@ -378,15 +418,15 @@ const SignUpForm = () =>{
     <div className="signUp-page-container">
       {
         //중복 아이디 알림
-        <Alert inputRef={idDupAlert} contents={"중복된 아이디가 있습니다.\n다시 입력하신 후 중복 검사를 해주세요."}/>
+        alertState ? <Alert inputRef={idDupAlert} contents={"중복된 아이디가 있습니다.\n다시 입력하신 후 중복 검사를 해주세요."}/> : null
       }
       {
         //올바르지 않은 아이디 알림
-        <Alert inputRef={idChkAlert} contents={"올바른 아이디 형식이 아닙니다."}/>
+        alertState ? <Alert inputRef={idChkAlert} contents={"올바른 아이디 형식이 아닙니다."}/> : null
       }
       {
-        //올바르지 않은 아이디 알림
-        <Alert inputRef={idValAlert} contents={"사용 가능한 아이디입니다."}/>
+        //사용가능한 아이디 알림
+        alertState ? <Alert inputRef={idValAlert} contents={"사용 가능한 아이디입니다."}/> : null
       }
       <div className="signUp-title"><p>회원가입</p></div>
       <div className='backBtn' onClick={()=>{navigator(-1)}}>
@@ -498,10 +538,13 @@ const SignUpForm = () =>{
           /> */}
           <select value={selectCValue} onChange={onChangeCSelect}>
             <option value="">나라 선택</option>
-            <option value="MN">Mongolia</option>
-            <option value="KZ">Kazakhstan</option>
-            <option value="KR">Korea</option>
-            <option value="VN">Vietnam</option>
+            {
+            countries.map((item)=>(
+              <option value={item.alpha2} key={item.alpha2}>
+                  {item.name}
+              </option>
+            ))
+            }
           </select>
         </div>
         <div className="signUp-field">
@@ -514,7 +557,7 @@ const SignUpForm = () =>{
           <select disabled ref={selectO} value={selectOValue} onChange={onChangeOSelect}>
             <option value="">기관 선택</option>
             {organizations.map((item)=>(
-              <option value={item.id} key={item.id}>
+              <option value={item.id} key={country+item.tax}>
                   {item.name}
               </option>
             ))}
@@ -537,7 +580,7 @@ const SignUpForm = () =>{
           </select>
         </div>
         {/* {error ? <p className='error'>{error}</p> : <p></p>} */}
-        <button ref={signUpBtn} type='submit' className='signUpBtn' disabled>회원가입</button>
+        <button ref={signUpBtn} type='submit' className='signUpBtn'>회원가입</button>
       </form>
       
     </div>

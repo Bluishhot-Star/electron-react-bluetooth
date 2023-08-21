@@ -11,17 +11,18 @@ import DateSelector from './DateSelector.js'
 const MemberList = ()=>{
   const [examinees, setExaminees] = useState([]);
   const [date, setDate] = useState([]);
-  const [examinee, setExaminee] = useState("");
+  const [chartNumber, setChartNumber] = useState("");
   const [birth, setBirth] = useState("");
   const cookies = new Cookies();
   let navigator = useNavigate();
-
+  //페이지 스크롤시 /subjects?page=1&size=10에서 page가 변경되어야 함
   useEffect(()=>{
-    axios.get("/examinees?name=" , {
+    axios.get("/subjects?page=1&size=10" , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }}).then((res)=>{
-        setExaminees(res.data.response);
+        setExaminees(res.data.response.subjects);
+        console.log(res.data.response)
       }).catch((err)=>{
         console.log(err);
       })
@@ -38,27 +39,27 @@ const MemberList = ()=>{
     let temp = document.getElementById(clicked);
     temp.classList.remove("memberList-selected")
   }
-  const click = (index,exId, birth) =>{
+  const click = (index,chartNumber, birth) =>{
     setCurtainStat(false)
     if(clicked !== ""){removeCSS();}
     setClicked("memberItem"+index);
     setBirth(birth);
     console.log(birth);
 
-    axios.get(`/examinees/${exId}/measurements/date?from=&to=` , {
+    axios.get(`/subjects/${chartNumber}/histories` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
     }).then((res)=>{
       setDate(res.data.response);
-      setExaminee(exId);
+      setChartNumber(chartNumber);
     }).catch((err)=>{
       console.log(err);
     })
   }
 
   const report = (date)=>{
-    axios.get(`/examinees/${examinee}` , {
+    axios.get(`/subjects/${chartNumber}/types/fvc/results/${date}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
@@ -66,6 +67,7 @@ const MemberList = ()=>{
       console.log(res.data.response);
       let data = res.data.response;
       data["date"] = date;
+      data["birthday"] = birth;
       navigator('/memberList/resultPage', {state: data})
     }).catch((err)=>{
       console.log(err);
@@ -77,12 +79,12 @@ const MemberList = ()=>{
   // 검색 기능
   const [searchVal, setSearchVal] = useState("")
   const searchName = ()=>{
-    axios.get(`/examinees?name=${searchVal}` , {
+    axios.get(`/subjects?page=1&size=10&name=${searchVal}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }})
       .then((res)=>{
-        setExaminees(res.data.response);
+        setExaminees(res.data.response.subjects);
       }).catch((err)=>{
         console.log(err);
       })
@@ -96,8 +98,8 @@ const MemberList = ()=>{
   });
 
   useEffect(()=>{
-    if(examinee==="")return;
-    axios.get(`/examinees/${examinee}/measurements/date?from=${inspectionDate.start}&to=${inspectionDate.end}` , {
+    if(chartNumber==="")return;
+    axios.get(`/subjects/${chartNumber}/histories?from=${inspectionDate.start}&end=${inspectionDate.end}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }}).then((res)=>{
@@ -105,13 +107,14 @@ const MemberList = ()=>{
       }).catch((err)=>{
         console.log(err);
       })
-  },[examinee,inspectionDate])
+  },[chartNumber,inspectionDate])
 
 
 const dateSelect = (select) =>{
     console.log(select);
     setInspectionDate(select);
 }
+
 
 const [dateSelectorStat, setDateSelectorStat] = useState(false);
 
@@ -151,10 +154,10 @@ const [dateSelectorStat, setDateSelectorStat] = useState(false);
                 {
                   examinees.map((item, index)=>{
                     return(
-                    <div id={"memberItem"+index} className="patient-item" key={item.chartNumber} onClick={(e)=>{click(index,item.id,item.birthday);}}>
+                    <div id={"memberItem"+index} className="patient-item" key={item.chartNumber} onClick={(e)=>{click(index,item.chartNumber,item.birthday);}}>
                       <div className="patient-item-chartNumber"><p>{item.chartNumber}</p></div>
                       <div className="patient-item-name"><p>{item.name}</p></div>
-                      <div className="patient-item-gender"><p>{item.gender == "MALE" ? "남자" : "여자"}</p></div>
+                      <div className="patient-item-gender"><p>{item.gender == "m" ? "남자" : "여자"}</p></div>
                       <div className="patient-item-birthday"><p>{item.birthday}</p></div>
                     </div>
                     )
@@ -210,4 +213,3 @@ const [dateSelectorStat, setDateSelectorStat] = useState(false);
   );
 }
 export default MemberList;
-

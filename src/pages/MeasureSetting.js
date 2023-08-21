@@ -16,55 +16,16 @@ const MeasureSetting = ()=>{
   const numberInput = (target)=>{
     target.value = target.value.replace(/[^0.0-9.0]/g, '');
   }
-
-  // 담당자 데이터 GET
-  const [managers, setManagers] = useState([]);
-  useEffect(()=>{
-    axios.get('/managers?loginId=&name=',{
-      headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
-    }}).then((res)=>{
-      // console.log(res.data.response);
-      setManagers(res.data.response);
-    }).catch((err)=>{
-      console.log(err);
-    })
-  },[])
-  const [medications, setMedications] = useState([]);
-  useEffect(()=>{
-    axios.get('/medications',{
-      headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
-    }}).then((res)=>{
-      console.log(res.data.response);
-      setMedications(res.data.response);
-    }).catch((err)=>{
-      console.log(err);
-    })
-  },[])
-  const [mediTools, setMediTools] = useState([]);
-  useEffect(()=>{
-    axios.get('/medication-tools',{
-      headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
-    }}).then((res)=>{
-      console.log(res.data.response);
-      setMediTools(res.data.response);
-    }).catch((err)=>{
-      console.log(err);
-    })
-  },[])
-  
   // 각종 useRef
-  const mangerIdRef = useRef();
+  // const mangerIdRef = useRef();
   const FVCTypeRef = useRef();
   const SVCTypeRef = useRef();
   const mediTrueRef = useRef();
   const mediFalseRef = useRef();
-  const mediTypeRef = useRef();
-  const mediToolsRef = useRef();
-  const mediAmountRef = useRef();
-  const mediCountRef = useRef();
+  // const mediTypeRef = useRef();
+  // const mediToolsRef = useRef();
+  // const mediAmountRef = useRef();
+  // const mediCountRef = useRef();
 
   // medication 상황별 버튼 활성화
   // useEffect(()=>{
@@ -170,27 +131,27 @@ const MeasureSetting = ()=>{
           <div className="inner">
             <form>
 
-              <div className="info-input-container">
+              {/* <div className="info-input-container">
                 <label htmlFor="">담당의</label>
-                {/* <FontAwesomeIcon htmlFor="adminSelect" className='admin-chevronDown' icon={faChevronDown} style={{color: "#4b75d6",}} /> */}
+                <FontAwesomeIcon htmlFor="adminSelect" className='admin-chevronDown' icon={faChevronDown} style={{color: "#4b75d6",}} />
                 <select
                 id='adminSelect'
                 ref={mangerIdRef}
-                // onChange={(e)=>{
-                //   let copy = examinee.managerId;
-                //   copy = e.target.value;
-                //   setExaminee({...examinee, managerId: copy});
-                // }}
+                onChange={(e)=>{
+                  let copy = examinee.managerId;
+                  copy = e.target.value;
+                  setExaminee({...examinee, managerId: copy});
+                }}
                 >
                   <option value="">담당자명</option>
                   {managers.map((item)=>(
-                    <option value={item.id} key={item.id}>
-                        {item.name}
+                    <option value={item.clinicianId} key={item.clinicianId}>
+                        {item.clinicianName}
                     </option>
                   ))}
                 </select>
                 <FontAwesomeIcon className='measure-admin-chevronDown' icon={faChevronDown} style={{color: "#4b75d6",}} />
-              </div>
+              </div> */}
               <div className="info-input-container">
                 <label htmlFor="">검사 종류</label>
                 <div className="radio-container">
@@ -225,7 +186,7 @@ const MeasureSetting = ()=>{
                   </div>
                 </div>
               </div>
-              <div className="info-input-container">
+              {/* <div className="info-input-container">
                 <label htmlFor="">적용 약물 종류</label>
                 <select
                 id='adminSelect'
@@ -244,8 +205,8 @@ const MeasureSetting = ()=>{
                   ))}
                 </select>
                 <FontAwesomeIcon className='measure-admin-chevronDown' icon={faChevronDown} style={{color: "#4b75d6",}} />
-              </div>
-              <div className="info-input-container">
+              </div> */}
+              {/* <div className="info-input-container">
                 <label htmlFor="">약물 투여 기구</label>
                 <select
                 id='adminSelect'
@@ -264,9 +225,9 @@ const MeasureSetting = ()=>{
                   ))}
                 </select>
                 <FontAwesomeIcon className='measure-admin-chevronDown' icon={faChevronDown} style={{color: "#4b75d6",}} />
-              </div>
+              </div> */}
               
-              <div className="info-input-container">
+              {/* <div className="info-input-container">
                 <label htmlFor="">적용 약물 양</label>
                 <input ref={mediAmountRef} type="text" 
                 // value={examinee.smoke.stopAge} 
@@ -278,8 +239,8 @@ const MeasureSetting = ()=>{
                 //   setExaminee({...examinee, smoke: copy})
                 // }}
                 />
-              </div>
-              <div className="info-input-container">
+              </div> */}
+              {/* <div className="info-input-container">
                 <label htmlFor="">약물 적용 횟수</label>
                 <input ref={mediCountRef} type="text" 
                 // value={examinee.smoke.stopAge} 
@@ -291,8 +252,8 @@ const MeasureSetting = ()=>{
                 //   setExaminee({...examinee, smoke: copy})
                 // }}
                 />
-              </div>
-              <button ref={addBtnRef} className="measure-btn"><p>추가 완료</p></button>
+              </div> */}
+              <button ref={addBtnRef} className="measure-btn"><p>검사하기</p></button>
             </form>
           </div>
         </div>

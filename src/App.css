@@ -214,17 +214,62 @@
   display:flex;
   width: calc(300px * 12);
   align-items: center;
+  overflow-x: auto;
+  position: relative;
 }
-.history-container  .slider div{
+.history-container .slider .simple-result-container{
   width: 30vh;
   height: 30vh;
+  min-width: 30vh;
   border: #ccc 1px solid;
   margin-right: 10px;
+  border-radius: 5px;
+  display: grid;
+  grid-template-rows: 1fr 5fr;
+  padding: 1vh 0;
+  cursor: pointer;
 }
+.simple-result-title-container{
+
+}
+.simple-result-title-container p{
+  font-size: 2.2vh;
+  margin: 0;
+  display: block;
+  text-align: center;
+  text-transform: uppercase;
+}
+.simple-result-title-container .simple-result-date{
+  font-size: 1.8vh;
+  color: #aaa;
+}
+
+.simple-result-table-container{
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 1fr;
+}
+
+.simple-result-table-container p{
+  display: block;
+  margin: 0;
+  font-size: 2vh;
+  text-align: center;
+}
+.simple-result-table-container > div {
+  display: grid;
+  grid-template-columns: 28% 1fr 1fr 1fr;
+  align-items: center;
+  padding: 0 1vh;
+  border-bottom: 1px solid #ccc;
+}
+.simple-result-table-container > div:last-child{
+  border: none;
+}
+
 
 
 /* 로그인 화면 */
-
 .login-page-container{
   width: 40%;
   height: 80%;
@@ -306,6 +351,9 @@
   color: rgb(77, 174, 226);
   font-size: 2.3vh;
 }
+.login-page-container form .loginBtn{
+  cursor: pointer;
+}
 .login-page-container form .login-signUpBtn{
   all:unset;
   width: 90%;
@@ -317,6 +365,7 @@
   border-radius: 100vh;
   color: rgb(77, 174, 226);
   font-size: 2.3vh;
+  cursor: pointer;
 }
 .login-page-container form button:active{
   opacity: .3;
@@ -354,6 +403,7 @@
   position: absolute;
   top: 1rem;
   left: 1rem;
+  cursor: pointer;
 }
 
 .signUp-title{
@@ -469,6 +519,7 @@
   border: 1px solid rgb(75, 204, 214);
   border-radius: 20px;
   color: rgb(75, 204, 214);
+  cursor: pointer;
 }
 
 .signUp-page-container .signUpBtn:active{
@@ -478,6 +529,7 @@
   background: #ddd;
   color: #bbb;
   border: 1px solid #ddd;
+  cursor: default;
 }
 
 /* Alert */
@@ -501,11 +553,13 @@
   text-align: center;
   font-weight: bold;
   margin-bottom: 1vh;
+  cursor: default;
 }
 .alert-container .alert-contents{
   display: flex;
   height: -webkit-fill-available;
   align-items: center;
+  cursor: default;
 }
 .alert-container p{
   display: inline-block;
@@ -513,6 +567,7 @@
   white-space: pre-line;
   text-align: center;
   margin: 0;
+  cursor: default;
 }
 .signUp-page-container .alert-container{
   transition: .5s;

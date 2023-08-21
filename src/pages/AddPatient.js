@@ -8,22 +8,38 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 const AddPatient = ()=>{
   const [examinee,setExaminee] = useState({
-    managerId:"",//담당 매니저의 UUID
-    chartNumber:"",
-    name:"",
-    birthday:"",
-    gender:"",
-    info: {
-      height: "",
-      weight: "",
-    },
-    smoke: {
-      experience: "", //true : 경험있음, false : 경험없음
-      smoking: "", //true : 현재 흡연중, false : 현재 금연 상태
-      amountDay: "", //하루 흡연량(갑 기준)
-      startAge: "",
-      stopAge: ""
+    chartNumber: "",
+    name: "",
+    gender: "",//m 혹은 f 여야 함
+    race: "",//1 ~ 5 여야 함
+    clinicianId: "",
+    birthday: "",//yyyy-MM-dd 형식이어야 함
+    subjectDetails: {
+        height: "",//실수양식의 문자열만 허용
+        weight: "",//실수양식의 문자열만 허용
+        smoking: true,//boolean 타입이어야 함, 아닐 경우는 false 로 저장됨.
+        smokingStartAge: "",//정수 문자열이어야 함, "" 허용
+        smokingExperience: true,//boolean 타입이어야 함, 아닐 경우는 false 로 저장됨.
+        smokingStopAge: "",//정수 문자열이어야 함, "" 허용
+        smokingPackYear: ""//실수 문자열이어야 함, "" 허용
     }
+    // managerId:"",//담당 매니저의 UUID
+    // chartNumber:"",
+    // name:"",
+    // birthday:"",
+    // gender:"",
+    // info: {
+    //   height: "",
+    //   weight: "",
+    // },
+    // smoke: {
+    //   experience: "", //true : 경험있음, false : 경험없음
+    //   smoking: "", //true : 현재 흡연중, false : 현재 금연 상태
+    //   amountDay: "", //하루 흡연량(갑 기준)
+    //   startAge: "",
+    //   stopAge: ""
+    // }
+    
   });
   const submitAddP = ()=>{
     console.log("GH")
@@ -65,9 +81,9 @@ const AddPatient = ()=>{
   }
   // 흡연여부radio값 반영
   const smokeChange = (e, val)=>{
-    let copy = examinee.smoke;
+    let copy = examinee.subjectDetails;
     copy[val] = e.target.value;
-    setExaminee({...examinee, smoke:copy});
+    setExaminee({...examinee, subjectDetails:copy});
   }
   // 생년월일 하이픈
   const hypenBirth = (target) => {
@@ -77,18 +93,25 @@ const AddPatient = ()=>{
   }
 
   // 담당자 데이터 GET
+  //page 증가시켜야함
   const [managers, setManagers] = useState([]);
   useEffect(()=>{
-    axios.get('/managers?loginId=&name=',{
+    axios.get('/clinicians?page=1&size=10',{
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
     }}).then((res)=>{
-      // console.log(res.data.response);
-      setManagers(res.data.response);
+      
+      setManagers(res.data.response.clinicians);
+      console.log(res.data.responsea);
     }).catch((err)=>{
       console.log(err);
     })
   },[])
+  
+  useEffect(()=>{
+    console.log("a")
+    console.log(managers);
+  },[managers])
   
   // 각종 useRef
   const mangerIdRef = useRef();
@@ -106,7 +129,7 @@ const AddPatient = ()=>{
   // smoke 상황별 버튼 활성화
   useEffect(()=>{
     let time = setTimeout(()=>{
-      if(examinee.smoke.experience === false || examinee.smoke.experience === "false"){
+      if(examinee.subjectDetails.smokingExperience === false || examinee.subjectDetails.smokingExperience === "false"){
         console.log("HERERER");
         console.log(examinee);
         smokingTrueRef.current.checked = false;
@@ -116,12 +139,13 @@ const AddPatient = ()=>{
         startAgeRef.current.disabled = true;
         amountRef.current.disabled = true;
         stopAgeRef.current.disabled = true;
-        let copy = examinee.smoke;
+        let copy = examinee.subjectDetails;
         copy.smoking = "";
-        copy.startAge = "";
-        copy.stopAge = "";
-        copy.amountDay = "";
-        setExaminee({...examinee, smoke: copy});
+        copy.smokingStartAge = "";
+        copy.smokingStopAge = "";
+        copy.smokingPackYear = ""
+        // copy.amountDay = "";
+        setExaminee({...examinee, subjectDetails: copy});
       }
       else{
         console.log("HERE1");
@@ -133,38 +157,38 @@ const AddPatient = ()=>{
       }
     },100)
     return()=>{clearTimeout(time)}
-  },[examinee.smoke.experience])
+  },[examinee.subjectDetails.smokingExperience])
 
   useEffect(()=>{
     let time = setTimeout(()=>{
-      if(examinee.smoke.experience === false || examinee.smoke.experience === "false")return;
-      if(examinee.smoke.smoking === false || examinee.smoke.smoking === "false"){
+      if(examinee.subjectDetails.smokingExperience === false || examinee.subjectDetails.smokingExperience === "false")return;
+      if(examinee.subjectDetails.smoking === false || examinee.subjectDetails.smoking === "false"){
         console.log("HERE11")
         stopAgeRef.current.disabled = false;
       }
       else{
         console.log("HERE2")
         stopAgeRef.current.disabled = true;
-        let copy = examinee.smoke;
+        let copy = examinee.subjectDetails;
         copy.stopAge = "";
-        setExaminee({...examinee, smoke: copy});
+        setExaminee({...examinee, subjectDetails: copy});
       }
     },200)
 
     return()=>{
       clearTimeout(time);
     }
-  },[examinee.smoke.smoking])
+  },[examinee.subjectDetails.smoking])
 
   // 담당자 명 기본값 css
   useEffect(()=>{
-    if(examinee.managerId === ""){
+    if(examinee.clinicianId === ""){
       mangerIdRef.current.classList.add("unselect")
     }
     else{
       mangerIdRef.current.classList.remove("unselect")
     }
-  },[examinee.managerId])
+  },[examinee.clinicianId])
 
   // 생년월일 유효성 상태
   const [validity, setValidity] = useState(false);
@@ -180,8 +204,8 @@ const AddPatient = ()=>{
   
   // 추가 완료 버튼 유효성 검사
   useEffect(()=>{
-    if(!(examinee.managerId!==""&&examinee.chartNumber!==""&&examinee.name!==""&&examinee.birthday!==""
-    &&examinee.gender!==""&&examinee.info.height!==""&&examinee.info.weight&&examinee.smoke.experience!=="")){
+    if(!(examinee.clinicianId!==""&&examinee.chartNumber!==""&&examinee.name!==""&&examinee.birthday!==""
+    &&examinee.gender!==""&&examinee.info.height!==""&&examinee.info.weight&&examinee.subjectDetails.smokingExperience!=="")){
       console.log("ch1");
       setAddBtnStatus(false);
       return;
@@ -190,14 +214,14 @@ const AddPatient = ()=>{
       setAddBtnStatus(false);
       return;
     }
-    if(examinee.smoke.experience === "true"){
-      if(!(examinee.smoke.smoking !== ""&&examinee.smoke.amountDay !== ""&&examinee.smoke.startAge !== "")){
+    if(examinee.subjectDetails.smokingExperience === "true"){
+      if(!(examinee.subjectDetails.smoking !== ""&&examinee.subjectDetails.amountDay !== ""&&examinee.subjectDetails.startAge !== "")){
         console.log("ch2");
         setAddBtnStatus(false);
         return;
       }
-      if(examinee.smoke.smoking === "false"){
-        if(!(examinee.smoke.stopAge !== "")){
+      if(examinee.subjectDetails.smoking === "false"){
+        if(!(examinee.subjectDetails.smokingStopAge !== "")){
           console.log("ch3");
           setAddBtnStatus(false);
           return;
@@ -225,20 +249,20 @@ const AddPatient = ()=>{
 
   useEffect(()=>{
     if(location.state){
-      axios.get(`/examinees/${location.state.id}`,{
+      axios.get(`/subjects/${location.state.id}`,{
         headers: {
           Authorization: `Bearer ${cookies.get('accessToken')}`
       }}).then((res)=>{
         const exData = res.data.response;
         setAddUpdate(location.state.update);
         //흡연 경혐
-        if(exData.smoke.experience){
+        if(exData.subjectDetails.smoking){
           expTrueRef.current.checked = true;
         }else{
           expFalseRef.current.checked = true;
         }
         //현재 흡연 여부
-        if(exData.smoke.smoking){
+        if(exData.subjectDetails.smoking){
           smokingTrueRef.current.checked = true;
         }else{
           smokingFalseRef.current.checked = true;
@@ -249,23 +273,23 @@ const AddPatient = ()=>{
         }else{
           femaleRef.current.checked = true;
         }
+        
         setExaminee({
           ...examinee,
-          managerId:exData.manager.id,
+          clinicianId:exData.clinicianId,
           chartNumber:exData.chartNumber,
           name:exData.name,
+          race: exData.race,
           birthday:exData.birthday,
           gender:exData.gender,
-          info: {
-            height: exData.inform.height,
-            weight: exData.inform.weight,
-          },
-          smoke: {
-            experience: exData.smoke.experience,
-            smoking: exData.smoke.smoking, 
-            amountDay: exData.smoke.amountDay,
-            startAge: exData.smoke.startAge,
-            stopAge: exData.smoke.stopAge
+          subjectDetails: {
+            height: exData.subjectDetails.height,
+            weight: exData.subjectDetails.weight,
+            smokingExperience: exData.subjectDetails.smokingExperience,
+            smoking: exData.subjectDetails.smoking, 
+            smokingPackYear: exData.subjectDetails.smokingPackYear,
+            smokingStartAge: exData.subjectDetails.smokingStartAge,
+            smokingStopAge: exData.subjectDetails.smokingStopAge
           }
       });
       }).catch((err)=>{
@@ -308,16 +332,16 @@ const AddPatient = ()=>{
               <select
               id='adminSelect'
               ref={mangerIdRef}
-              value={examinee.managerId}
+              value={examinee.clinicianId}
               onChange={(e)=>{
-                let copy = examinee.managerId;
+                let copy = examinee.clinicianId;
                 copy = e.target.value;
-                setExaminee({...examinee, managerId: copy});
+                setExaminee({...examinee, clinicianId: copy});
               }}>
                 <option value="">담당자명</option>
                 {managers.map((item)=>(
-                  <option value={item.id} key={item.id}>
-                      {item.name}
+                  <option value={item.clinicianId} key={item.clinicianId}>
+                      {item.clinicianName}
                   </option>
                 ))}
               </select>
@@ -354,23 +378,23 @@ const AddPatient = ()=>{
             </div>
             <div className="info-input-container">
               <label htmlFor="">신장</label>
-              <input type="text" value={examinee.info.height} placeholder='0'
+              <input type="text" value={examinee.subjectDetails.height} placeholder='0'
               onInput={(e)=>{numberInput(e.target)}}
               onChange={(e)=>{
-                let copy = examinee.info;
+                let copy = examinee.subjectDetails;
                 copy.height = e.target.value;
-                setExaminee({...examinee, info: copy})
+                setExaminee({...examinee, subjectDetails: copy})
               }}/>
               <div className='inputMeasure'><p>cm</p></div>
             </div>
             <div className="info-input-container">
               <label htmlFor="">몸무게</label>
-              <input type="text" value={examinee.info.weight} placeholder='0'
+              <input type="text" value={examinee.subjectDetails.weight} placeholder='0'
               onInput={(e)=>{numberInput(e.target)}}
               onChange={(e)=>{
-                let copy = examinee.info;
+                let copy = examinee.subjectDetails;
                 copy.weight = e.target.value;
-                setExaminee({...examinee, info: copy})
+                setExaminee({...examinee, subjectDetails: copy})
               }}/>  
               <div className='inputMeasure'><p>Kg</p></div>
             </div>
@@ -395,11 +419,11 @@ const AddPatient = ()=>{
               <label htmlFor="">흡연경험</label>
               <div className="radio-container">
                 <div className='radioBtn' >
-                  <input ref={expTrueRef} onChange={(e)=>{smokeChange(e,"experience")}} value="true" type="radio" name="experience" id="expTrue"/>
+                  <input ref={expTrueRef} onChange={(e)=>{smokeChange(e,"smokingExperience")}} value="true" type="radio" name="smokingExperience" id="expTrue"/>
                   <label htmlFor="expTrue">있음</label>
                 </div>
                 <div className='radioBtn'>
-                  <input ref={expFalseRef} onChange={(e)=>{smokeChange(e,"experience")}} value="false" type="radio" name="experience" id="expFalse" />
+                  <input ref={expFalseRef} onChange={(e)=>{smokeChange(e,"smokingExperience")}} value="false" type="radio" name="smokingExperience" id="expFalse" />
                   <label htmlFor="expFalse">없음</label>
                 </div>
               </div>
@@ -419,32 +443,32 @@ const AddPatient = ()=>{
             </div>
             <div className="info-input-container">
               <label htmlFor="">흡연 시작나이</label>
-              <input ref={startAgeRef} type="text" value={examinee.smoke.startAge} placeholder='0'
+              <input ref={startAgeRef} type="text" value={examinee.subjectDetails.smokingStartAge} placeholder='0'
               onInput={(e)=>{numberInput(e.target)}}
               onChange={(e)=>{
-                let copy = examinee.smoke;
-                copy.startAge = e.target.value;
-                setExaminee({...examinee, smoke: copy})
+                let copy = examinee.subjectDetails;
+                copy.smokingStartAge = e.target.value;
+                setExaminee({...examinee, subjectDetails: copy})
               }}/>  
             </div>
             <div className="info-input-container">
               <label htmlFor="">하루 흡연량(갑)</label>
-              <input ref={amountRef} type="text" value={examinee.smoke.amountDay} placeholder='0'
+              <input ref={amountRef} type="text" value={examinee.subjectDetails.smokingPackYear} placeholder='0'
               onInput={(e)=>{numberInput(e.target)}}
               onChange={(e)=>{
-                let copy = examinee.smoke;
-                copy.amountDay = e.target.value;
-                setExaminee({...examinee, smoke: copy})
+                let copy = examinee.subjectDetails;
+                copy.smokingPackYear = e.target.value;
+                setExaminee({...examinee, subjectDetails: copy})
               }}/>  
             </div>
             <div className="info-input-container">
               <label htmlFor="">금연한 나이</label>
-              <input ref={stopAgeRef} type="text" value={examinee.smoke.stopAge} placeholder='0'
+              <input ref={stopAgeRef} type="text" value={examinee.subjectDetails.smokingStopAge} placeholder='0'
               onInput={(e)=>{numberInput(e.target)}}
               onChange={(e)=>{
-                let copy = examinee.smoke;
-                copy.stopAge = e.target.value;
-                setExaminee({...examinee, smoke: copy})
+                let copy = examinee.subjectDetails;
+                copy.smokingStopAge = e.target.value;
+                setExaminee({...examinee, subjectDetails: copy})
               }}/>  
             </div>
           </div>

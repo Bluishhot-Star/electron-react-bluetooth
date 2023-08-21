@@ -12,22 +12,25 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 axios.interceptors.response.use(
   (res)=>{
+
     return res;
+
   },
   async (err)=>{
+
     if(err.response.status===401){
+
       const cookies = new Cookies();
       const accessExpires = new Date();
-      await axios.get("/auth/renewal" ,{
+      await axios.post("/auth/renewal" ,{},{
         headers: {
           Authorization: `Bearer ${cookies.get('refreshToken')}`
       }}).then((res)=>{
-        console.log(res.data.response.accessToken);
         accessExpires.setMinutes(accessExpires.getMinutes() + 14);
         cookies.set('accessToken',res.data.response.accessToken,{expires : accessExpires,secure:"true"});
       }).catch((err)=>{
         console.log(err);
-        window.location.replace('/l');
+        window.location.replace('/');
 
       });
       err.config.headers = {
@@ -43,11 +46,11 @@ axios.interceptors.response.use(
   }
 )
 root.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+  // <React.StrictMode>   double invoked,,
+  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
