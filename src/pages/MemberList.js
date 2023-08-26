@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faSearch, faCalendar, faChevronRight } from '@fortawesome/free-solid-svg-icons'
 
 import DateSelector from './DateSelector.js'
-
+import { useInView } from 'react-intersection-observer';
 const MemberList = ()=>{
   const [examinees, setExaminees] = useState([]);
   const [date, setDate] = useState([]);
@@ -15,18 +15,19 @@ const MemberList = ()=>{
   const [birth, setBirth] = useState("");
   const cookies = new Cookies();
   let navigator = useNavigate();
+
   //페이지 스크롤시 /subjects?page=1&size=10에서 page가 변경되어야 함
-  useEffect(()=>{
-    axios.get("/subjects?page=1&size=10" , {
-      headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
-      }}).then((res)=>{
-        setExaminees(res.data.response.subjects);
-        console.log(res.data.response)
-      }).catch((err)=>{
-        console.log(err);
-      })
-  },[])
+  // useEffect(()=>{
+  //   axios.get("/subjects?page=1&size=10" , {
+  //     headers: {
+  //       Authorization: `Bearer ${cookies.get('accessToken')}`
+  //     }}).then((res)=>{
+  //       setExaminees(res.data.response.subjects);
+  //       console.log(res.data.response)
+  //     }).catch((err)=>{
+  //       console.log(err);
+  //     })
+  // },[])
 
   const [clicked, setClicked] = useState("");
   useEffect(()=>{
@@ -110,20 +111,53 @@ const MemberList = ()=>{
   },[chartNumber,inspectionDate])
 
 
-const dateSelect = (select) =>{
-    console.log(select);
-    setInspectionDate(select);
-}
+  const dateSelect = (select) =>{
+      console.log(select);
+      setInspectionDate(select);
+  }
 
 
-const [dateSelectorStat, setDateSelectorStat] = useState(false);
+  const [dateSelectorStat, setDateSelectorStat] = useState(false);
 
+  const [ref, inView] = useInView();
+  const [page, setPage] = useState(1); // 현재 페이지 번호 (페이지네이션)
 
+  // 무한 스크롤
+  // 지정한 타겟 div가 화면에 보일 때 마다 서버에 요청을 보냄
+  const productFetch = () => {
+    axios.get(`/subjects?page=${page}&size=10` , {
+      headers: {
+        Authorization: `Bearer ${cookies.get('accessToken')}`
+      }}).then((res)=>{
+        if(res.data.message !== "OK"){return;}
+        setExaminees([...examinees, ...res.data.response.subjects]);
+        console.log(examinees)
+        setPage((page) => page + 1)
+      }).catch((err)=>{
+        console.log(err);
+      })
+  };
+
+  useEffect(() => {
+    // inView가 true 일때만 실행(마지막 요소 보이면 true)
+    if (inView) {
+      console.log(inView, '무한 스크롤 요청')
+      let time = setTimeout(()=>{
+        productFetch();
+      },10)
+      return()=>{
+        clearTimeout(time);
+      }
+    }
+    else{
+      console.log(inView);
+    }
+  });
 
   return (
       <div className="memberList-page-container">
         {dateSelectorStat ? <DateSelector data={inspectionDate} onOff={setDateSelectorStat} select={dateSelect}/> : null}
-        <div className="memberList-page-nav">
+        <div className="memberList-page-nav" onClick={()=>{console.log(examinees)}}>
           <p>환자 선택</p>
         </div>
         <div className="memberList-page-left-container">
@@ -162,7 +196,9 @@ const [dateSelectorStat, setDateSelectorStat] = useState(false);
                     </div>
                     )
                   })
+                  //아래 요소가 마지막(무한로딩 트리거)
                 }
+                <div className='patient-loading' ref={ref}></div>
               </div>
             </div>
           </div>

@@ -90,6 +90,24 @@ const LoginForm = () =>{
     }
   },[signUpPage])
 
+  useEffect(()=>{
+    const cookie = new Cookies();
+    if(cookie.get('refreshToken') !== undefined){
+      axios.post("/auth/renewal" ,{},{
+        headers: {
+          Authorization: `Bearer ${cookie.get('refreshToken')}`
+      }}).then((res)=>{
+        accessExpires.setMinutes(accessExpires.getMinutes() + 14);
+        cookie.set('accessToken',res.data.response.accessToken,{expires : accessExpires,secure:"true"});
+        navigate('/memberList');
+      }).catch((err)=>{
+        console.log(err);
+        window.location.replace('/');
+      });
+    }
+  },[])
+
+
   return(
     <div className="login-page-container">
       {
