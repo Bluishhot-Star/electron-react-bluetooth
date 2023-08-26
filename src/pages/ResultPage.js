@@ -23,27 +23,42 @@ function ResultPage(){
 
 
   let diagnosis, trials;
-  let timeVolumeList = [];
-  let volumeFlowList = [];
-  let timeVolumeMaxList = [];
+
   let colorList = ['rgb(5,128,190)','rgb(158,178,243)','rgb(83,126,232)','rgb(67,185,162)','rgb(106,219,182)','rgb(255,189,145)','rgb(255,130,130)','rgb(236,144,236)'];
+  
+  const [graphOnOff, setGraphOnOff] = useState([]);
+  const [graphOnOffInit, setGraphOnOffInit] = useState([]);
+  const [allTimeVolumeList, setAllTimeVolumeList] = useState([]);
+  const [allVolumeFlowList, setAllVolumeFlowList] = useState([]);
+
   useEffect(()=>{
-    console.log(1);
+    console.log(123123123);
     diagnosis = location.state.diagnosis;
     trials = location.state.trials;
+    let timeVolumeList = [];
+    let volumeFlowList = [];
+    let timeVolumeMaxList = [];
+
     if(trials){
+      console.log(trials.length);
+      let temp = new Array(trials.length).fill(1);
+      setGraphOnOff(temp);
+
       // 매 결과에서 데이터 추출
       trials.forEach((item)=>{
         timeVolumeList.push(item.graph.timeVolume);
         volumeFlowList.push(item.graph.volumeFlow);
+
         //현 timeVolume에서 최대값 찾기
         timeVolumeMaxList.push(item.results[3].meas);
-        console.log(timeVolumeMaxList);
       })
       setVolumeFlow(volumeFlowList);
       setTimeVolume(timeVolumeList);
+      setAllTimeVolumeList(timeVolumeList);
+      setAllVolumeFlowList(volumeFlowList);
       setTvMax(timeVolumeMaxList);
       graphOption.scales.x.max = parseInt(Math.max(...timeVolumeMaxList));
+      setTrigger(0);
     }
   },[])
 
@@ -70,18 +85,81 @@ function ResultPage(){
   const [simpleResult,setSimpleResult] = useState([]);
 
 
+  
+  const [graphSelection, setGraphSelection] = useState([]);
+  const [trigger, setTrigger] = useState(-1);
 
-  const selectGraph=(mId)=>{
-  // volumeFlow.filter((volume)=>volume.measurementId === mId).map((item)=>(
-  //   console.log(item)
-  // ))
-  // timeVolume.filter((time)=>time.measurementId === mId).map((item)=>(
-  //   console.log(item)
-  // ))
-  // svcGraph.filter((time)=>time.measurementId === mId).map((item)=>(
-  //   console.log(item)
-  // ))
+  const selectGraph=(index)=>{
+    console.log("HE!!!!");
+    let temp;
+    //처음 눌렀을때
+    if(trigger == 0){
+      temp = [...graphOnOff].fill(0); //0으로 바꾸기
+    }
+    else{ //처음 아닐때
+      temp = [...graphOnOff];
+    }
+
+    if (temp[index] == 1){
+      temp[index] = 0;
+      setTrigger(trigger-1);
+    }
+    else if(temp[index] == 0){
+      temp[index] = 1;
+      setTrigger(trigger+1);
+    }
+    setGraphOnOff(temp);
   }
+
+  useEffect(()=>{
+    /**
+     * timeVolumeList -> 전체 리스트
+     * timeVolume -> 보여줄 리스트
+     */
+    
+    // 누른거 없을떄 onoff[1,1,1, ...]
+    console.log("Trigger : "+trigger);
+    if(trigger == 0){
+      console.log("ALLLLL : ",allTimeVolumeList);
+      let temp = [...graphOnOff].fill(1);
+      setGraphOnOff(temp);
+      setTimeVolume(allTimeVolumeList);
+      setVolumeFlow(allVolumeFlowList);
+      return;
+    }
+    // 누른거 있을때
+    let temp = [...allTimeVolumeList];
+    let temp2 = [...allVolumeFlowList];
+    graphOnOff.forEach((item, index)=>{
+      if(item == 0){
+        temp[index] = [{x: 0, y: 0}];
+        temp2[index] = [{x: 0, y: 0}];
+      }
+      else if(item == 1){
+        temp[index] = allTimeVolumeList[index];
+        temp2[index] = allVolumeFlowList[index];
+      }
+    })
+    setTimeVolume(temp);
+    setVolumeFlow(temp2);
+    console.log(temp);
+
+    /////////////////////////
+  },[trigger])
+
+  useEffect(()=>{
+    graphOnOff.forEach((item, index)=>{
+      if(item == 1){
+        simpleResultsRef.current[index].classList+=" selected";
+        simpleResultsRef.current[index].style+="";
+      }
+      else{
+        if(simpleResultsRef.current[index].classList.contains("selected")){
+          simpleResultsRef.current[index].classList.remove("selected");
+        }
+      }
+    })
+  },[graphOnOff])
 
 
   const [graphData, setGraphData] = useState({
@@ -230,7 +308,6 @@ function ResultPage(){
   const [temp, setTemp] = useState(false);
 
   const handleResize = debounce(()=>{
-    console.log(second);
     setTemp(false);
     setSecond({
       x: window.innerWidth,
@@ -386,12 +463,14 @@ function ResultPage(){
 
   const chartRef = useRef();
 
+  const simpleResultsRef = useRef([]);
+  const addSimpleResultsRef = (el) => {simpleResultsRef.current.push(el)};
 
 
   return(
     <div className="result-page-container">
         <div className="nav">
-          <div className="nav-logo" onClick={()=>{console.log(chartRef.current['boxes'][3].max)}}>
+          <div className="nav-logo" onClick={()=>{console.log(graphOnOff);}}>
             <h1>The SpiroKit</h1>
           </div>
           <div className="nav-content-container">
@@ -428,7 +507,7 @@ function ResultPage(){
 
 
               {/* // 이부분 api 문제있음 */}
-              <div className="title">흡연 기간</div> 
+              <div className="title">흡연 기간(연)</div> 
               {/* <div className="content">{state.smoke.period === 0 ? "-" : state.smoke.period}</div> */}
 
               <div className="space"></div>
@@ -457,7 +536,7 @@ function ResultPage(){
             <div className="slider">
             {
               location.state.trials.map((item, index)=>(
-              <div  key={item.measurementId}  className='simple-result-container'>
+              <div ref={(el)=>{simpleResultsRef.current[index]=el}} onClick={()=>{console.log(simpleResultsRef.current[index]);console.log(item.measurementId);selectGraph(index)}} key={item.measurementId}  className='simple-result-container'>
                 <div className='simple-result-title-container'>
                   <p className='simple-result-title'>{item.bronchodilator}</p>
                   <p className='simple-result-date'>검사일시({item.date})</p>
