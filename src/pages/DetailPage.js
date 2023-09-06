@@ -38,7 +38,7 @@ function DetailPage(){
     const [postFvc,setPostFvc] = useState({
       lower: "",
       max: "",
-      meas: "0.1",
+      meas: "",
       min: "",
       post: "",
       title: "FVC",
@@ -56,7 +56,7 @@ function DetailPage(){
     const [postFev1,setPostFev1] = useState({
       lower: "",
       max: "",
-      meas: "0.1",
+      meas: "",
       min: "",
       post: "",
       title: "FEV1",
@@ -74,7 +74,7 @@ function DetailPage(){
     const [postFev1Per,setPostFev1Per] = useState({
       lower: "",
       max: "",
-      meas: "0.1",
+      meas: "",
       min: "",
       post: "",
       title: "FEV%",
@@ -101,7 +101,12 @@ function DetailPage(){
           }
           i++;
         }        
+        
     },[]);
+
+    useEffect(()=>{
+      console.log(Math.min(parseFloat(preFvc.meas, preFvc.min)));
+    },[preFvc])
 
     // useEffect(()=>{
     //   axios.get(`/subjects/${chartNumber}/types/fvc/results/${state.date}/diagnosis` , {
@@ -153,7 +158,7 @@ function DetailPage(){
           pointBackgroundColor: "#FF9191",
           pointRadius: 5,
           pointHitRadius: 10,
-          data: [{x: quadrant4XY.x, y: quadrant4XY.y}],
+          data: [{x: quadrant4XY.x, y: quadrant4XY.y}], 
           tension: 0.4,
         },]
       }
@@ -252,7 +257,7 @@ function DetailPage(){
         x: {
           axios: 'x',
           max: preFev1.max,
-          min: preFev1.min,
+          min: Math.min(parseFloat(preFev1.meas), parseFloat(preFev1.min)),
           ticks:{
             display:false,
             beginAtZero: true,
@@ -318,7 +323,7 @@ function DetailPage(){
         x: {
           axios: 'x',
           max: preFev1Per.max,
-          min: preFev1Per.min,
+          min: Math.min(parseFloat(preFev1Per.meas), parseFloat(preFev1Per.min)),
           ticks:{
             beginAtZero: true,
             display:false,
@@ -383,9 +388,11 @@ function DetailPage(){
       scales: {
         x: {
           axios: 'x',
+          
+          min: Math.min(parseFloat(preFvc.meas), parseFloat(preFvc.min)),
           max: preFvc.max,
-          min: preFvc.min,
           ticks:{
+
             display:false,
             beginAtZero: true,
           },
