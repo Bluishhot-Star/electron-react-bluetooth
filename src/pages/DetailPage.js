@@ -133,7 +133,7 @@ function DetailPage(){
           })
       }
     },[preResult]);
-    
+
     //post
     useEffect(()=>{
       if(Object.keys(postResult).length !== 0){
@@ -415,7 +415,9 @@ function DetailPage(){
         <div> 
           <div>담당자 {state.subject[7].value}</div>
           <div>검사적합성 : {state.diagnosis.suitability}</div>
-            <div>
+            <div onClick={()=>{
+              navigator(-1) //탈출용
+            }}>
                 {preResult.map((item)=>(
                     <table border={1}>
                         <tr>

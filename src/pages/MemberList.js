@@ -58,22 +58,46 @@ const MemberList = ()=>{
       console.log(err);
     })
   }
-
+  const [goTO, setGoTO] = useState(false)
+  // let data1, data2;
+  const [data1, setData1] = useState([]);
+  const [data2, setData2] = useState([]);
   const report = (date)=>{
     axios.get(`/subjects/${chartNumber}/types/fvc/results/${date}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
     }).then((res)=>{
-      console.log(res.data.response);
-      let data = res.data.response;
-      data["date"] = date;
-      data["birthday"] = birth;
-      navigator('/memberList/resultPage', {state: data})
+      console.log(res);
+      setData1(res.data.response);
+      console.log(data1);
+      
     }).catch((err)=>{
       console.log(err);
     })
+    axios.get(`/subjects/${chartNumber}/types/svc/results/${date}` , {
+      headers: {
+        Authorization: `Bearer ${cookies.get('accessToken')}`
+      }
+    }).then((res)=>{
+      console.log(res);
+      setData2(res.data.response);
+    }).catch((err)=>{
+      console.log(err);
+    })
+    let time = setTimeout(()=>{
+      setGoTO(true);
+
+    },1000)
   }
+  useEffect(()=>{
+    if(goTO){
+      console.log(data1);
+      console.log(data2);
+      navigator('/memberList/resultPage', {state: {fvc:data1, svc:data2, date:date, birth:birth}});
+    }
+    else{}
+  },[goTO])
 
   const [curtainStat, setCurtainStat] = useState(true);
 
@@ -90,27 +114,35 @@ const MemberList = ()=>{
         console.log(err);
       })
   }
+  useEffect(()=>{
 
+  },[chartNumber])
 
   //기간 설정 기능
   const [inspectionDate, setInspectionDate] = useState({
     start : "",
     end : ""
   });
-
+//수정
   useEffect(()=>{
-    if(chartNumber==="")return;
-    axios.get(`/subjects/${chartNumber}/histories?from=${inspectionDate.start}&end=${inspectionDate.end}` , {
-      headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
-      }}).then((res)=>{
-        setDate(res.data.response);
-      }).catch((err)=>{
-        console.log(err);
-      })
-  },[chartNumber,inspectionDate])
+    if(chartNumber !== ""){
+      axios.get(`/subjects/${chartNumber}/histories?from=${inspectionDate.start === "" ? "2000-01-01" : inspectionDate.start}&end=${inspectionDate.end === "" ? "2099-01-01" : inspectionDate.end}` , {
+        headers: {
+          Authorization: `Bearer ${cookies.get('accessToken')}`
+        }}).then((res)=>{
+          console.log(inspectionDate);
+          setDate(res.data.response);
+        }).catch((err)=>{
+          console.log(err);
+        })
+    }
+      
+    
+  },[inspectionDate])
 
-
+useEffect(()=>{
+  console.log(date)
+})
   const dateSelect = (select) =>{
       console.log(select);
       setInspectionDate(select);
@@ -131,12 +163,15 @@ const MemberList = ()=>{
       }}).then((res)=>{
         if(res.data.message !== "OK"){return;}
         setExaminees([...examinees, ...res.data.response.subjects]);
-        console.log(examinees)
+        console.log(res.data.response)
         setPage((page) => page + 1)
       }).catch((err)=>{
         console.log(err);
       })
   };
+  useEffect(()=>{
+    console.log(page);
+  },[examinees])
 
   useEffect(() => {
     // inView가 true 일때만 실행(마지막 요소 보이면 true)
@@ -152,7 +187,7 @@ const MemberList = ()=>{
     else{
       console.log(inView);
     }
-  });
+  },);
 
   return (
       <div className="memberList-page-container">

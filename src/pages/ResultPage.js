@@ -17,31 +17,33 @@ function ResultPage(){
   const navigator = useNavigate();
   const state = location.state;
   const cookies = new Cookies();
-
+  const [FvcSvc, setFvcSvc] = useState("fvc"); //fvc, svc
   const [info, setInfo] = useState();
   const [tvMax, setTvMax] = useState([10]);
 
 
   let diagnosis, trials;
 
-  let colorList = ['rgb(5,128,190)','rgb(158,178,243)','rgb(83,126,232)','rgb(67,185,162)','rgb(106,219,182)','rgb(255,189,145)','rgb(255,130,130)','rgb(236,144,236)'];
+  let colorList = ['rgb(5,128,190)','rgb(158,178,243)','rgb(83, 225, 232)','rgb(67,185,162)','rgb(106,219,182)','rgb(255,189,145)','rgb(255,130,130)','rgb(236,144,236)','rgb(175,175,175)','rgb(97,97,97)'];
   
   const [graphOnOff, setGraphOnOff] = useState([]);
-  const [graphOnOffInit, setGraphOnOffInit] = useState([]);
   const [allTimeVolumeList, setAllTimeVolumeList] = useState([]);
   const [allVolumeFlowList, setAllVolumeFlowList] = useState([]);
 
+  //fvc 그래프 처리
   useEffect(()=>{
+    console.log(location.state);
     console.log(123123123);
     diagnosis = location.state.diagnosis;
-    trials = location.state.trials;
+    //fvc의 심플카드
+    trials = location.state.fvc.trials;
     let timeVolumeList = [];
     let volumeFlowList = [];
     let timeVolumeMaxList = [];
 
     if(trials){
       console.log(trials.length);
-      let temp = new Array(trials.length).fill(1);
+      let temp = new Array(trials.length).fill(0);
       setGraphOnOff(temp);
 
       // 매 결과에서 데이터 추출
@@ -77,24 +79,31 @@ function ResultPage(){
     navigator('/memberList/addPatient', {state: patientDate})
   }
 
-  //결과 그래프 목록 요청 FVC,SVC
+  //결과 그래프 목록 요청 FVC
   const[volumeFlow,setVolumeFlow] = useState([]);
   const[timeVolume,setTimeVolume] = useState([]);
-  const[svcGraph,setSvcGraph] = useState([]);
 
-  const [simpleResult,setSimpleResult] = useState([]);
-
-
-  
-  const [graphSelection, setGraphSelection] = useState([]);
   const [trigger, setTrigger] = useState(-1);
 
+  //svc그래프
+  const[svcGraph,setSvcGraph] = useState([]);
+  const[allSvcGraph,setAllSvcGraph] = useState([]);
+  //svcY축 최대값
+  const[svcMax, setSvcMax] = useState([10]);
+  //그래프 선택 온오프
+  const[svcGraphOnOff, setSvcGraphOnOff] = useState([]);
+  //svc trigger
+  const[svcTrigger, setSvcTrigger] = useState(-1);
+  //심플카드 모음
+  const[svcTrials, setSvcTrials] = useState([1]);
+
+  //그래프 선택
   const selectGraph=(index)=>{
     console.log("HE!!!!");
     let temp;
     //처음 눌렀을때
     if(trigger == 0){
-      temp = [...graphOnOff].fill(0); //0으로 바꾸기
+      temp = [...graphOnOff].fill(0); //0으로 바꾸기 (선택효과 끄기)
     }
     else{ //처음 아닐때
       temp = [...graphOnOff];
@@ -111,9 +120,32 @@ function ResultPage(){
     setGraphOnOff(temp);
   }
 
+  //svc 그래프 선택
+  const selectSvcGraph=(index)=>{
+    console.log("SVC!!!!");
+    let temp;
+    //처음 눌렀을때
+    if(svcTrigger == 0){
+      temp = [...svcGraphOnOff].fill(0); //0으로 바꾸기 (선택효과 끄기)
+    }
+    else{ //처음 아닐때
+      temp = [...svcGraphOnOff];
+    }
+
+    if (temp[index] == 1){
+      temp[index] = 0;
+      setSvcTrigger(svcTrigger-1);
+    }
+    else if(temp[index] == 0){
+      temp[index] = 1;
+      setSvcTrigger(svcTrigger+1);
+    }
+    setSvcGraphOnOff(temp);
+  }
+
   useEffect(()=>{
     /**
-     * timeVolumeList -> 전체 리스트
+     * allTimeVolumeList -> 전체 리스트
      * timeVolume -> 보여줄 리스트
      */
     
@@ -121,7 +153,7 @@ function ResultPage(){
     console.log("Trigger : "+trigger);
     if(trigger == 0){
       console.log("ALLLLL : ",allTimeVolumeList);
-      let temp = [...graphOnOff].fill(1);
+      let temp = [...graphOnOff].fill(0);
       setGraphOnOff(temp);
       setTimeVolume(allTimeVolumeList);
       setVolumeFlow(allVolumeFlowList);
@@ -146,8 +178,74 @@ function ResultPage(){
 
     /////////////////////////
   },[trigger])
+  
+  useEffect(()=>{
+    /**
+     * allTimeVolumeList -> 전체 리스트
+     * timeVolume -> 보여줄 리스트
+     */
+    
+    // 누른거 없을떄 onoff[1,1,1, ...]
+    console.log("SVCTrigger : "+svcTrigger);
+    if(svcTrigger == 0){
+      console.log("SVCALLLLL : ",allSvcGraph);
+      let temp = [...svcGraphOnOff].fill(0);
+      setSvcGraphOnOff(temp);
+      setSvcGraph(allSvcGraph);
+      return;
+    }
+    // 누른거 있을때
+    let temp = [...allSvcGraph];
+    svcGraphOnOff.forEach((item, index)=>{
+      if(item == 0){
+        temp[index] = [{x: 0, y: 0}];
+      }
+      else if(item == 1){
+        temp[index] = allSvcGraph[index];
+      }
+    })
+    setSvcGraph(temp);
+    console.log(temp);
+
+    /////////////////////////
+  },[svcTrigger])
+
+  const report = (date)=>{
+    
+  }
+
+
+
 
   useEffect(()=>{
+  //   console.log(location.state);
+    console.log(123123123);
+    //fvc의 심플카드
+    trials = location.state.svc.trials;
+    let svcGraphList = [];
+    let svcMaxList = [];
+
+    if(trials){
+      console.log(trials.length);
+      let temp = new Array(trials.length).fill(0);
+      setSvcGraphOnOff(temp);
+// 
+      // 매 결과에서 데이터 추출
+      trials.forEach((item)=>{
+        svcGraphList.push(item.graph.timeVolume);
+
+        //현 svc 최대값 찾기
+        svcMaxList.push(parseInt(item.results[0].meas));
+      })
+      setSvcGraph(svcGraphList);
+      setAllSvcGraph(svcGraphList);
+      setSvcMax(svcMaxList);
+      setSvcTrigger(0);
+    }
+  },[])
+
+  useEffect(()=>{
+    if(FvcSvc=="svc")return;
     graphOnOff.forEach((item, index)=>{
       if(item == 1){
         simpleResultsRef.current[index].classList+=" selected";
@@ -160,7 +258,21 @@ function ResultPage(){
       }
     })
   },[graphOnOff])
-
+  
+  useEffect(()=>{
+    if(FvcSvc=="fvc")return;
+    svcGraphOnOff.forEach((item, index)=>{
+      if(item == 1){
+        svcSimpleResultsRef.current[index].classList+=" selected";
+        svcSimpleResultsRef.current[index].style+="";
+      }
+      else{
+        if(svcSimpleResultsRef.current[index].classList.contains("selected")){
+          svcSimpleResultsRef.current[index].classList.remove("selected");
+        }
+      }
+    })
+  },[svcGraphOnOff])
 
   const [graphData, setGraphData] = useState({
     labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
@@ -176,6 +288,19 @@ function ResultPage(){
     },]
   })
   const [graphData2, setGraphData2] = useState({
+    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+    datasets: [{
+      label: "",
+      data: [
+        {x: 0.030999999999999996, y: 0.23858681948280723},
+        {x: 0.030999999999999996, y: 0.23858681948280724},
+        {x: 0.030999999999999996, y: 0.23858681948280724}],
+      borderColor: 'rgb(255,255,255)',
+      showLine: true,
+      tension: 0.4
+    },]
+  })
+  const [graphData3, setGraphData3] = useState({
     labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
     datasets: [{
       label: "",
@@ -270,7 +395,7 @@ function ResultPage(){
       x: {
         axios: 'x',
         min: 0,
-        max: 3,
+        suggestedMax: 3,
         // suggestedMax: 6.0,
         ticks:{
           stepSize : .5,
@@ -299,6 +424,58 @@ function ResultPage(){
       },
     },
   }
+  const graphOption3={
+    plugins:{
+      legend: {
+          display: false
+      },
+      resizeDelay:0,
+    },
+    responsive: true,
+    animation:{
+      // duration:0
+    },
+    maintainAspectRatio: false,
+    interaction: false, 
+    elements: {
+      point: {
+        radius: 0,
+      },
+    },
+    scales: {
+      x: {
+        axios: 'x',
+        // min: 0,
+        suggestedMax: 60.0,
+        // suggestedMax: 6.0,
+        ticks:{
+          stepSize : 10.0,
+          beginAtZero: false,
+          max: 12.0,
+          autoSkip: false,
+        }
+      },
+      y: {
+        gridLines:{
+          zeroLineColor:'rgba(0, 0, 255, 1)',
+        },
+        axios: 'y',
+        max: parseFloat(Math.max(...svcMax)),
+        min: parseFloat(Math.max(...svcMax))*-1,
+        // suggestedMax:0,
+        // suggestedMin:-6,
+        ticks: {
+          major: true,
+          beginAtZero: true,
+          // stepSize : .5,
+          fontSize : 10,
+          textStrokeColor: 10,
+          precision: 1,
+        },
+      },
+    },
+  }
+
 
 
 
@@ -316,9 +493,13 @@ function ResultPage(){
   })
 
   useEffect(()=>{
+    setTemp(false);
+  },[FvcSvc])
+
+  useEffect(()=>{
     let time = setTimeout(() => {
       setTemp(true);
-    },1000);
+    },500);
   },[graphData])
 
   useEffect(()=>{
@@ -339,7 +520,7 @@ function ResultPage(){
         setTemp(false)
         console.log("HEllt")
       };
-    }, 300);
+    },300);
     return()=>{clearTimeout(time)}
   })
   
@@ -376,7 +557,7 @@ function ResultPage(){
             {
               label: "",
               data: item,
-              borderColor: `${colorList[index]}`,
+              borderColor: `${colorList[index%10]}`,
               borderWidth: 2.5,
               showLine: true,
               tension: 0.4
@@ -426,7 +607,7 @@ function ResultPage(){
             {
               label: "WEEEK",
               data: item,
-              borderColor: `${colorList[index]}`,
+              borderColor: `${colorList[index%10]}`,
               borderWidth: 2.5,
               showLine: true,
               tension: 0.4
@@ -458,26 +639,104 @@ function ResultPage(){
       clearTimeout(time);
     }
   },[timeVolume])
+  
+  // svcGraph 그리기
+  useEffect(()=>
+  {
+    console.log("!#!##")
+
+    let time = setTimeout(()=>{
+      console.log("!#!##!@!@")
+      
+      let time2 = setTimeout(() => {
+        let dataset = []
+        svcGraph.forEach((item,index)=>{
+          dataset.push(
+            {
+              label: "WEEEK",
+              data: item,
+              borderColor: `${colorList[index%10]}`,
+              borderWidth: 2.5,
+              showLine: true,
+              tension: 0.4
+            }
+          )
+        })
+        let time3 = setTimeout(() => {
+          let data = {
+            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            datasets: dataset,
+          }
+          let time4 = setTimeout(() => {
+            setGraphData3(data);
+          }, 50);
+          return()=>{
+            clearTimeout(time4);
+          }
+        }, 50);
+        return()=>{
+          clearTimeout(time3);
+        }
+      }, 50);
+      return()=>{
+        clearTimeout(time2);
+      }
+    },50)
+
+    return()=>{
+      clearTimeout(time);
+    }
+  },[svcGraph])
+
+
 
   const graphStyle = {width:"0px" ,height:"0px", transition:"none"}
 
   const chartRef = useRef();
 
   const simpleResultsRef = useRef([]);
+  const svcSimpleResultsRef = useRef([]);
   const addSimpleResultsRef = (el) => {simpleResultsRef.current.push(el)};
+  const detailPage = () => {
+    if(FvcSvc == "fvc") navigator('/memberList/detailPage', {state: state.fvc});
+    else navigator('/memberList/detailPage', {state: state.svc});
+  }
+
+  const FVCBtnRef = useRef();
+  const SVCBtnRef = useRef();
+
+  const changeType = (type)=>{
+    setFvcSvc(type);
+  }
+  useEffect(()=>{
+    if(FvcSvc === 'fvc'){
+      if(SVCBtnRef.current.classList.contains("clickedType")){
+        SVCBtnRef.current.classList.remove("clickedType");
+      }
+      FVCBtnRef.current.classList += " clickedType"
+    }
+    else{
+      if(FVCBtnRef.current.classList.contains("clickedType")){
+        FVCBtnRef.current.classList.remove("clickedType");
+      }
+      SVCBtnRef.current.classList += " clickedType"
+    }
+  },[FvcSvc])
+
+
 
 
   return(
     <div className="result-page-container">
         <div className="nav">
-          <div className="nav-logo" onClick={()=>{console.log(graphOnOff);}}>
+          <div className="nav-logo" onClick={()=>{console.log(graphOption3.scales.y.suggestedMax);}}>
             <h1>The SpiroKit</h1>
           </div>
           <div className="nav-content-container">
             <div className="nav-left-container">
               <div className="admin">
                 <span>담당자</span>
-                <span>{state.subject[7].value}</span>
+                {/* <span>{state.subject[7].value}</span> */}
               </div>
             </div>
             <div className="nav-right-container">
@@ -491,24 +750,25 @@ function ResultPage(){
             <span>환자 정보</span>
             <div className="patient-info">
               <div className="title">이름</div>
-              <div className="content">{state.subject[1].value}</div>
+              <div className="content">{state.fvc.subject[1].value}</div>
               <div className="title">성별</div>
-              <div className="content">{state.subject[3].value=="m"?"남자":"여자"}</div>
+              <div className="content">{state.fvc.subject[3].value=="m"?"남자":"여자"}</div>
               <div className="title">신장</div>
-              <div className="content">{state.subject[4].value}cm</div>
+              <div className="content">{state.fvc.subject[4].value}cm</div>
               <div className="title">몸무게</div>
-              <div className="content">{state.subject[5].value}kg</div>
+              <div className="content">{state.fvc.subject[5].value}kg</div>
               <div className="title">생년월일</div>
-              <div className="content">{state.birthday}</div>
+              <div className="content">{state.birth}</div>
               <div className="title">연간 흡연량</div>
-              <div className="content">{state.subject[13].value == "0" ? "-":state.subject[13].value}</div>
+              <div className="content">{state.fvc.subject[13].value == "0" ? "-":state.fvc.subject[13].value}</div>
               <div className="title">흡연 여부</div>
-              <div className="content">{state.subject[9].value === "false"||state.subject[9].value === false ? "아니오" : "예"}</div>
+              <div className="content">{state.fvc.subject[9].value === "false"||state.fvc.subject[9].value === false ? "아니오" : "예"}</div>
 
 
               {/* // 이부분 api 문제있음 */}
               <div className="title">흡연 기간(연)</div> 
-              {/* <div className="content">{state.smoke.period === 0 ? "-" : state.smoke.period}</div> */}
+              <div className="content">{Boolean(parseInt(state.fvc.subject[12].value) - parseInt(state.fvc.subject[11].value)) === false ? "-" :parseInt(state.subject[12].value) - parseInt(state.subject[11].value)}</div>
+              
 
               <div className="space"></div>
             </div>
@@ -519,62 +779,126 @@ function ResultPage(){
         <div className="right-container">
           <div className="button-container">
             <div className="two-btn-container">
-              <button onClick={()=>{}} id="clickme" className="FVC-btn">FVC</button>
-              <button className="SVC-btn">SVC</button>
+              <button ref={FVCBtnRef} onClick={()=>{changeType("fvc")}} id="clickme" className="FVC-btn">FVC</button>
+              <button ref={SVCBtnRef} onClick={()=>{changeType("svc")}} className="SVC-btn">SVC</button>
             </div>
-            <button className="detail-btn">결과 상세보기</button>
+            <button className="detail-btn" onClick={()=>{detailPage()}}>결과 상세보기</button>
           </div>
-          <div className="graph-container">
-            <div className="graph">
-              {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingG'>화면 조정 중..</p>}
+          {
+            FvcSvc == "fvc" ? 
+            <div className="fvc-graph-container">
+              <div className="graph">
+                {temp?<div className="title-y">Flow(l/s)</div>:<></>}
+                {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingG'>화면 조정 중..</p>}
+                {temp?<div className="title-x">Volume(L)</div>:<></>}
+              </div>
+              <div className="graph">
+                {temp?<div className="title-y">Volume(L)</div>:<></>}
+                {temp?<Scatter style={graphStyle} data={graphData2} options={graphOption2}/>:<p className='loadingG'>화면 조정 중..</p>}
+                {temp?<div className="title-x">Time(s)</div>:<></>}
+              </div>
             </div>
-            <div className="graph">
-            {temp?<Scatter style={graphStyle} data={graphData2} options={graphOption2}/>:<p className='loadingG'>화면 조정 중..</p>}
+          :
+            <div className='svc-graph-container'>
+              <div className="graph">
+                {temp?<div className="title-y">Volume(L)</div>:<></>}
+                {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData3} options={graphOption3}/>:<p className='loadingG'>화면 조정 중..</p>}
+                {temp?<div className="title-x">Time(s)</div>:<></>}
+              </div>
             </div>
-          </div>
+          }
+          {/* <div className="fvc-graph-container">
+          </div> */}
+
+
           <div className="history-container">
             <div className="slider">
             {
-              location.state.trials.map((item, index)=>(
-              <div ref={(el)=>{simpleResultsRef.current[index]=el}} onClick={()=>{console.log(simpleResultsRef.current[index]);console.log(item.measurementId);selectGraph(index)}} key={item.measurementId}  className='simple-result-container'>
-                <div className='simple-result-title-container'>
-                  <p className='simple-result-title'>{item.bronchodilator}</p>
-                  <p className='simple-result-date'>검사일시({item.date})</p>
+              FvcSvc == "fvc" ?
+                location.state.fvc.trials.map((item, index)=>(
+                <div ref={(el)=>{simpleResultsRef.current[index]=el}} onClick={()=>{console.log(simpleResultsRef.current[index]);console.log(item.measurementId);selectGraph(index)}} key={item.measurementId}  className='simple-result-container'>
+                  <div className='simple-result-title-container'>
+                    <p className='simple-result-title'>{item.bronchodilator}</p>
+                    <p className='simple-result-date'>검사일시({item.date})</p>
+                  </div>
+                  <div className='simple-result-table-container'>
+                    <div className='simple-result-table-column'>
+                      <p></p>
+                      <p>meas</p>
+                      <p>pred</p>
+                      <p>percent</p>
+                    </div>
+                    <div className='simple-result-table-FVC'>
+                      <p>{item.results[0].title}({item.results[0].unit})</p>
+                      <p>{item.results[0].meas?item.results[0].meas:"-"}</p>
+                      <p>{item.results[0].pred?item.results[0].pred:"-"}</p>
+                      <p>{item.results[0].per?item.results[0].per:"-"}</p>
+                    </div>
+                    <div className='simple-result-table-FEV1'>
+                      <p>{item.results[1].title}({item.results[1].unit})</p>
+                      <p>{item.results[1].meas?item.results[1].meas:"-"}</p>
+                      <p>{item.results[1].pred?item.results[1].pred:"-"}</p>
+                      <p>{item.results[1].per?item.results[1].per:"-"}</p>
+                    </div>
+                    <div className='simple-result-table-FEV1per'>
+                      <p>FEV1%</p>
+                      <p>{item.results[2].meas?item.results[2].meas:"-"}</p>
+                      <p>{item.results[2].pred?item.results[2].pred:"-"}</p>
+                      <p>{item.results[2].per?item.results[2].per:"-"}</p>
+                    </div>
+                    <div className='simple-result-table-PEF'>
+                      <p>PEF(L/s)</p>
+                      <p>{item.results[3].meas?item.results[3].meas:"-"}</p>
+                      <p>{item.results[3].pred?item.results[3].pred:"-"}</p>
+                      <p>{item.results[3].per?item.results[3].per:"-"}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className='simple-result-table-container'>
-                  <div className='simple-result-table-column'>
-                    <p></p>
-                    <p>meas</p>
-                    <p>pred</p>
-                    <p>percent</p>
+                ))
+              :
+              location.state.svc.trials.map((item, index)=>(
+                <div ref={(el)=>{svcSimpleResultsRef.current[index]=el}} onClick={()=>{console.log(svcSimpleResultsRef.current[index]);console.log(item.measurementId);selectSvcGraph(index)}} key={item.measurementId}  className='simple-result-container'>
+                  <div className='simple-result-title-container'>
+                    <p className='simple-result-title'>{item.bronchodilator}</p>
+                    <p className='simple-result-date'>검사일시({item.date})</p>
                   </div>
-                  <div className='simple-result-table-FVC'>
-                    <p>{item.results[0].title}({item.results[0].unit})</p>
-                    <p>{item.results[0].meas}</p>
-                    <p>{item.results[0].pred}</p>
-                    <p>{item.results[0].per}</p>
-                  </div>
-                  <div className='simple-result-table-FEV1'>
-                    <p>{item.results[1].title}({item.results[1].unit})</p>
-                    <p>{item.results[1].meas}</p>
-                    <p>{item.results[1].pred}</p>
-                    <p>{item.results[1].per}</p>
-                  </div>
-                  <div className='simple-result-table-FEV1per'>
-                    <p>FEV1%</p>
-                    <p>{item.results[2].meas}</p>
-                    <p>{item.results[2].pred}</p>
-                    <p>{item.results[2].per}</p>
-                  </div>
-                  <div className='simple-result-table-PEF'>
-                    <p>PEF(L/s)</p>
-                    <p>{item.results[3].meas}</p>
-                    <p>{item.results[3].pred}</p>
-                    <p>{item.results[3].per}</p>
+                  <div className='simple-result-table-container'>
+                    <div className='simple-result-table-column'>
+                      <p></p>
+                      <p>meas</p>
+                      <p>pred</p>
+                      <p>percent</p>
+                    </div>
+                    <div className='simple-result-table-vc'>
+                      <p>{item.results[0].title}({item.results[0].unit})</p>
+                      <p>{item.results[0].meas?item.results[0].meas:"-"}</p>
+                      <p>{item.results[0].pred?item.results[0].pred:"-"}</p>
+                      <p>{item.results[0].per?item.results[0].per:"-"}</p>
+                    </div>
+                    <div className='simple-result-table-ic'>
+                      <p>{item.results[1].title}({item.results[1].unit})</p>
+                      <p>{item.results[1].meas?item.results[1].meas:"-"}</p>
+                      <p>{item.results[1].pred?item.results[1].pred:"-"}</p>
+                      <p>{item.results[1].per?item.results[1].per:"-"}</p>
+                    </div>
+                    <div className='simple-result-table-FEV1per'>
+                      <p>FEV1%</p>
+                      <p>{item.results[2].meas?item.results[2].meas:"-"}</p>
+                      <p>{item.results[2].pred?item.results[2].pred:"-"}</p>
+                      <p>{item.results[2].per?item.results[2].per:"-"}</p>
+                    </div>
+                    <div className='simple-result-table-PEF'>
+                      <p>PEF(L/s)</p>
+                      <p>{item.results[3].meas?item.results[3].meas:"-"}</p>
+                      <p>{item.results[3].pred?item.results[3].pred:"-"}</p>
+                      <p>{item.results[3].per?item.results[3].per:"-"}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+                ))
+                // svcTrials.map((item,index)=>{
+                // })
+            }
               
 
 

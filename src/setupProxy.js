@@ -26,9 +26,17 @@ module.exports = function(app){
     })
   )
   app.use(
+    createProxyMiddleware('/v2/subjects',{
+      target:'https://spirokitdev.the-researcher.com/v1',
+      changeOrigin: true,        
+    })
+  )
+  app.use(
     createProxyMiddleware('/clinicians',{
       target:'https://spirokitdev.the-researcher.com/v1',
       changeOrigin: true,
     })
   )
 };
+
+
