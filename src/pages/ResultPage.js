@@ -275,7 +275,7 @@ function ResultPage(){
   },[svcGraphOnOff])
 
   const [graphData, setGraphData] = useState({
-    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+    labels: ['FVC'],
     datasets: [{
       label: "",
       data: [
@@ -288,7 +288,7 @@ function ResultPage(){
     },]
   })
   const [graphData2, setGraphData2] = useState({
-    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+    labels: ['FVC'],
     datasets: [{
       label: "",
       data: [
@@ -301,7 +301,7 @@ function ResultPage(){
     },]
   })
   const [graphData3, setGraphData3] = useState({
-    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+    labels: ['SVC'],
     datasets: [{
       label: "",
       data: [
@@ -566,7 +566,7 @@ function ResultPage(){
         })
         let time3 = setTimeout(() => {
           let data = {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: '',
             datasets: dataset,
           }
           let time4 = setTimeout(() => {
@@ -605,7 +605,7 @@ function ResultPage(){
         timeVolume.forEach((item,index)=>{
           dataset.push(
             {
-              label: "WEEEK",
+              label: "",
               data: item,
               borderColor: `${colorList[index%10]}`,
               borderWidth: 2.5,
@@ -616,7 +616,7 @@ function ResultPage(){
         })
         let time3 = setTimeout(() => {
           let data = {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: "",
             datasets: dataset,
           }
           let time4 = setTimeout(() => {
@@ -653,7 +653,7 @@ function ResultPage(){
         svcGraph.forEach((item,index)=>{
           dataset.push(
             {
-              label: "WEEEK",
+              label: "",
               data: item,
               borderColor: `${colorList[index%10]}`,
               borderWidth: 2.5,
@@ -664,7 +664,7 @@ function ResultPage(){
         })
         let time3 = setTimeout(() => {
           let data = {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: "",
             datasets: dataset,
           }
           let time4 = setTimeout(() => {
@@ -699,7 +699,7 @@ function ResultPage(){
   const addSimpleResultsRef = (el) => {simpleResultsRef.current.push(el)};
   const detailPage = () => {
     if(FvcSvc == "fvc") navigator('/memberList/detailPage', {state: state.fvc});
-    else navigator('/memberList/detailPage', {state: state.svc});
+    else navigator('/memberList/detailSvcPage', {state: state.svc});
   }
 
   const FVCBtnRef = useRef();

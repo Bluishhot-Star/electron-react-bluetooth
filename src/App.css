@@ -335,6 +335,299 @@
 
 
 
+/* 디테일 페이지 */
+.detail-page-container{
+  width: 100%;
+  height : 100%;
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  grid-template-rows: 40px 40px 1fr;
+  grid-column-gap: 10px;
+}
+.nav{
+  grid-column: 1/-1;
+  width: 100%;
+  height: 40px;
+  display: grid;
+  align-items: center;
+  grid-template-columns: 150px 1fr;
+  /* background: #ccc; */
+}
+.nav-bottom{
+  grid-column: 1/-1;
+  width: 100%;
+  height: 40px;
+  display: flex;
+}
+
+.nav-bottom .button-container{
+  /* height: 5%; */
+  /* background: skyblue; */
+  width: 100%; 
+  display: flex;
+  justify-content: space-between;
+  /* position: relative; */
+}
+.nav-bottom .button-container button{
+  all: unset;
+  width: 100px;
+  height: 25px;
+  border: #333 1px solid;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 0.8rem;
+  margin: 0 10px;
+  /* margin-left: 20px; */
+}
+.nav-bottom .button-container  .suitability{
+  font-size: .8rem;
+}
+.nav-bottom .button-container .detail-btn{
+  /* position: absolute; */
+  display: block;
+  right: 0px;
+  margin: 0;
+  border: rgb(34, 110, 177) 1px solid;
+  color: rgb(34, 110, 177);
+}
+
+.nav-bottom .button-container .detail-btn:active{
+  opacity: .3;
+}
+
+.detail-page-container .left-container{
+  width: 100%;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+}
+
+.detail-fvc-graph-container{
+  /* height: 50%; */
+  /* background: yellowgreen; */
+  display: grid;
+  /* grid-gap: 1px; */
+  width: 100%;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: 100%;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.detail-fvc-graph-container .graph{
+  /* background: #000; */
+  width: 99.2%;
+  height: 99.9%;
+  border-radius: 7px;
+  border: #ccc 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  transition: none;
+  padding: 3vh 0 3vh;
+  position: relative;
+}
+.graph canvas{
+  transition: none;
+}
+
+.bottom-graph-container{
+  border-radius: 7px;
+  border: #ccc 1px solid;
+  display: grid;
+  align-items: center;
+  padding: 10px;
+  grid-template-columns: 1fr 1.5fr;
+  grid-gap: 10px;
+}
+.bottom-graph-container .quadrant-graph-container{
+  width: 100%;
+  height: 100%;
+}
+.quadrant-graph-container .graph{
+  /* background: #000; */
+  width: 99.2%;
+  height: 99.9%;
+  border-radius: 7px;
+  border: #ccc 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.quadrant-graph-container .graph .quadrantXY{position: absolute; bottom: 5px; left: 5px; font-size: 1.7vh;}
+.quadrant-graph-container .graph .guard{position: absolute;background: #fff;}
+.quadrant-graph-container .guard-top{
+  top: 0;
+  width: 100%;
+  height: 5px;
+}
+.quadrant-graph-container .guard-bottom{
+  bottom: 0;
+  width: 100%;
+  height: 10px;
+}
+.quadrant-graph-container .guard-right{
+  right: 0;
+  width: 6px;
+  height: 100%;
+}
+.quadrant-graph-container .guard-left{
+  left: 0;
+  width: 9px;
+  height: 100%;
+}
+
+.bottom-graph-container .compare-graph-container{
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr;
+}
+.bottom-graph-container .compare-graph-container>div{
+  display: grid;
+  grid-template-columns: 5.5vw 1fr;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+.compare-canvas-container{
+  width: 100%;
+  height: 50%;
+}
+.compare-title{
+  font-size: 1.2vw;
+}
+.fvc-compare-graph{border-bottom: 1px solid #ccc;}
+.fev1-compare-graph{border-bottom: 1px solid #ccc;}
+
+
+.detail-svc-graph-container{
+  /* height: 50%; */
+  /* background: yellowgreen; */
+  display: grid;
+  /* grid-gap: 1px; */
+  width: 100%;
+  grid-template-rows: 100%;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.detail-svc-graph-container .graph{
+  /* background: #000; */
+  width: 99.2%;
+  height: 99.9%;
+  border-radius: 7px;
+  border: #ccc 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  transition: none;
+  padding: 3vh 0 3vh;
+  position: relative;
+}
+.graph canvas{
+  transition: none;
+}
+
+
+
+.detail-page-container .right-container{
+  width: 100%;
+  position: relative;
+}
+.detail-page-container .prePost-container{
+  width: 100%;
+  height: -webkit-fill-available;
+  /* background: #ccc; */
+  border-radius: 5px 5px 0 0;
+  border: #ccc 1px solid;
+  position: absolute;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 5vh 1fr 40px;
+  overflow: hidden;
+}
+.prePost-container .prePost-column{
+  width: 100%;
+  height: 5vh;
+  display: grid;
+  grid-template-columns: 10px 2.1fr 1fr 1fr 1fr 2fr 10px;
+  border-bottom: #ccc 1px solid;
+  /* grid-gap: .5vh;  */
+}
+.prePost-column .prePost-column-name{
+  height: 5vh;
+  font-size: min(2vh,0.9rem);
+  background: rgb(214, 244, 246);;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.prePost-item-container{
+  width: 100%;
+  height: 100%;
+  /* position: absolute;
+  margin-top: 5vh; */
+  overflow: scroll;
+  scrollbar-width: none;
+}
+.prePost-item-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera*/
+}
+.prePost-item{
+  width: 100%;
+  height: 5vh;
+  display: grid;
+  grid-template-columns: 1.5vw 2.1fr 1fr 1fr 1fr 2fr 1.5vw;
+  border-bottom: #ccc 1px solid;
+  /* grid-gap: .5vh; */
+}
+
+.prePost-item div{
+  display: inline-block;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  white-space:nowrap;
+}
+.prePost-item div p{
+  font-size: min(1.7vh,0.8rem);
+  overflow: hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+.prePost-item .prePost-item-title {
+  font-weight: bold;
+  justify-content: left;
+}
+.prePost-container .prePost-btn-container{
+  width: 100%;
+  height: 40px;
+  /* background: #000; */
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  border-top: #ccc 1px solid;
+}
+.prePost-btn-container button{
+  all: unset;
+  width: 35%;
+  height: 25px;
+  border: #333 1px solid;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 0.8rem;
+}
+.prePost-btn-container .clickedType{
+  border: rgb(34, 110, 177) 1px solid;
+  color: rgb(34, 110, 177);
+}
+
+
 /* 로그인 화면 */
 .login-page-container{
   width: 40%;

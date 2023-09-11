@@ -14,7 +14,7 @@ import {
 import { Scatter } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 import { debounce } from 'lodash'
-function DetailPage(){
+function DetailSvcPage(){
   const location = useLocation();
   const navigator = useNavigate();
   const state = location.state;
@@ -108,7 +108,7 @@ function DetailPage(){
   useEffect(()=>{
     console.log(Math.min(parseFloat(preFvc.meas, preFvc.min)));
   },[preFvc])
-
+  
   // useEffect(()=>{
   //   axios.get(`/subjects/${chartNumber}/types/fvc/results/${state.date}/diagnosis` , {
   //     headers: {
@@ -434,14 +434,13 @@ function DetailPage(){
   const[volumeFlow,setVolumeFlow] = useState([]);
   const[timeVolume,setTimeVolume] = useState([]);
 
+  const[svcGraph,setSvcGraph] = useState([]);
+  const[svcMax, setSvcMax] = useState([10]);
   let diagnosis, trials;
 
   let colorList = ['rgb(5,128,190)','rgb(158,178,243)','rgb(83, 225, 232)','rgb(67,185,162)','rgb(106,219,182)','rgb(255,189,145)','rgb(255,130,130)','rgb(236,144,236)','rgb(175,175,175)','rgb(97,97,97)'];
   
-  const [graphOnOff, setGraphOnOff] = useState([]);
   const graphStyle = {width:"0px" ,height:"0px", transition:"none"}
-  const [graphPreCount, setGraphPreCount] = useState([]);
-  const [graphPostCount, setGraphPostCount] = useState([]);
   useEffect(()=>{
     console.log(location.state);
     console.log(123123123);
@@ -453,15 +452,9 @@ function DetailPage(){
     let timeVolumeMaxList = [];
 
     if(trials){
-      console.log(trials.length);
-      let temp = new Array(trials.length).fill(0);
-      setGraphOnOff(temp);
-      let count = 0;
       // 매 결과에서 데이터 추출
       trials.forEach((item)=>{
         if(item.best){
-          if(item.bronchodilator === "pre")setGraphPreCount([...graphPreCount, count++]);
-          else if(item.bronchodilator === "post")setGraphPostCount([...graphPreCount, count++]);
           timeVolumeList.push(item.graph.timeVolume);
           volumeFlowList.push(item.graph.volumeFlow);
           //현 timeVolume에서 최대값 찾기
@@ -473,7 +466,26 @@ function DetailPage(){
       setTvMax(timeVolumeMaxList);
     }
   },[])
-
+  useEffect(()=>{
+    //   console.log(location.state);
+      console.log(123123123);
+      //fvc의 심플카드
+      trials = location.state.trials;
+      let svcGraphList = [];
+      let svcMaxList = [];
+  
+      if(trials){
+        // 매 결과에서 데이터 추출
+        trials.forEach((item)=>{
+          svcGraphList.push(item.graph.timeVolume);
+  
+          //현 svc 최대값 찾기
+          svcMaxList.push(parseInt(item.results[0].meas));
+        })
+        setSvcGraph(svcGraphList);
+        setSvcMax(svcMaxList);
+      }
+    },[])
   const [graphData, setGraphData] = useState({
     labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
     datasets: [{
@@ -653,10 +665,10 @@ function DetailPage(){
           zeroLineColor:'rgba(0, 0, 255, 1)',
         },
         axios: 'y',
-        // max: parseFloat(Math.max(...svcMax)),
-        // min: parseFloat(Math.max(...svcMax))*-1,
-        // suggestedMax:0,
-        // suggestedMin:-6,
+        max: parseFloat(Math.max(...svcMax)),
+        min: parseFloat(Math.max(...svcMax))*-1,
+        suggestedMax:0,
+        suggestedMin:-6,
         ticks: {
           major: true,
           beginAtZero: true,
@@ -746,13 +758,11 @@ function DetailPage(){
       let time2 = setTimeout(() => {
         let dataset = []
         volumeFlow.forEach((item,index)=>{
-          let color = "red";
-          if([...graphPostCount].includes(index)) color = 'blue';
           dataset.push(
             {
               label: "",
               data: item,
-              borderColor: color,
+              borderColor: 'rgba(255,0,0,1)',
               borderWidth: 2.5,
               showLine: true,
               tension: 0.4
@@ -798,13 +808,11 @@ function DetailPage(){
       let time2 = setTimeout(() => {
         let dataset = []
         timeVolume.forEach((item,index)=>{
-          let color = "red";
-          if([...graphPostCount].includes(index)) color = 'blue';
           dataset.push(
             {
               label: "",
               data: item,
-              borderColor: color,
+              borderColor:'rgba(255,0,0,1)',
               borderWidth: 2.5,
               showLine: true,
               tension: 0.4
@@ -813,7 +821,7 @@ function DetailPage(){
         })
         let time3 = setTimeout(() => {
           let data = {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+            labels: "",
             datasets: dataset,
           }
           let time4 = setTimeout(() => {
@@ -836,189 +844,206 @@ function DetailPage(){
     }
   },[timeVolume])
 
-  //prePost 상태
-  const [prePost, setPrePost] = useState("pre"); //fvc, svc
-  const preBtnRef = useRef();
-  const postBtnRef = useRef();
+  useEffect(()=>
+  {
+    console.log("!#!##")
 
-  const changeType = (type)=>{
-    setPrePost(type);
-  }
-  useEffect(()=>{
-    if(prePost === 'pre'){
-      if(postBtnRef.current.classList.contains("clickedType")){
-        postBtnRef.current.classList.remove("clickedType");
-      }
-      preBtnRef.current.classList += " clickedType"
-    }
-    else if(prePost === 'post'){
-      if(preBtnRef.current.classList.contains("clickedType")){
-        preBtnRef.current.classList.remove("clickedType");
-      }
-      postBtnRef.current.classList += " clickedType"
-    }
-  },[prePost])
-
-  return (
-      // <div> 
-      //   <div>담당자 {state.subject[7].value}</div>
-      //   <div>검사적합성 : {state.diagnosis.suitability}</div>
-      //     <div onClick={()=>{
-      //       navigator(-1) //탈출용
-      //     }}>
-      //         {preResult.map((item)=>(
-      //             <table border={1}>
-      //                 <tr>
-      //                     <td></td>
-      //                     <td>측정</td>
-      //                     <td>예측값</td>
-      //                     <td>%</td>
-      //                     <td>정상범위</td>
-      //                 </tr>
-      //                 <tr>
-      //                     <td>{item.title}</td>
-      //                     <td>{item.meas === '' ? '-' : item.meas}</td>
-      //                     <td>{item.pred === '' ? '-' : item.pred}</td>
-      //                     <td>{item.per === '' ? '-' : item.per}</td>
-      //                     <td>{item.min} ~ {item.max}</td>
-                      
-      //                 </tr>
-      //             </table>
-      //         ))}
-      //         pre
-      //     </div>
-
-      //     <div>
-            
-      //         {postResult.map((item)=>(
-      //             <table border={1}>
-      //                 <tr>
-      //                     <td></td>
-      //                     <td>측정</td>
-      //                     <td>예측값</td>
-      //                     <td>%</td>
-      //                     <td>정상범위</td>
-      //                 </tr>
-      //                 <tr>
-      //                     <td>{item.title}</td>
-      //                     <td>{item.meas === '' ? '-' : item.meas}</td>
-      //                     <td>{item.pred === '' ? '-' : item.pred}</td>
-      //                     <td>{item.per === '' ? '-' : item.per}</td>
-      //                     <td>{item.min} {item.min === '' ? '-' : '~'} {item.max}</td>
-                      
-      //                 </tr>
-      //             </table>
-      //         ))}
-      //         Post
-      //     </div>
-
-      //     <div>
-      //       4사분면
-      //         <Scatter options={quadrant4Option} data={quadrant4Data} />
-      //     </div>
-      //     <div >
-      //       FVC<Scatter id="fvc" options={fvcCompareBarOption} data={fvcCompareBarData}/>
-      //     </div>
-      //     <div>
-      //       FEV1<Scatter options={fev1CompareBarOption} data={fev1CompareBarData} />
-      //     </div>
-      //     <div>
-      //       FEV1%<Scatter options={fev1PerCompareBarOption} data={fev1PerCompareBarData} />
-      //     </div>
-      // </div>
-      <div className="result-page-container detail-page-container">
-      <div className="nav">
-        <div className="nav-logo" onClick={()=>{console.log({x: quadrant4XY.x.toFixed(2), y: quadrant4XY.y.toFixed(2)});}}>
-          <h1>The SpiroKit</h1>
-        </div>
-        <div className="nav-content-container">
-          <div className="nav-left-container">
-            <div className="admin">
-              <span>담당자</span>
-              {/* <span>{state.subject[7].value}</span> */}
-            </div>
-          </div>
-          {/* <div className="nav-right-container">
-            <button className="select-patient-btn" onClick={()=>{navigator(-1)}}>환자 선택</button>
-            <button className="setting-btn">설정</button>
-          </div> */}
-        </div>
-      </div>
-      <div className="nav-bottom">
-        <div className="button-container">
-          <div className="suitability">검사 적합성 : </div>
-          <button className="detail-btn" onClick={()=>{navigator(-1)}}>결과 요약보기</button>
-        </div>
-      </div>
-      <div className="left-container">
-        {/* <div className="button-container">
-          <button className="detail-btn" onClick={()=>{}}>결과 상세보기</button>
-        </div> */}
-          <div className="detail-fvc-graph-container">
-            <div className="graph">
-              {temp?<div className="title-y">Flow(l/s)</div>:<></>}
-              {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingG'>화면 조정 중..</p>}
-              {temp?<div className="title-x">Volume(L)</div>:<></>}
-            </div>
-            <div className="graph">
-              {temp?<div className="title-y">Volume(L)</div>:<></>}
-              {temp?<Scatter style={graphStyle} data={graphData2} options={graphOption2}/>:<p className='loadingG'>화면 조정 중..</p>}
-              {temp?<div className="title-x">Time(s)</div>:<></>}
-            </div>
-          </div>
-        
-        {/* <div className="fvc-graph-container">
-        </div> */}
-        
-
-        <div className="bottom-graph-container">
-          <div className="quadrant-graph-container">
-            <div className="graph">
-              {temp?<Scatter options={quadrant4Option} style={graphStyle} data={quadrant4Data} />:<></>}
-              <div className="guard guard-top"></div>
-              <div className="guard guard-right"></div>
-              <div className="guard guard-bottom"></div>
-              <div className="guard guard-left"></div>
-              <div className="quadrantXY">({quadrant4XY.x.toFixed(2)},{quadrant4XY.y.toFixed(2)})</div>
-            </div>
-          </div>
-          <div className="compare-graph-container">
-            <div className="fvc-compare-graph">
-              <div className="compare-title">FVC(L)</div>
-              <div className="compare-canvas-container">
-                {temp?<Scatter id="fvcCompare" style={graphStyle} options={fvcCompareBarOption} data={fvcCompareBarData}/>:<></>}
-              </div>
-            </div>
-            <div className="fev1-compare-graph">
-              <div className="compare-title">FEV1(L)</div>
-              <div className="compare-canvas-container">
-                {temp?<Scatter style={graphStyle} options={fev1CompareBarOption} data={fev1CompareBarData} />:<></>}
-              </div>
-            </div>
-            <div className="fev1per-compare-graph">
-              <div className="compare-title">FEV1(%)</div>
-              <div className="compare-canvas-container">
-                {temp?<Scatter style={graphStyle} options={fev1PerCompareBarOption} data={fev1PerCompareBarData} />:<></>}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="right-container">
-        <div className="prePost-container">
-          <div className="prePost-column">
-            <div className="prePost-column-name"></div>
-            <div className="prePost-column-name"></div>
-            <div className="prePost-column-name">측정</div>
-            <div className="prePost-column-name">예측값</div>
-            <div className="prePost-column-name">%</div>
-            <div className="prePost-column-name">정상범위</div>
-            <div className="prePost-column-name"></div>
-          </div>
-          <div className="prePost-item-container">
+    let time = setTimeout(()=>{
+      console.log("!#!##!@!@")
+      
+      let time2 = setTimeout(() => {
+        let dataset = []
+        svcGraph.forEach((item,index)=>{
+          dataset.push(
             {
-              prePost === "pre" ?
-                preResult.map((item,index)=>(
+              label: "",
+              data: item,
+              borderColor: "red",
+              borderWidth: 2.5,
+              showLine: true,
+              tension: 0.4
+            }
+          )
+        })
+        let time3 = setTimeout(() => {
+          let data = {
+            labels: "",
+            datasets: dataset,
+          }
+          let time4 = setTimeout(() => {
+            setGraphData3(data);
+          }, 50);
+          return()=>{
+            clearTimeout(time4);
+          }
+        }, 50);
+        return()=>{
+          clearTimeout(time3);
+        }
+      }, 50);
+      return()=>{
+        clearTimeout(time2);
+      }
+    },50)
+
+    return()=>{
+      clearTimeout(time);
+    }
+  },[svcGraph])
+
+    return (
+        // <div> 
+        //   <div>담당자 {state.subject[7].value}</div>
+        //   <div>검사적합성 : {state.diagnosis.suitability}</div>
+        //     <div onClick={()=>{
+        //       navigator(-1) //탈출용
+        //     }}>
+        //         {preResult.map((item)=>(
+        //             <table border={1}>
+        //                 <tr>
+        //                     <td></td>
+        //                     <td>측정</td>
+        //                     <td>예측값</td>
+        //                     <td>%</td>
+        //                     <td>정상범위</td>
+        //                 </tr>
+        //                 <tr>
+        //                     <td>{item.title}</td>
+        //                     <td>{item.meas === '' ? '-' : item.meas}</td>
+        //                     <td>{item.pred === '' ? '-' : item.pred}</td>
+        //                     <td>{item.per === '' ? '-' : item.per}</td>
+        //                     <td>{item.min} ~ {item.max}</td>
+                        
+        //                 </tr>
+        //             </table>
+        //         ))}
+        //         pre
+        //     </div>
+
+        //     <div>
+              
+        //         {postResult.map((item)=>(
+        //             <table border={1}>
+        //                 <tr>
+        //                     <td></td>
+        //                     <td>측정</td>
+        //                     <td>예측값</td>
+        //                     <td>%</td>
+        //                     <td>정상범위</td>
+        //                 </tr>
+        //                 <tr>
+        //                     <td>{item.title}</td>
+        //                     <td>{item.meas === '' ? '-' : item.meas}</td>
+        //                     <td>{item.pred === '' ? '-' : item.pred}</td>
+        //                     <td>{item.per === '' ? '-' : item.per}</td>
+        //                     <td>{item.min} {item.min === '' ? '-' : '~'} {item.max}</td>
+                        
+        //                 </tr>
+        //             </table>
+        //         ))}
+        //         Post
+        //     </div>
+
+        //     <div>
+        //       4사분면
+        //         <Scatter options={quadrant4Option} data={quadrant4Data} />
+        //     </div>
+        //     <div >
+        //       FVC<Scatter id="fvc" options={fvcCompareBarOption} data={fvcCompareBarData}/>
+        //     </div>
+        //     <div>
+        //       FEV1<Scatter options={fev1CompareBarOption} data={fev1CompareBarData} />
+        //     </div>
+        //     <div>
+        //       FEV1%<Scatter options={fev1PerCompareBarOption} data={fev1PerCompareBarData} />
+        //     </div>
+        // </div>
+        <div className="result-page-container detail-page-container">
+        <div className="nav">
+          <div className="nav-logo" onClick={()=>{console.log(volumeFlow);}}>
+            <h1>The SpiroKit</h1>
+          </div>
+          <div className="nav-content-container">
+            <div className="nav-left-container">
+              <div className="admin">
+                <span>담당자</span>
+                {/* <span>{state.subject[7].value}</span> */}
+              </div>
+            </div>
+            {/* <div className="nav-right-container">
+              <button className="select-patient-btn" onClick={()=>{navigator(-1)}}>환자 선택</button>
+              <button className="setting-btn">설정</button>
+            </div> */}
+          </div>
+        </div>
+        <div className="nav-bottom">
+          <div className="button-container">
+            <div className="suitability">검사 적합성 : </div>
+            <button className="detail-btn" onClick={()=>{navigator(-1)}}>결과 요약보기</button>
+          </div>
+        </div>
+        <div className="left-container">
+          {/* <div className="button-container">
+            <button className="detail-btn" onClick={()=>{}}>결과 상세보기</button>
+          </div> */}
+            <div className="detail-svc-graph-container">
+              <div className="graph">
+                {temp?<div className="title-y">Volume(L)</div>:<></>}
+                {temp?<Scatter style={graphStyle} data={graphData3} options={graphOption3}/>:<p className='loadingG'>화면 조정 중..</p>}
+                {temp?<div className="title-x">Time(s)</div>:<></>}
+              </div>
+            </div>
+          
+          {/* <div className="fvc-graph-container">
+          </div> */}
+          
+
+          <div className="bottom-graph-container">
+            <div className="quadrant-graph-container">
+              <div className="graph">
+                {temp?<Scatter options={quadrant4Option} style={graphStyle} data={quadrant4Data} />:<></>}
+                <div className="guard guard-top"></div>
+                <div className="guard guard-right"></div>
+                <div className="guard guard-bottom"></div>
+                <div className="guard guard-left"></div>
+              </div>
+            </div>
+            <div className="compare-graph-container">
+              {/* <div className="fvc-compare-graph">
+                <div className="compare-title">FVC(L)</div>
+                <div className="compare-canvas-container">
+                  {temp?<Scatter id="fvcCompare" style={graphStyle} options={fvcCompareBarOption} data={fvcCompareBarData}/>:<></>}
+                </div>
+              </div>
+              <div className="fev1-compare-graph">
+                <div className="compare-title">FEV1(L)</div>
+                <div className="compare-canvas-container">
+                  {temp?<Scatter style={graphStyle} options={fev1CompareBarOption} data={fev1CompareBarData} />:<></>}
+                </div>
+              </div>
+              <div className="fev1per-compare-graph">
+                <div className="compare-title">FEV1(%)</div>
+                <div className="compare-canvas-container">
+                  {temp?<Scatter style={graphStyle} options={fev1PerCompareBarOption} data={fev1PerCompareBarData} />:<></>}
+                </div>
+              </div> */}
+            </div>
+          </div>
+        </div>
+        <div className="right-container">
+        <div className="prePost-container">
+            <div className="prePost-column">
+              <div className="prePost-column-name"></div>
+              <div className="prePost-column-name"></div>
+              <div className="prePost-column-name">측정</div>
+              <div className="prePost-column-name">예측값</div>
+              <div className="prePost-column-name">%</div>
+              <div className="prePost-column-name">정상범위</div>
+              <div className="prePost-column-name"></div>
+            </div>
+            <div className="prePost-item-container">
+              {
+                preResult.map((item)=>(
                     <div className="prePost-item">
                         <div></div>
                         <div className="prePost-item-title"><p>{item.title}</p></div>
@@ -1029,30 +1054,17 @@ function DetailPage(){
                         <div></div>
                     </div>
                 ))
-              :
-            //   postResult.map((item)=>(
-            //     <div className="prePost-item">
-            //         <div></div>
-            //         <div className="prePost-item-title"><p>{item.title}</p></div>
-            //         <div><p>{item.meas === '' ? '-' : item.meas}</p></div>
-            //         <div><p>{item.pred === '' ? '-' : item.pred}</p></div>
-            //         <div><p>{item.per === '' ? '-' : item.per}</p></div>
-            //         <div><p>{item.min} ~ {item.max}</p></div>
-            //         <div></div>
-            //     </div>
-            // ))
-              <></>
-            }
-          </div>
-          <div className="prePost-btn-container">
-            <button ref={preBtnRef} onClick={()=>{changeType("pre")}}>Pre 보기</button>
-            <button ref={postBtnRef} onClick={()=>{changeType("post")}}>Post 보기</button>
+              }
+            </div>
+            <div className="prePost-btn-container">
+              <button>Pre 보기</button>
+              <button>Post 보기</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
 
 }
 
-export default DetailPage;
+export default DetailSvcPage;

@@ -14,6 +14,7 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import MeasureSetting from './pages/MeasureSetting.js';
 import ResultPage from './pages/ResultPage.js'
 import DetailPage from './pages/DetailPage.js'
+import DetailSvcPage from './pages/DetailSvcPage.js'
 
 // Variable & State
 const author = "KASSID&HAI";
@@ -29,6 +30,7 @@ function App() {
         <Route path='/memberList/measureSetting' element={<MeasureSetting/>}/>
         <Route path='/memberList/resultPage' element={<ResultPage/>}/>
         <Route path='/memberList/detailPage' element={<DetailPage/>}/>
+        <Route path='/memberList/detailSvcPage' element={<DetailSvcPage/>}/>
       </Routes>
     </div>
   );
