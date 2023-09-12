@@ -327,6 +327,7 @@ function ResultPage(){
           display: false
       },
       resizeDelay:0,
+      datalabels: false,
     },
     responsive: true,
     animation:{
@@ -379,6 +380,7 @@ function ResultPage(){
           display: false
       },
       resizeDelay:0,
+      datalabels: false,
     },
     responsive: true,
     animation:{
@@ -430,6 +432,7 @@ function ResultPage(){
           display: false
       },
       resizeDelay:0,
+      datalabels: false,
     },
     responsive: true,
     animation:{

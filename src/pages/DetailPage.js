@@ -10,10 +10,13 @@ import {
     BarElement,
     Tooltip,
     Legend,
+    plugins,
+    CategoryScale,
   } from 'chart.js';
-import { Scatter } from 'react-chartjs-2';
+import { Scatter, Bar } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 import { debounce } from 'lodash'
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 function DetailPage(){
   const location = useLocation();
   const navigator = useNavigate();
@@ -81,29 +84,30 @@ function DetailPage(){
     title: "FEV%",
     upper: "",
   });
-  ChartJS.register(LinearScale, PointElement, LineElement,BarElement, Tooltip, Legend);
+  ChartJS.register(LinearScale, PointElement, LineElement,BarElement, Tooltip, Legend,ChartDataLabels, CategoryScale);
+  
   //종합 결과 목록 조회
-  useEffect(()=>{
-      let i = 0;
-      let pre = undefined;
-      let post = undefined;
-      console.log(state)
-      while(state.trials.length !== i){
-        if(state.trials[i].best === true){
-          if(pre === undefined){
-            pre = i;
-            setPreResult(state.trials[i].results);
+  // useEffect(()=>{
+  //     let i = 0;
+  //     let pre = undefined;
+  //     let post = undefined;
+  //     console.log(state)
+  //     while(state.trials.length !== i){
+  //       if(state.trials[i].best === true){
+  //         if(pre === undefined){
+  //           pre = i;
+  //           setPreResult(state.trials[i].results);
             
-          }else if(post === undefined){
-            post = i;
-            setPostResult(state.trials[i].results);
-            break;
-          }
-        }
-        i++;
-      }        
+  //         }else if(post === undefined){
+  //           post = i;
+  //           setPostResult(state.trials[i].results);
+  //           break;
+  //         }
+  //       }
+  //       i++;
+  //     }        
       
-  },[]);
+  // },[]);
 
   useEffect(()=>{
     console.log(Math.min(parseFloat(preFvc.meas, preFvc.min)));
@@ -173,7 +177,6 @@ function DetailPage(){
     },
     maintainAspectRatio: false,
     responsive: true,
-    interaction: false,
     elements: {
       point: {
         radius: 0,
@@ -223,13 +226,15 @@ function DetailPage(){
   }
 
   
-
+  const fev1Ref = useRef();
+  // fev1Ref.register(ChartDataLabels);
   const fev1CompareBarData = {
     labels: "",
     datasets: [{
       label: "pre",
       fill: false,
-      pointBackgroundColor: "#000",
+      pointBackgroundColor: "red",
+      pointBorderColor: "red",
       pointRadius: 5,
       pointHitRadius: 10,
       data: [{ x :preFev1.meas, y : 0.5}],
@@ -237,24 +242,60 @@ function DetailPage(){
     },{
       label: "post",
       fill: false,
-      pointBackgroundColor: "#000",
+      pointBackgroundColor: "blue",
+      pointBorderColor: "blue",
       pointRadius: 5,
       pointHitRadius: 10,
       data: [{x:postFev1.meas, y : 0.5}],
       tension: 0.4,
     }]
   }
-
+  const alwaysShowTooltip = {
+    id: "alwaysShowTooltip",
+    afterDraw(chart, args, options){
+      const {ctx} = chart;
+      ctx.save();
+      console.log(chart);
+    }
+  }
   
+  Tooltip.positioners.custom = function(elements, position) {
+    console.log(position);
+    console.log(fev1Ref.current.tooltip);
+    fev1Ref.current.tooltip.active = true;
+    // fev1Ref.current.tooltip.opacity = 1;
+    // if (!elements.length) {
+    //   return false;
+    // }
+    // let offset = 0;
+    // //adjust the offset left or right depending on the event position
+    // if (elements[0]._chart.width / 2 > position.x) {
+    //   offset = 50;
+    // } else {
+    //   offset = -50;
+    // }
+    return {
+      x: position.x,
+      // x: position.x + offset,
+      y: position.y
+    }
+  }
   const fev1CompareBarOption={
     plugins:{
       legend: {
           display: false
       },
+      tooltip: {
+        //use our new custom position
+        position: 'custom',
+        // includeInvisible: false,
+      },
+      // plugin:[alwaysShowTooltip],
     },
     responsive: true,  
     maintainAspectRatio: false,
-    interaction: false,
+    // interaction: false,
+    cutoutPercentage: 60,
     elements: {
       point: {
         radius: 0,
@@ -265,6 +306,7 @@ function DetailPage(){
         axios: 'x',
         max: preFev1.max,
         min: Math.min(parseFloat(preFev1.meas), parseFloat(preFev1.min)),
+        // min: preFev1.min,
         ticks:{
           display:false,
           beginAtZero: true,
@@ -297,7 +339,8 @@ function DetailPage(){
     datasets: [{
       label: "pre",
       fill: false,
-      pointBackgroundColor: "#000",
+      pointBackgroundColor: "red",
+      pointBorderColor: "red",
       pointRadius: 5,
       pointHitRadius: 10,
       data: [{ x :preFev1Per.meas, y : 0.5}],
@@ -305,19 +348,21 @@ function DetailPage(){
     },{
       label: "post",
       fill: false,
-      pointBackgroundColor: "#000",
+      pointBackgroundColor: "blue",
+      pointBorderColor: "blue",
       pointRadius: 5,
       pointHitRadius: 10,
       data: [{x:postFev1Per.meas, y : 0.5}],
       tension: 0.4,
     }]
   }
-
+  
   const fev1PerCompareBarOption={
     plugins:{
       legend: {
           display: false
       },
+
     },
     responsive: true,  
     maintainAspectRatio: false,
@@ -332,6 +377,7 @@ function DetailPage(){
         axios: 'x',
         max: preFev1Per.max,
         min: Math.min(parseFloat(preFev1Per.meas), parseFloat(preFev1Per.min)),
+        // min: preFev1Per.min,
         ticks:{
           beginAtZero: true,
           display:false,
@@ -364,7 +410,8 @@ function DetailPage(){
     datasets: [{
       label: "pre",
       fill: false,
-      pointBackgroundColor: "#000",
+      pointBackgroundColor: "red",
+      pointBorderColor:"red",
       pointRadius: 5,
       // pointHitRadius: 10,
       data: [{ x :preFvc.meas, y : 0.5}],
@@ -372,8 +419,9 @@ function DetailPage(){
     },{
       label: "post",
       fill: false,
-      pointBackgroundColor: "#000",
-      pointRadius: 5,
+      pointBackgroundColor: "blue",
+      pointBorderColor:"blue",
+      pointRadius: "5vh",
       data: [{x:postFvc.meas, y : 0.5}],
       tension: 0.4,
     }]
@@ -384,25 +432,36 @@ function DetailPage(){
       legend: {
           display: false
       },
+      datalabels: false,
     },
+    interaction:{
+      intersect:true,
+      includeInvisible:true,
+    },
+    interaction: true,
     responsive: true,  
     maintainAspectRatio: false,
-    interaction: false,
+    layout:{
+      padding:0,
+
+    },
     elements: {
       point: {
         radius: 0,
+      },
+      line:{
+        borderWidth:19,
       },
     },
     scales: {
       x: {
         axios: 'x',
-        
-        min: Math.min(parseFloat(preFvc.meas), parseFloat(preFvc.min)),
+        start: preFvc.min,
+        // min: Math.min(parseFloat(preFvc.meas), parseFloat(preFvc.min)),
         max: preFvc.max,
         ticks:{
-
           display:false,
-          beginAtZero: true,
+          // beginAtZero: true,
         },
         grid:{
           display:false
@@ -426,9 +485,80 @@ function DetailPage(){
     }
   }
   
+
+
+  const fvcCompareBarData2 = {
+    labels: ["pre","post"],
+    datasets: [{
+      label: "pre",
+      fill: false,
+      data: [preFvc.meas],
+      // pointBackgroundColor: "red",
+      // pointBorderColor:"red",
+      // pointRadius: 5,
+      // pointHitRadius: 10,
+      // tension: 0.4,
+      // backgroundColor: "",
+      // borderColor: "",
+    },{
+      label: "post",
+      fill: false,
+      data: [postFvc.meas],
+      // pointBackgroundColor: "blue",
+      // pointBorderColor:"blue",
+      // pointRadius: 5,
+      // tension: 0.4,
+    }]
+  }
+  const fvcCompareBarOption2={
+    pointStyle: 'circle',
+    indexAxis: 'y',
+    plugins:{
+      legend: {
+          display: false
+      },
+      // datalabels: false,
+    },
+    responsive: true,  
+    maintainAspectRatio: false,
+    layout:{
+      padding:0,
+    },
+    // elements: {
+    //   point: {
+    //     radius: 0,
+    //   },
+    //   line:{
+    //     borderWidth:19,
+    //   },
+    // },
+    scales:{
+      x: {
+        // stacked: true,
+        ticks: {
+          suggestedMin: 7
+        }
+      },
+    },
+    elements: {
+      bar: {
+        borderWidth: 2,
+      }
+    },
+    responsive: true,
+  }
+
+
+
+
+
+
+
+
+
+
+  // main Graph
   const chartRef = useRef();
-  const [FvcSvc, setFvcSvc] = useState("fvc"); //fvc, svc
-  const [info, setInfo] = useState();
   const [tvMax, setTvMax] = useState([10]);
   //결과 그래프 목록 요청 FVC
   const[volumeFlow,setVolumeFlow] = useState([]);
@@ -436,9 +566,8 @@ function DetailPage(){
 
   let diagnosis, trials;
 
-  let colorList = ['rgb(5,128,190)','rgb(158,178,243)','rgb(83, 225, 232)','rgb(67,185,162)','rgb(106,219,182)','rgb(255,189,145)','rgb(255,130,130)','rgb(236,144,236)','rgb(175,175,175)','rgb(97,97,97)'];
+  // let colorList = ['rgb(5,128,190)','rgb(158,178,243)','rgb(83, 225, 232)','rgb(67,185,162)','rgb(106,219,182)','rgb(255,189,145)','rgb(255,130,130)','rgb(236,144,236)','rgb(175,175,175)','rgb(97,97,97)'];
   
-  const [graphOnOff, setGraphOnOff] = useState([]);
   const graphStyle = {width:"0px" ,height:"0px", transition:"none"}
   const [graphPreCount, setGraphPreCount] = useState([]);
   const [graphPostCount, setGraphPostCount] = useState([]);
@@ -454,14 +583,18 @@ function DetailPage(){
 
     if(trials){
       console.log(trials.length);
-      let temp = new Array(trials.length).fill(0);
-      setGraphOnOff(temp);
-      let count = 0;
+      let count = 0; //pre post 인덱스 관리 (색 구분용)
       // 매 결과에서 데이터 추출
       trials.forEach((item)=>{
         if(item.best){
-          if(item.bronchodilator === "pre")setGraphPreCount([...graphPreCount, count++]);
-          else if(item.bronchodilator === "post")setGraphPostCount([...graphPreCount, count++]);
+          if(item.bronchodilator === "pre"){
+            setGraphPreCount([...graphPreCount, count++])
+            setPreResult(item.results);
+          }
+          else if(item.bronchodilator === "post"){
+            setGraphPostCount([...graphPreCount, count++]);
+            setPostResult(item.results);
+          }
           timeVolumeList.push(item.graph.timeVolume);
           volumeFlowList.push(item.graph.volumeFlow);
           //현 timeVolume에서 최대값 찾기
@@ -520,6 +653,7 @@ function DetailPage(){
           display: false
       },
       resizeDelay:0,
+      datalabels: false,
     },
     responsive: true,
     animation:{
@@ -572,6 +706,7 @@ function DetailPage(){
           display: false
       },
       resizeDelay:0,
+      datalabels: false,
     },
     responsive: true,
     animation:{
@@ -623,6 +758,7 @@ function DetailPage(){
           display: false
       },
       resizeDelay:0,
+      datalabels: false,
     },
     responsive: true,
     animation:{
@@ -684,10 +820,6 @@ function DetailPage(){
       y: window.innerHeight,
     })
   })
-
-  useEffect(()=>{
-    setTemp(false);
-  },[FvcSvc])
 
   useEffect(()=>{
     let time = setTimeout(() => {
@@ -986,13 +1118,14 @@ function DetailPage(){
             <div className="fvc-compare-graph">
               <div className="compare-title">FVC(L)</div>
               <div className="compare-canvas-container">
-                {temp?<Scatter id="fvcCompare" style={graphStyle} options={fvcCompareBarOption} data={fvcCompareBarData}/>:<></>}
+                {temp?<Scatter  id="fvcCompare" style={graphStyle} options={fvcCompareBarOption} data={fvcCompareBarData}/>:<></>}
+                {/* {temp?<Bar id="fvcCompare" style={graphStyle} options={fvcCompareBarOption2} data={fvcCompareBarData2}/>:<></>} */}
               </div>
             </div>
             <div className="fev1-compare-graph">
               <div className="compare-title">FEV1(L)</div>
               <div className="compare-canvas-container">
-                {temp?<Scatter style={graphStyle} options={fev1CompareBarOption} data={fev1CompareBarData} />:<></>}
+                {temp?<Scatter ref={fev1Ref} style={graphStyle} options={fev1CompareBarOption} data={fev1CompareBarData} />:<></>}
               </div>
             </div>
             <div className="fev1per-compare-graph">
@@ -1030,18 +1163,17 @@ function DetailPage(){
                     </div>
                 ))
               :
-            //   postResult.map((item)=>(
-            //     <div className="prePost-item">
-            //         <div></div>
-            //         <div className="prePost-item-title"><p>{item.title}</p></div>
-            //         <div><p>{item.meas === '' ? '-' : item.meas}</p></div>
-            //         <div><p>{item.pred === '' ? '-' : item.pred}</p></div>
-            //         <div><p>{item.per === '' ? '-' : item.per}</p></div>
-            //         <div><p>{item.min} ~ {item.max}</p></div>
-            //         <div></div>
-            //     </div>
-            // ))
-              <></>
+              postResult.map((item)=>(
+                <div className="prePost-item">
+                    <div></div>
+                    <div className="prePost-item-title"><p>{item.title}</p></div>
+                    <div><p>{item.meas === '' ? '-' : item.meas}</p></div>
+                    <div><p>{item.pred === '' ? '-' : item.pred}</p></div>
+                    <div><p>{item.per === '' ? '-' : item.per}</p></div>
+                    <div><p>{item.min} ~ {item.max}</p></div>
+                    <div></div>
+                </div>
+              ))
             }
           </div>
           <div className="prePost-btn-container">

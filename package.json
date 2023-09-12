@@ -13,6 +13,7 @@
     "@testing-library/user-event": "^13.5.0",
     "chart.js": "^4.3.0",
     "chartjs-adapter-date-fns": "^3.0.0",
+    "chartjs-plugin-datalabels": "^2.2.0",
     "concurrently": "^8.0.1",
     "date-fns": "^2.30.0",
     "electron": "^23.1.3",
