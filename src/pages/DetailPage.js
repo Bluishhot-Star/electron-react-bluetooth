@@ -160,13 +160,18 @@ function DetailPage(){
       setPreFev1Per(preResult[2]);
       const x = fvcMeas/fvcPred
       const y = fev1Meas/fvcMeas
+      if(x < 0 || y < 0){
+        x = 0;
+        y = 0;
+      }else if(x > 1 || y > 1){
+        x = 1;
+        y = 1;
+      }
       setQuadrant4XY({
           ...quadrant4XY,
-          x:(x >= 1 ? 1 : x),
-          y:(y >= 1 ? 1 : y)
+          x:x,
+          y:x
         })
-      setPreValSet(1);
-      setPostValSet(1);
     }
   },[preResult]);
 
