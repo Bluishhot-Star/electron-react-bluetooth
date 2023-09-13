@@ -15,6 +15,8 @@ import MeasureSetting from './pages/MeasureSetting.js';
 import ResultPage from './pages/ResultPage.js'
 import DetailPage from './pages/DetailPage.js'
 import DetailSvcPage from './pages/DetailSvcPage.js'
+import SettingPage from './pages/SettingPage.js'
+import MngClncs from './pages/MngClncs.js'
 
 // Variable & State
 const author = "KASSID&HAI";
@@ -31,6 +33,8 @@ function App() {
         <Route path='/memberList/resultPage' element={<ResultPage/>}/>
         <Route path='/memberList/detailPage' element={<DetailPage/>}/>
         <Route path='/memberList/detailSvcPage' element={<DetailSvcPage/>}/>
+        <Route path='/setting' element={<SettingPage/>}/>
+        <Route path='/setting/mngClncs' element={<MngClncs/>}/>
       </Routes>
     </div>
   );

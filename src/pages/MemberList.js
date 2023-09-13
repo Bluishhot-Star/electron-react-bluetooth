@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import { Cookies, useCookies } from 'react-cookie';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom'
@@ -13,6 +13,7 @@ const MemberList = ()=>{
   const [date, setDate] = useState([]);
   const [chartNumber, setChartNumber] = useState("");
   const [birth, setBirth] = useState("");
+  const [loading, setLoading] = useState(false)
   const cookies = new Cookies();
   let navigator = useNavigate();
 
@@ -95,6 +96,7 @@ const MemberList = ()=>{
       console.log(data1);
       console.log(data2);
       navigator('/memberList/resultPage', {state: {fvc:data1, svc:data2, date:date, birth:birth}});
+      
     }
     else{}
   },[goTO])
@@ -102,18 +104,18 @@ const MemberList = ()=>{
   const [curtainStat, setCurtainStat] = useState(true);
 
   // 검색 기능
-  const [searchVal, setSearchVal] = useState("")
-  const searchName = ()=>{
-    axios.get(`/subjects?page=1&size=10&name=${searchVal}` , {
-      headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
-      }})
-      .then((res)=>{
-        setExaminees(res.data.response.subjects);
-      }).catch((err)=>{
-        console.log(err);
-      })
-  }
+
+  // const searchName = ()=>{
+  //   axios.get(`/subjects?page=1&size=10&name=${searchVal}` , {
+  //     headers: {
+  //       Authorization: `Bearer ${cookies.get('accessToken')}`
+  //     }})
+  //     .then((res)=>{
+  //       setExaminees(res.data.response.subjects);
+  //     }).catch((err)=>{
+  //       console.log(err);
+  //     })
+  // }
   useEffect(()=>{
 
   },[chartNumber])
@@ -156,38 +158,71 @@ useEffect(()=>{
 
   // 무한 스크롤
   // 지정한 타겟 div가 화면에 보일 때 마다 서버에 요청을 보냄
-  const productFetch = () => {
-    axios.get(`/subjects?page=${page}&size=10` , {
+  // const productFetch = () => {
+  //   axios.get(`/subjects?page=${page}&size=10` , {
+  //     headers: {
+  //       Authorization: `Bearer ${cookies.get('accessToken')}`
+  //     }}).then((res)=>{
+  //       if(res.data.message !== "OK"){return;}
+  //       setExaminees([...examinees, ...res.data.response.subjects]);
+  //       console.log(res.data.response)
+  //       setPage((page) => page + 1)
+  //     }).catch((err)=>{
+  //       console.log(err);
+  //     })
+  // };
+  // useEffect(()=>{
+  //   console.log(page);
+  // },[examinees])
+
+  // useEffect(() => {
+  //   // inView가 true 일때만 실행(마지막 요소 보이면 true)
+  //   if (inView) {
+  //     console.log(inView, '무한 스크롤 요청')
+  //     let time = setTimeout(()=>{
+  //       productFetch();
+  //     },10)
+  //     return()=>{
+  //       clearTimeout(time);
+  //     }
+  //   }
+  //   else{
+  //     console.log(inView);
+  //   }
+  // },);
+  const [searchVal, setSearchVal] = useState("")
+  const MemberList = useCallback(async () => {
+    setLoading(true)
+    axios.get(`/subjects?page=${page}&size=10&name=${searchVal}`,{
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }}).then((res)=>{
-        if(res.data.message !== "OK"){return;}
-        setExaminees([...examinees, ...res.data.response.subjects]);
-        console.log(res.data.response)
-        setPage((page) => page + 1)
+        console.log(res.data.response.clinicians);
+        console.log(res.data.subCode);
+        if(res.data.subCode !== 2004){
+          setExaminees([...examinees, ...res.data.response.subjects]);
+          setPage((page) => page + 1);
+        }
       }).catch((err)=>{
         console.log(err);
-      })
-  };
+      });
+    setLoading(false)
+  },[page])
+
   useEffect(()=>{
-    console.log(page);
+    MemberList()
   },[examinees])
 
-  useEffect(() => {
-    // inView가 true 일때만 실행(마지막 요소 보이면 true)
-    if (inView) {
-      console.log(inView, '무한 스크롤 요청')
-      let time = setTimeout(()=>{
-        productFetch();
-      },10)
-      return()=>{
-        clearTimeout(time);
-      }
-    }
-    else{
-      console.log(inView);
-    }
-  },);
+  // useEffect(() => {
+  //   // 사용자가 마지막 요소를 보고 있고, 로딩 중이 아니라면
+   
+  //   if (inView && !loading) {
+  //     console.log(page);
+      
+  //     setPage((page) => page + 1);
+  //   }
+  // }, [inView,loading])
+
 
   return (
       <div className="memberList-page-container">
@@ -207,7 +242,9 @@ useEffect(()=>{
               <form 
                 onSubmit={(e)=>{
                 e.preventDefault(); // 전체 리렌더링 방지
-                searchName();}}>
+                setExaminees([]);
+                MemberList();
+                setPage(1)}}>
               <input type="text" placeholder='환자 이름을 입력해주세요.'
                 onChange={(e)=>{setSearchVal(e.target.value);}}/>
               </form>

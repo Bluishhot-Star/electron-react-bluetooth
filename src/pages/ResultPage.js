@@ -744,7 +744,7 @@ function ResultPage(){
             </div>
             <div className="nav-right-container">
               <button className="select-patient-btn" onClick={()=>{navigator(-1)}}>환자 선택</button>
-              <button className="setting-btn">설정</button>
+              <button className="setting-btn" onClick={()=>{navigator("/setting")}}>설정</button>
             </div>
           </div>
         </div>
