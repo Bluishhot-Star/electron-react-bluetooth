@@ -6,8 +6,8 @@ import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronDown } from '@fortawesome/free-solid-svg-icons'
-const MeasureSetting = ()=>{
-  const submitMSetting = ()=>{
+const MeasureInfo = ()=>{
+  const submitMInfo = ()=>{
     
   }
   const cookies = new Cookies();
@@ -120,14 +120,14 @@ const MeasureSetting = ()=>{
 
   return(
     <>
-      <div className="measure-setting-page-container">
-        <div className="measure-setting-page-nav">
-          <div className='measure-setting-backBtn' onClick={()=>{navigator(-1)}}>
+      <div className="measure-info-page-container">
+        <div className="measure-info-page-nav">
+          <div className='measure-info-backBtn' onClick={()=>{navigator(-1)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
           </div>
           <p>검사 정보</p>
         </div>
-        <div className="measure-setting-page-main-container">
+        <div className="measure-info-page-main-container">
           <div className="inner">
             <form>
 
@@ -261,4 +261,4 @@ const MeasureSetting = ()=>{
     </>
   )
 }
-export default MeasureSetting;
+export default MeasureInfo;

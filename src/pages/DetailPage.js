@@ -170,8 +170,10 @@ function DetailPage(){
       setQuadrant4XY({
           ...quadrant4XY,
           x:x,
-          y:x
+          y:y
         })
+      setPreValSet(1);
+      setPostValSet(1);
     }
   },[preResult]);
 
@@ -1153,7 +1155,7 @@ function DetailPage(){
           <div className="nav-left-container">
             <div className="admin">
               <span>담당자</span>
-              {/* <span>{state.subject[7].value}</span> */}
+              <span>{state.subject[7].value}</span>
             </div>
           </div>
           {/* <div className="nav-right-container">
@@ -1164,7 +1166,7 @@ function DetailPage(){
       </div>
       <div className="nav-bottom">
         <div className="button-container">
-          <div className="suitability">검사 적합성 : </div>
+          <div className="suitability">검사 적합성 : {state.diagnosis.suitability}</div>
           <button className="detail-btn" onClick={()=>{navigator(-1)}}>결과 요약보기</button>
         </div>
       </div>

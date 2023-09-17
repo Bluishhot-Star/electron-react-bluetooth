@@ -11,7 +11,7 @@ const AddPatient = ()=>{
     chartNumber: "",
     name: "",
     gender: "",//m 혹은 f 여야 함
-    race: "",//1 ~ 5 여야 함
+    race: "4",//1 ~ 5 여야 함
     clinicianId: "",
     birthday: "",//yyyy-MM-dd 형식이어야 함
     subjectDetails: {
@@ -43,26 +43,42 @@ const AddPatient = ()=>{
   });
   const submitAddP = ()=>{
     console.log("GH")
-    //PATCH 부분
-    // if(location.state.update){
-    //   axios.patch('/examinees',examinee,{withCredentials : true})
-    //   .then((res)=>{
-    //     console.log(res);
-    //   })
-    //   .catch((error)=>{
-    //     console.log(error);alert("ERROR");
-    //   })
-    // }
-    //POST 부분
-    // else{
-    //   axios.post('/examinees',examinee,{withCredentials : true})
-    //   .then((res)=>{
-    //     console.log(res);
-    //   })
-    //   .catch((error)=>{
-    //     console.log(error);alert("ERROR");
-    //   })
-    // }
+    let temp = {...examinee};
+    
+    if(examinee.subjectDetails.smoking === "true"){
+      temp.subjectDetails.smoking = true;
+    }
+    else{
+      temp.subjectDetails.smoking = false;
+    }
+
+    if(examinee.subjectDetails.smokingExperience=== "true"){
+      temp.subjectDetails.smokingExperience = true;
+    }
+    else{
+      temp.subjectDetails.smokingExperience = false;
+    }
+    console.log(temp);
+    // PATCH 부분
+    if(location.state.update){
+      axios.patch('/subjects',temp,{withCredentials : true})
+      .then((res)=>{
+        console.log(res);
+      })
+      .catch((error)=>{
+        console.log(error);alert("ERROR");
+      })
+    }
+    // POST 부분
+    else{
+      axios.post('/subjects',temp,{withCredentials : true})
+      .then((res)=>{
+        console.log(res);
+      })
+      .catch((error)=>{
+        console.log(error);alert("ERROR₩₩₩₩");
+      })
+    }
     navigator(-1);
   }
   const location = useLocation();
@@ -205,7 +221,7 @@ const AddPatient = ()=>{
   // 추가 완료 버튼 유효성 검사
   useEffect(()=>{
     if(!(examinee.clinicianId!==""&&examinee.chartNumber!==""&&examinee.name!==""&&examinee.birthday!==""
-    &&examinee.gender!==""&&examinee.info.height!==""&&examinee.info.weight&&examinee.subjectDetails.smokingExperience!=="")){
+    &&examinee.gender!==""&&examinee.subjectDetails.height!==""&&examinee.subjectDetails.weight&&examinee.subjectDetails.smokingExperience!=="")){
       console.log("ch1");
       setAddBtnStatus(false);
       return;
@@ -268,7 +284,7 @@ const AddPatient = ()=>{
           smokingFalseRef.current.checked = true;
         }
         //성별
-        if(exData.gender === "MALE"){
+        if(exData.gender === "m"){
           maleRef.current.checked = true;
         }else{
           femaleRef.current.checked = true;
@@ -367,11 +383,11 @@ const AddPatient = ()=>{
               <label htmlFor="">성별</label>
               <div className="radio-container">
                 <div className='radioBtn' >
-                  <input ref={maleRef} onChange={genderChange} value="MALE" type="radio" name="gender" id="man"/>
+                  <input ref={maleRef} onChange={genderChange} value="m" type="radio" name="gender" id="man"/>
                   <label htmlFor="man">남</label>
                 </div>
                 <div className='radioBtn'>
-                  <input ref={femaleRef} onChange={genderChange} value="FEMALE" type="radio" name="gender" id="woman" />
+                  <input ref={femaleRef} onChange={genderChange} value="f" type="radio" name="gender" id="woman" />
                   <label htmlFor="woman">여</label>
                 </div>
               </div>

@@ -53,9 +53,6 @@
   /* width: ; */
   display: flex;
 }
-.nav-right-container{
-  display: flex;
-}
 .nav-left-container .admin{
   margin-left: 10px;
   font-size: 0.7rem;
@@ -64,17 +61,44 @@
   margin-left: 5px;
   color: rgb(44, 192, 202);
 }
+.nav-right-container{
+  display: flex;
+  width: 50vw;
+  position: relative;
+}
 .nav-right-container button{
   all: unset;
   font-size: 0.8rem;
 }
 .nav-right-container .select-patient-btn{
+  position: absolute;
+  top: -2px;
+  right: 40px;
+  font-size: .8rem;
+  font-weight: bold;
   margin-right: 10px;
+  cursor: pointer;
 }
-.nav-right-container .setting-btn{
+.nav-right-container .setting-btn-container{
+  position: absolute;
+  right: 0;
+  top: -2px;
+  cursor: pointer;
+  /* height: 40px; */
+  /* transform: translate(0,-1vh); */
+  display: flex;align-items: center;justify-content: center;
   color: rgb(44, 192, 202);
 }
-
+.nav-right-container .setting-btn{
+  all:unset;
+  font-size: .8rem;
+  margin-left: 3px;
+  font-weight: bold;
+}
+.nav-right-container .cogIcon{
+  font-size: .8rem;
+  color: rgb(44, 192, 202);
+}
 
 
 .result-page-container .left-container{
@@ -129,7 +153,7 @@
   border: #333 1px solid;
   font-size: 0.8rem;
   text-align: center;
-
+  cursor: pointer;
   background: #fff;
   bottom: 30px;
   left: 30px;
@@ -158,6 +182,7 @@
   text-align: center;
   font-size: 0.8rem;
   margin: 0 10px;
+  cursor: pointer;
   /* margin-left: 20px; */
 }
 .two-btn-container button{
@@ -377,6 +402,7 @@
   text-align: center;
   font-size: 0.8rem;
   margin: 0 10px;
+  cursor: pointer;
   /* margin-left: 20px; */
 }
 .nav-bottom .button-container  .suitability{
@@ -737,6 +763,7 @@
   border-radius: 20px;
   text-align: center;
   font-size: 0.8rem;
+  cursor: pointer;
 }
 .prePost-btn-container .clickedType{
   border: rgb(34, 110, 177) 1px solid;
@@ -1075,12 +1102,33 @@
   width: 100%;
   height: 40px;
   align-items: center;
+  position: relative;
 }
 .memberList-page-nav p{
   display: block;
   text-align: center;
-  margin: 1vh 0 0;
+  margin: 0;
   font-size: 1.1rem;
+}
+.memberList-page-nav .setting-btn-container{
+  position: absolute;
+  right: 0;
+  top: 2px;
+  cursor: pointer;
+  /* height: 40px; */
+  /* transform: translate(0,-1vh); */
+  display: flex;align-items: center;justify-content: center;
+  color: rgb(44, 192, 202);
+}
+.memberList-page-nav .setting-btn{
+  all:unset;
+  font-size: .8rem;
+  margin-left: 3px;
+  font-weight: bold;
+}
+.memberList-page-nav .cogIcon{
+  font-size: .7rem;
+  color: rgb(44, 192, 202);
 }
 .memberList-page-left-container{
   position: relative;
@@ -1698,8 +1746,8 @@
 
 
 
-/* measure Setting */
-.measure-setting-page-container{
+/* measure Info */
+.measure-info-page-container{
   width: 100%;
   height : 100%;
   display: grid;
@@ -1707,7 +1755,7 @@
   grid-template-columns: 1fr;
   grid-gap: 10px;
 }
-.measure-setting-page-container .inner{
+.measure-info-page-container .inner{
   width: 100%;
   height: 100%;
   border-radius: 5px;
@@ -1717,7 +1765,7 @@
   justify-content: center;
 }
 
-.measure-setting-page-nav{
+.measure-info-page-nav{
   grid-column: 1/-1;
   width: 100%;
   height: 100%;
@@ -1726,13 +1774,13 @@
   justify-content: center;
   position: relative;
 }
-.measure-setting-page-nav p{
+.measure-info-page-nav p{
   display: block;
   text-align: center;
   font-size: 1.1rem;
   margin: 0;
 }
-.measure-setting-backBtn{
+.measure-info-backBtn{
   position: absolute;
   display: flex;
   top: 0;
@@ -1741,7 +1789,7 @@
   align-items: center;
   cursor: pointer;
 }
-.measure-setting-page-main-container form{
+.measure-info-page-main-container form{
   width: 50%;
   height: 80%;
   display: grid;
@@ -1750,13 +1798,13 @@
   grid-gap: 3vh;
 }
 
-.measure-setting-page-main-container .info-input-container{
+.measure-info-page-main-container .info-input-container{
   display: grid;
   grid-template-columns: 20vh 1fr;
   align-items: center;
   position: relative;
 }
-.measure-setting-page-main-container .info-input-container select{
+.measure-info-page-main-container .info-input-container select{
   all: unset;
   -moz-appearance: none;
   -webkit-appearance: none;
@@ -1770,7 +1818,7 @@
   font-size: 2.2vh;
   cursor: pointer;
 }
-.measure-setting-page-main-container .info-input-container select:focus{
+.measure-info-page-main-container .info-input-container select:focus{
   border: 1px solid rgb(75, 117, 214);
 }
 
@@ -1778,11 +1826,11 @@
   position: absolute;
   right: 10px;
 }
-.measure-setting-page-main-container .info-input-container label{
+.measure-info-page-main-container .info-input-container label{
   font-size: 2.2vh;
   font-weight: bold;
 }
-.measure-setting-page-main-container .info-input-container input{
+.measure-info-page-main-container .info-input-container input{
   all: unset;
   border: 1px solid #ddd;
   padding: 0 5px;
@@ -1790,15 +1838,15 @@
   height: 100%;
 }
 
-.measure-setting-page-main-container .info-input-container input:disabled{
+.measure-info-page-main-container .info-input-container input:disabled{
   background: #ddd;
 }
-.measure-setting-page-main-container .info-input-container input:disabled::placeholder{
+.measure-info-page-main-container .info-input-container input:disabled::placeholder{
   color: #ddd;
 }
 
 
-.measure-setting-page-main-container .info-input-container .radio-container {
+.measure-info-page-main-container .info-input-container .radio-container {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 1vh;
@@ -1817,7 +1865,7 @@
   text-align: center;
   cursor: pointer;
 }
-.measure-setting-page-main-container .info-input-container .radio-container input{
+.measure-info-page-main-container .info-input-container .radio-container input{
   all: unset;
   appearance: none;
   display: block;
@@ -1828,29 +1876,29 @@
   background: #f5f5f5;
   cursor: pointer;
 }
-.measure-setting-page-main-container .info-input-container input:focus{
+.measure-info-page-main-container .info-input-container input:focus{
   border: 1px solid rgb(75, 117, 214);
 }
-.measure-setting-page-main-container .info-input-container .radio-container input:disabled{
+.measure-info-page-main-container .info-input-container .radio-container input:disabled{
   opacity: .2;
 }
-.measure-setting-page-main-container .info-input-container .radio-container input:disabled + label{
+.measure-info-page-main-container .info-input-container .radio-container input:disabled + label{
   opacity: .2;
 }
-.measure-setting-page-main-container .info-input-container .radio-container input:active{
+.measure-info-page-main-container .info-input-container .radio-container input:active{
   opacity: .2;
 }
-.measure-setting-page-main-container .info-input-container .radio-container input:active + label{
+.measure-info-page-main-container .info-input-container .radio-container input:active + label{
   opacity: .2;
 }
-.measure-setting-page-main-container .info-input-container .radio-container input:checked{
+.measure-info-page-main-container .info-input-container .radio-container input:checked{
   border: 1px solid rgb(75, 117, 214);
   background: #f9f9f9;
 }
-.measure-setting-page-main-container .info-input-container .radio-container input:checked+label{
+.measure-info-page-main-container .info-input-container .radio-container input:checked+label{
   color: rgb(75, 117, 214);
 }
-.measure-setting-page-main-container .measure-btn{
+.measure-info-page-main-container .measure-btn{
   width: 100%;
   height: 5vh;
   border: 1px solid rgb(77, 174, 226);
@@ -1863,6 +1911,336 @@
   background: #fff;
   cursor: pointer;
 }
+
+
+
+
+/* setting-page */
+.setting-page-container{
+  width: 100%;
+  height : 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 40px 1fr;
+  grid-column-gap: 10px;
+}
+.setting-page-nav{
+  grid-column: 1/-1;
+  width: 100%;
+  height: 40px;
+  align-items: center;
+  position: relative;
+}
+.setting-page-nav p{
+  display: block;
+  text-align: center;
+  margin: 0;
+  font-size: 1.1rem;
+}
+.setting-page-nav .setting-page-backBtn{
+  position: absolute;
+  display: flex;
+  top: 10px;
+  left: 0;
+  height: 0;
+  align-items: center;
+  cursor: pointer;
+}
+
+.setting-page-left-container{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 5%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+  display: grid;
+  grid-template-rows: .5fr 2fr 3.5fr .5fr;
+}
+.setting-page-left-container .setting-page-left-container-nav{
+  position: relative;
+  height: 100%;
+  /* background: #000; */
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  justify-content:space-between;
+}
+.setting-page-left-container-nav p{
+  margin: 0;
+  font-weight: bold;
+}
+
+.setting-page-left-container-nav .device-connect{
+  width: fit-content;
+  font-size: min(2.7vh, 1.2rem);
+  font-weight: bold;
+  display: flex;
+  align-items: start;
+  color: #ccc;
+}
+.setting-page-left-container-nav .connect{
+  color: rgb(75, 117, 214);
+}
+.setting-page-left-container-nav .device-connect p{
+  all: unset;
+  font-size: min(2.3vh, 1rem);
+  margin-right: 10px;
+}
+
+.connect-info-container{
+  display: flex;
+}
+.connect-info{
+  font-size: min(2vh, 1rem);
+  margin-top: 2vh;
+  white-space: pre-line;
+  word-break: keep-all;
+  
+}
+.connect-info p{
+  margin: 0;
+  color: rgb(255, 63, 63);
+}
+
+.device-list-container{
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 5vh 1fr;
+  position: relative;
+}
+
+.device-list-column{
+  display: grid;
+  width: 100%;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid #aaa;
+  font-size: min(2.3vh, 1rem);
+  font-weight: bold;
+}
+.device-list-column div{
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  width: 100%;
+}
+.device-item-container{
+  position: absolute;
+  margin-top: 5vh;
+  width: 100%;
+  height: 80%;
+  overflow: scroll;
+  scrollbar-width: none;
+  font-size: min(2.3vh, 1.2rem);
+}
+.device-item-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera*/
+}
+.device-item{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.device-item div{
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  width: 100%;
+  height: 5vh;
+  border-bottom: 1px solid #ccc;
+}
+.device-item div p{
+  margin: 0;
+  text-align: center;
+  font-size: min(2.2vh, 1rem);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.device-scan-btn-container{
+  /* background: #000; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.device-scan-btn{
+  width: 100%;
+  height: 100%;
+  /* background: #000; */
+  border: 1px solid rgb(75, 117, 214);
+  border-radius: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+.device-scan-btn p{
+  margin: 0;
+  font-size: min(2.5vh, 1rem);
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+}
+
+.setting-page-right-container{
+  position: relative;
+}
+.setting-page-right-container>div{
+  width: 100%;
+  height: 8vh;
+  border: #ccc 1px solid;
+  margin-bottom: 1vh;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  padding-left: 10px;
+  cursor: pointer;
+}
+.setting-page-right-container>div p{
+  font-size: min(2.3vh, 1rem);
+  font-weight: bold;
+  margin: 0;
+}
+.setting-page-right-container .log-out-btn{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.setting-page-right-container .log-out-btn p{
+  color: rgb(255, 63, 63);
+}
+
+
+/* 회원정보 변경 */
+.subjectSetting-page-container{
+  width: 100%;
+  height : 100%;
+  display: grid;
+  grid-template-rows: 35px 1fr;
+  grid-template-columns: 1fr;
+  grid-gap: 10px;
+}
+.subjectSetting-page-nav{
+  grid-column: 1/-1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.subjectSetting-page-nav .backBtn{
+  position: absolute;
+  display: flex;
+  top: 0;
+  left: 0;
+  height: 100%;
+  align-items: center;
+  cursor: pointer;
+}
+/* .subjectSetting-page-nav .backBtn svg{
+  cursor: pointer;
+} */
+.subjectSetting-page-container{
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+.password-list-container{
+  width: 100%;
+  height: 100%;
+  padding: 5%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+
+}
+.change-password-field{
+  width: 100%;
+  height: 15%;
+  max-width: 1000px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 15%;
+}
+.password-field{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.password-field label{
+  display: flex;
+  width: 100px;
+  height: .9rem;
+  margin-bottom: 0.5rem;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  font-size: .9rem;
+}
+
+.password-field .password-valition{
+  width: -webkit-fill-available;
+  height: 10%;
+  text-align: left;
+}
+
+
+.password-valition  .hint{
+  display: block;
+  margin: 0;
+  font-size: .80rem;
+  color: #aaa;
+}
+.password-field input{
+  all: unset;
+  height: 80%;
+  width: -webkit-fill-available;
+  border: 1px solid #eee;
+  padding: 0 10px;
+  border-radius: 10px;
+
+}
+.password-valition .incorrect:focus{
+  border: 1px solid red;
+}
+.password-valition .incorrect{
+  border: 1px solid red;
+}
+.password-valition .hint-incorrect{
+  color: red;
+}
+.password-list-container .chBtn{
+  all:unset;
+  width: 100%;
+  max-width: 500px;
+  height: 7%;
+  text-align: center;
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+  margin-bottom: 10px;
+  border: 1px solid rgb(75, 204, 214);
+  border-radius: 20px;
+  color: rgb(75, 204, 214);
+  cursor: pointer;
+}
+.password-list-container .chBtn:disabled{
+  background: #ddd;
+  color: #bbb;
+  border: 1px solid #ddd;
+  cursor: default;
+}
+
 
 
 
@@ -1886,4 +2264,9 @@ button{
 button:active{
   opacity: 0.3;
 }
-
+svg{
+  cursor: pointer;
+}
+path{
+  cursor: pointer;
+}

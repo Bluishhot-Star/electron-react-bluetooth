@@ -4,7 +4,7 @@ import { Cookies, useCookies } from 'react-cookie';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronLeft, faSearch, faCalendar, faChevronRight } from '@fortawesome/free-solid-svg-icons'
+import { faGear } from '@fortawesome/free-solid-svg-icons'
 import { debounce } from 'lodash'
 import {registerables,Chart as ChartJS,RadialLinearScale,LineElement,Tooltip,Legend,} from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
@@ -739,12 +739,15 @@ function ResultPage(){
             <div className="nav-left-container">
               <div className="admin">
                 <span>담당자</span>
-                {/* <span>{state.subject[7].value}</span> */}
+                <span>{state.fvc.subject[7].value}</span>
               </div>
             </div>
             <div className="nav-right-container">
-              <button className="select-patient-btn" onClick={()=>{navigator(-1)}}>환자 선택</button>
-              <button className="setting-btn" onClick={()=>{navigator("/setting")}}>설정</button>
+              <div className="select-patient-btn" onClick={()=>{navigator(-1)}}>환자 선택</div>
+              <div className='setting-btn-container' onClick={()=>{navigator("/setting")}}>
+                <FontAwesomeIcon className='cogIcon' icon={faGear}/>
+                <p className="setting-btn" >설정</p>
+              </div>
             </div>
           </div>
         </div>

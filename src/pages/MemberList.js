@@ -4,7 +4,8 @@ import { Cookies, useCookies } from 'react-cookie';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChevronLeft, faSearch, faCalendar, faChevronRight } from '@fortawesome/free-solid-svg-icons'
+import { faChevronLeft,faGear, faCog, faSearch, faCalendar, faChevronRight } from '@fortawesome/free-solid-svg-icons'
+
 
 import DateSelector from './DateSelector.js'
 import { useInView } from 'react-intersection-observer';
@@ -88,7 +89,6 @@ const MemberList = ()=>{
     })
     let time = setTimeout(()=>{
       setGoTO(true);
-
     },1000)
   }
   useEffect(()=>{
@@ -96,7 +96,6 @@ const MemberList = ()=>{
       console.log(data1);
       console.log(data2);
       navigator('/memberList/resultPage', {state: {fvc:data1, svc:data2, date:date, birth:birth}});
-      
     }
     else{}
   },[goTO])
@@ -215,7 +214,6 @@ useEffect(()=>{
 
   // useEffect(() => {
   //   // 사용자가 마지막 요소를 보고 있고, 로딩 중이 아니라면
-   
   //   if (inView && !loading) {
   //     console.log(page);
       
@@ -229,11 +227,15 @@ useEffect(()=>{
         {dateSelectorStat ? <DateSelector data={inspectionDate} onOff={setDateSelectorStat} select={dateSelect}/> : null}
         <div className="memberList-page-nav" onClick={()=>{console.log(examinees)}}>
           <p>환자 선택</p>
+          <div className='setting-btn-container' onClick={()=>{navigator("/setting")}}>
+            <FontAwesomeIcon className='cogIcon' icon={faGear}/>
+            <p className="setting-btn" >설정</p>
+          </div>
         </div>
         <div className="memberList-page-left-container">
           <div className="patient-list-container">
             <div className="add-patient-btn-container">
-              <div className="add-patient-btn" onClick={()=>{navigator("./addPatient")}}>
+              <div className="add-patient-btn" onClick={()=>{navigator("./addPatient", {state: {update:false}})}}>
                 + 환자 추가
               </div>
             </div>
@@ -281,7 +283,7 @@ useEffect(()=>{
           }
           <div className="patient-personal-container">
             <div className="measure-btn-container">
-              <div onClick={()=>{navigator("./measureSetting")}} className="measure-btn">검사하기</div>
+              <div onClick={()=>{navigator("./measureInfo")}} className="measure-btn">검사하기</div>
             </div>
             <div className="measure-date-container">
               <div className="measure-selected-date-container">
