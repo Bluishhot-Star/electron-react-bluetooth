@@ -393,91 +393,56 @@ function DetailSvcPage(){
   
   const chartRef = useRef();
   const [FvcSvc, setFvcSvc] = useState("fvc"); //fvc, svc
-  const [info, setInfo] = useState();
-  const [tvMax, setTvMax] = useState([10]);
+  
+  
   //결과 그래프 목록 요청 FVC
-  const[volumeFlow,setVolumeFlow] = useState([]);
-  const[timeVolume,setTimeVolume] = useState([]);
+  
 
   const[svcGraph,setSvcGraph] = useState([]);
   const[svcMax, setSvcMax] = useState([10]);
   let diagnosis, trials;
 
-  let colorList = ['rgb(5,128,190)','rgb(158,178,243)','rgb(83, 225, 232)','rgb(67,185,162)','rgb(106,219,182)','rgb(255,189,145)','rgb(255,130,130)','rgb(236,144,236)','rgb(175,175,175)','rgb(97,97,97)'];
+
   
   const graphStyle = {width:"0px" ,height:"0px", transition:"none"}
   const graphStyle2 = {boxSizing:"border-box",width:"0px" ,height:"0px", transition:"none"}
-  useEffect(()=>{
-    console.log(location.state);
-    console.log(123123123);
-    diagnosis = location.state.diagnosis;
-    //fvc의 심플카드
-    trials = location.state.trials;
-    let timeVolumeList = [];
-    let volumeFlowList = [];
-    let timeVolumeMaxList = [];
 
-    if(trials){
-      // 매 결과에서 데이터 추출
-      trials.forEach((item)=>{
-        if(item.best){
-          timeVolumeList.push(item.graph.timeVolume);
-          volumeFlowList.push(item.graph.volumeFlow);
-          //현 timeVolume에서 최대값 찾기
-          timeVolumeMaxList.push(item.results[3].meas);
-        }
-      })
-      setVolumeFlow(volumeFlowList);
-      setTimeVolume(timeVolumeList);
-      setTvMax(timeVolumeMaxList);
-    }
-  },[])
+  const [graphPreCount, setGraphPreCount] = useState([]);
+  const [graphPostCount, setGraphPostCount] = useState([]);
+
   useEffect(()=>{
     //   console.log(location.state);
       console.log(123123123);
-      //fvc의 심플카드
+      //svc의 심플카드
       trials = location.state.trials;
       let svcGraphList = [];
       let svcMaxList = [];
-  
       if(trials){
         // 매 결과에서 데이터 추출
+        let count = 0;
         trials.forEach((item)=>{
-          svcGraphList.push(item.graph.timeVolume);
+          if(item.best){
+            if(item.bronchodilator === "pre"){
+              setGraphPreCount([...graphPreCount, count++])
+              setPreResult(item.results);
+            }
+            else if(item.bronchodilator === "post"){
+              setGraphPostCount([...graphPreCount, count++]);
+              setPostResult(item.results);
+            }
+            svcGraphList.push(item.graph.timeVolume);
+            //현 svc 최대값 찾기
+            svcMaxList.push(parseFloat(item.results[0].meas));
+          }
   
-          //현 svc 최대값 찾기
-          svcMaxList.push(parseInt(item.results[0].meas));
+          // //현 svc 최대값 찾기
+          // svcMaxList.push(parseFloat(item.results[0].meas));
         })
         setSvcGraph(svcGraphList);
         setSvcMax(svcMaxList);
       }
     },[])
-  const [graphData, setGraphData] = useState({
-    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-    datasets: [{
-      label: "",
-      data: [
-        {x: 0.030999999999999996, y: 0.23858681948280723},
-        {x: 0.030999999999999996, y: 0.23858681948280724},
-        {x: 0.030999999999999996, y: 0.23858681948280724}],
-      borderColor: 'rgb(255,255,255)',
-      showLine: true,
-      tension: 0.4
-    },]
-  })
-  const [graphData2, setGraphData2] = useState({
-    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-    datasets: [{
-      label: "",
-      data: [
-        {x: 0.030999999999999996, y: 0.23858681948280723},
-        {x: 0.030999999999999996, y: 0.23858681948280724},
-        {x: 0.030999999999999996, y: 0.23858681948280724}],
-      borderColor: 'rgb(255,255,255)',
-      showLine: true,
-      tension: 0.4
-    },]
-  })
+
   const [graphData3, setGraphData3] = useState({
     labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
     datasets: [{
@@ -492,109 +457,6 @@ function DetailSvcPage(){
     },]
   })
 
-  // const graphOption={
-  //   plugins:{
-  //     legend: {
-  //         display: false
-  //     },
-  //     resizeDelay:0,
-  //   },
-  //   responsive: true,
-  //   animation:{
-  //     // duration:0
-  //   },
-  //   maintainAspectRatio: false,
-  //   interaction: false, 
-  //   elements: {
-  //     point: {
-  //       radius: 0,
-  //     },
-  //   },
-  //   scales: {
-  //     x: {
-  //       axios: 'x',
-  //       min: 0,
-  //       max: parseFloat(Math.max(...tvMax)),
-  //       // suggestedMax: 6.0,
-  //       ticks:{
-  //         autoSkip: false,
-  //         // stepSize : 0.1,
-  //         // precision : 0.1,
-  //         beginAtZero: false,
-  //         max: 12.0,
-  //       }
-  //     },
-  //     y: {
-  //       gridLines:{
-  //         zeroLineColor:'rgb(0, 0, 255)',
-  //       },
-  //       axios: 'y',
-  //       // min: -9,
-  //       // suggestedMax:12,
-  //       // suggestedMin:-6,
-  //       ticks: {
-  //         major: true,
-  //         beginAtZero: true,
-  //         stepSize : 1,
-  //         fontSize : 10,
-  //         textStrokeColor: 10,
-  //         precision: 1,
-  //       },
-  //     },
-  //   },
-  // }
-
-  // const graphOption2={
-  //   plugins:{
-  //     legend: {
-  //         display: false
-  //     },
-  //     resizeDelay:0,
-  //   },
-  //   responsive: true,
-  //   animation:{
-  //     // duration:0
-  //   },
-  //   maintainAspectRatio: false,
-  //   interaction: false, 
-  //   elements: {
-  //     point: {
-  //       radius: 0,
-  //     },
-  //   },
-  //   scales: {
-  //     x: {
-  //       axios: 'x',
-  //       min: 0,
-  //       suggestedMax: 3,
-  //       // suggestedMax: 6.0,
-  //       ticks:{
-  //         stepSize : .5,
-  //         beginAtZero: false,
-  //         max: 12.0,
-  //         autoSkip: false,
-  //       }
-  //     },
-  //     y: {
-  //       gridLines:{
-  //         zeroLineColor:'rgba(0, 0, 255, 1)',
-  //       },
-  //       axios: 'y',
-  //       // max: 3,
-  //       min: 0,
-  //       suggestedMax:3.3,
-  //       // suggestedMin:-6,
-  //       ticks: {
-  //         major: true,
-  //         beginAtZero: true,
-  //         stepSize : .5,
-  //         fontSize : 10,
-  //         textStrokeColor: 10,
-  //         precision: 1,
-  //       },
-  //     },
-  //   },
-  // }
   const graphOption3={
     plugins:{
       legend: {
@@ -625,6 +487,16 @@ function DetailSvcPage(){
           beginAtZero: false,
           max: 12.0,
           autoSkip: false,
+        },
+        grid:{
+          color: function(context) {
+            if (context.index === 0){
+              return '#20a0b3';
+            }
+            else{
+              return '#bbdfe4';
+            }
+          },
         }
       },
       y: {
@@ -644,6 +516,19 @@ function DetailSvcPage(){
           textStrokeColor: 10,
           precision: 1,
         },
+        grid:{
+          color: function(context) {
+            if (context.index === 0){
+              return '#20a0b3';
+            }
+            else if (context.tick.value > 0) {
+              return '#bbdfe4';
+            } else if (context.tick.value < 0) {
+              return '#bbdfe4';
+            }
+            return '#20a0b3';
+          },
+        }
       },
     },
   }
@@ -672,7 +557,7 @@ function DetailSvcPage(){
     let time = setTimeout(() => {
       setTemp(true);
     },500);
-  },[graphData])
+  },[graphData3])
 
   useEffect(()=>{
     setFirst(second)
@@ -710,106 +595,6 @@ function DetailSvcPage(){
       window.removeEventListener("resize", handleResize)
     }
   },[])
-  
-
-
-
-  // volumeFlow 그리기
-  useEffect(()=>
-  {
-    console.log("!#!##")
-
-    let time = setTimeout(()=>{
-      console.log("!#!##!@!@")
-      
-      let time2 = setTimeout(() => {
-        let dataset = []
-        volumeFlow.forEach((item,index)=>{
-          dataset.push(
-            {
-              label: "",
-              data: item,
-              borderColor: 'rgba(255,0,0,1)',
-              borderWidth: 2.5,
-              showLine: true,
-              tension: 0.4
-            }
-          )
-        })
-        let time3 = setTimeout(() => {
-          let data = {
-            labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-            datasets: dataset,
-          }
-          let time4 = setTimeout(() => {
-            setGraphData(data);
-          }, 50);
-          return()=>{
-            clearTimeout(time4);
-          }
-        }, 50);
-        return()=>{
-          clearTimeout(time3);
-        }
-      }, 50);
-      return()=>{
-        clearTimeout(time2);
-      }
-    },50)
-
-    return()=>{
-      clearTimeout(time);
-    }
-  },[volumeFlow])
-
-
-
-  // timeVolume 그리기
-  useEffect(()=>
-  {
-    console.log("!#!##")
-
-    let time = setTimeout(()=>{
-      console.log("!#!##!@!@")
-      
-      let time2 = setTimeout(() => {
-        let dataset = []
-        timeVolume.forEach((item,index)=>{
-          dataset.push(
-            {
-              label: "",
-              data: item,
-              borderColor:'rgba(255,0,0,1)',
-              borderWidth: 2.5,
-              showLine: true,
-              tension: 0.4
-            }
-          )
-        })
-        let time3 = setTimeout(() => {
-          let data = {
-            labels: "",
-            datasets: dataset,
-          }
-          let time4 = setTimeout(() => {
-            setGraphData2(data);
-          }, 50);
-          return()=>{
-            clearTimeout(time4);
-          }
-        }, 50);
-        return()=>{
-          clearTimeout(time3);
-        }
-      }, 50);
-      return()=>{
-        clearTimeout(time2);
-      }
-    },50)
-    return()=>{
-      clearTimeout(time);
-    }
-  },[timeVolume])
 
   useEffect(()=>
   {
@@ -821,11 +606,13 @@ function DetailSvcPage(){
       let time2 = setTimeout(() => {
         let dataset = []
         svcGraph.forEach((item,index)=>{
+          let color = "red";
+          if([...graphPostCount].includes(index)) color = 'blue';
           dataset.push(
             {
               label: "",
               data: item,
-              borderColor: "red",
+              borderColor: color,
               borderWidth: 2.5,
               showLine: true,
               tension: 0.4
@@ -881,7 +668,7 @@ function DetailSvcPage(){
     return (
         <div className="result-page-container detail-page-container">
         <div className="nav">
-          <div className="nav-logo" onClick={()=>{console.log(volumeFlow);}}>
+          <div className="nav-logo" onClick={()=>{}}>
             <h1>The SpiroKit</h1>
           </div>
           <div className="nav-content-container">

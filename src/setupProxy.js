@@ -37,6 +37,12 @@ module.exports = function(app){
       changeOrigin: true,
     })
   )
+  app.use(
+    createProxyMiddleware('/devices',{
+      target:'https://spirokitdev.the-researcher.com/v1',
+      changeOrigin: true,
+    })
+  )
 };
 
 

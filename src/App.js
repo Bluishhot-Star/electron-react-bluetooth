@@ -18,6 +18,7 @@ import DetailSvcPage from './pages/DetailSvcPage.js'
 import SettingPage from './pages/SettingPage.js'
 import MngClncs from './pages/MngClncs.js'
 import SubjectSetting from './pages/SubjectSetting.js'
+import DeviceSetting from './pages/DeviceSetting.js'
 
 
 // Variable & State
@@ -38,6 +39,7 @@ function App() {
         <Route path='/setting' element={<SettingPage/>}/>
         <Route path='/setting/mngClncs' element={<MngClncs/>}/>
         <Route path='/setting/subjectSetting' element={<SubjectSetting/>}/>
+        <Route path='/setting/deviceSetting' element={<DeviceSetting/>}/>
       </Routes>
     </div>
   );
@@ -59,10 +61,7 @@ async function testIt () {
     console.log(device.id)
     console.log(device.gatt)
     document.getElementById('device-name').innerHTML = device.name
-
-     // GATT 서버 연결
-    const server = await device.gatt.connect();
-  
+    
     // Nordic UART Service 가져오기
     const service = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
   
@@ -71,7 +70,12 @@ async function testIt () {
   
     // 송신 특성 가져오기
     const txCharacteristic = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
-  
+    
+
+     // GATT 서버 연결
+    const server = await device.gatt.connect();
+
+    // 검사하기 버튼 누르고 쓸 부분
     // Notify(구독) 활성화
     await txCharacteristic.startNotifications();
   

@@ -2113,32 +2113,37 @@
 }
 
 
+
 /* 회원정보 변경 */
 .subjectSetting-page-container{
   width: 100%;
   height : 100%;
   display: grid;
-  grid-template-rows: 35px 1fr;
+  grid-template-rows: 40px 1fr;
   grid-template-columns: 1fr;
-  grid-gap: 10px;
 }
 .subjectSetting-page-nav{
-  grid-column: 1/-1;
   width: 100%;
-  height: 100%;
+  height: 40px;
   display: flex;
-  align-items: center;
+  /* align-items: center; */
   justify-content: center;
   position: relative;
 }
 .subjectSetting-page-nav .backBtn{
   position: absolute;
   display: flex;
-  top: 0;
+  top: 10px;
   left: 0;
-  height: 100%;
+  height: 0; 
   align-items: center;
   cursor: pointer;
+}
+.subjectSetting-page-nav p{
+  display: block;
+  text-align: center;
+  margin: 0;
+  font-size: 1.1rem;
 }
 /* .subjectSetting-page-nav .backBtn svg{
   cursor: pointer;
@@ -2226,10 +2231,10 @@
   max-width: 500px;
   height: 7%;
   text-align: center;
-  color: rgb(75, 117, 214);
+  color: #4b75d6;
   font-weight: bold;
   margin-bottom: 10px;
-  border: 1px solid rgb(75, 204, 214);
+  border: 1px solid #20a0b3;
   border-radius: 20px;
   color: rgb(75, 204, 214);
   cursor: pointer;
@@ -2240,6 +2245,474 @@
   border: 1px solid #ddd;
   cursor: default;
 }
+
+.manage-clinics-container{
+  width: 100%;
+  height : 100%;
+  display: grid;
+  grid-template-rows: 40px 1fr;
+}
+
+.manage-clinics-nav{
+  width: 100%;
+  height: 40px;
+  align-items: center;
+  position: relative;
+}
+.manage-clinics-nav p{
+  display: block;
+  text-align: center;
+  margin: 0;
+  font-size: 1.1rem;
+}
+.manage-clinics-nav .manage-clinics-backBtn{
+  position: absolute;
+  display: flex;
+  top: 10px;
+  left: 0;
+  height: 0;
+  align-items: center;
+  cursor: pointer;
+}
+.manage-clinics-body-container{
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 15px;
+  padding-top: 6vh;
+}
+.manage-clinics-body-container > div:nth-child(1){
+  color:rgb(75, 117, 214);
+  font-weight: bold;
+  font-size: min(2.3vh, 1rem);
+}
+
+.manage-clinics-body-container .search-patient-container{
+  width: 35%;
+  height: 6vh;
+  border: 1px solid rgb(75, 117, 214);
+  border-radius: 5px;
+  display: grid;
+  grid-template-columns: 1fr 9fr;
+  align-items: center;
+  grid-gap: 10px;
+  margin-top: 1.5vh;
+}
+.manage-clinics-body-container .search-patient-container .searchIcon{
+  margin-left: 2vh;
+  cursor: pointer;
+}
+.manage-clinics-body-container .search-patient-container .searchIcon:active{
+  opacity: .3;
+}
+.manage-clinics-body-container .search-patient-container input{
+  all: unset;
+  display: block;
+  width: 100%;
+  /* padding-left: 2vh; */
+}
+.manage-clinics-body-container .search-patient-container input::placeholder{
+  color: #ccc;
+  font-size: min(2.4vh, 1rem);
+}
+
+.clinicians-list{
+  width: 100%;
+  margin-top: 2%;
+  height: 83%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+  display: grid;
+  position: relative;
+  grid-template-columns: 1fr;
+  grid-template-rows: 5vh 1fr;
+  overflow: hidden;
+}
+.clinicians-list .clinicians-list-column{
+  border-bottom: .5px solid #333;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  z-index: 10;
+  background: #fff;
+}
+.clinicians-list-column-name{
+  font-size: min(2vh,0.9rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+}
+.clinicians-list .clinicians-item-container{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  padding-top: 5vh;
+  overflow: scroll;
+  scrollbar-width: none;
+}
+.clinicians-list .clinicians-item-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera*/
+}
+.clinicians-item{
+  width: 100%;
+  height: 40px;
+  display: grid;
+  grid-template-columns: 20% 20% 20% 20% 20%;
+}
+.clinicians-item>div{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.clinicians-item>div p{
+  margin: 0;
+  width:fit-content;
+  font-size: min(1.5vw,0.9rem);
+}
+.clinicians-item:nth-child(1){
+  /* margin-top: 1vh; */
+}
+
+
+.clinicians-item-container .radio-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 1vh;
+  height: 100%;
+  align-items: center;
+  padding: 0 2vw;
+}
+.radioBtn{
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+  /* justify-content: center; */
+}
+.radioBtn:nth-child(1){
+  justify-content: end;
+}
+.radioBtn label{
+  position: absolute;
+  width: 100%;
+  max-width: 72px;
+  text-align: center;
+  cursor: pointer;
+  font-size: min(1.4vw,0.9rem);
+}
+.clinicians-item-container .radio-container input{
+  all: unset;
+  appearance: none;
+  display: block;
+  width: 100%;
+  max-width: 72px;
+  height: 50%;
+  border-radius: 100vh;
+  background: #fff;
+  cursor: pointer;
+}
+.clinicians-item-container .radio-container>div:active{
+  opacity: 0.3;
+}
+.clinicians-item-container .radio-container>div:nth-child(1) input{
+  border: 1px solid rgb(75, 117, 214);
+}
+.clinicians-item-container .radio-container>div:nth-child(2) input{
+  border: 1px solid rgb(255, 63, 63);
+}
+.clinicians-item-container .radio-container>div:nth-child(1) input+label{
+  color: rgb(75, 117, 214);
+}
+.clinicians-item-container .radio-container>div:nth-child(2) input+label{
+  color: rgb(255, 63, 63);
+}
+.clinicians-item-container .radio-container>div input:checked{
+  border: 1px solid #ccc;
+  background: #ccc;
+}
+.clinicians-item-container .radio-container>div input:checked + label{
+  color: #aaa;
+  font-weight: bold;
+}
+
+
+
+
+/* device */
+.deviceList-page-container{
+  width: 100%;
+  height : 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 40px 1fr;
+  grid-column-gap: 10px;
+}
+.deviceList-page-container  .deviceList-page-nav{
+  grid-column: 1/-1;
+  width: 100%;
+  height: 40px;
+  align-items: center;
+  position: relative;
+}
+.deviceList-page-container  .deviceList-page-nav .backBtn{
+    position: absolute;
+    display: flex;
+    top: 10px;
+    left: 0;
+    height: 0; 
+    align-items: center;
+    cursor: pointer;
+}
+.deviceList-page-container  .deviceList-page-nav p{
+  display: block;
+  text-align: center;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.deviceList-page-container  .deviceList-page-left-container{
+  position: relative;
+}
+.deviceList-page-container  .device-list-container{
+  width: 100%;
+  height: 100%;
+  padding: 5%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+
+}
+.deviceList-page-container .device-list-container .add-device-btn-container{
+  position: relative;
+  height: 5vh;
+  margin-bottom: 2vh;
+  display: flex;
+  align-items: center;
+  
+}
+.deviceList-page-container .device-list-container .add-device-btn{
+  position: absolute;
+  right: 0;
+  width: fit-content;
+  font-size: min(2.3vh, 1rem);
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+  text-align: right;
+  cursor: pointer;
+}
+.deviceList-page-container .device-list-container .add-device-btn:active{
+  opacity: .3;
+}
+
+.deviceList-page-container .device-list{
+  width: 100%;
+  margin-top: 5%;
+  height: 93%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+  display: grid;
+  position: relative;
+  grid-template-columns: 1fr;
+  grid-template-rows: 5vh 1fr;
+  overflow: hidden;
+}
+.deviceList-page-container .device-list .device-list-column{
+  border-bottom: .5px solid #333;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.deviceList-page-container .device-list-column-name{
+  font-size: min(2vh,0.9rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+}
+.deviceList-page-container .device-list .device-item-container{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin-top: 5vh;
+  overflow: scroll;
+  scrollbar-width: none;
+}
+.deviceList-page-container .device-list .device-item-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera*/
+}
+.deviceList-page-container .device-item{
+  width: 100%;
+  height: 7%;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  cursor: pointer;
+}
+.deviceList-page-container .device-loading{
+  width: 100%;
+  height: 5vh;
+  transform: translate(0,-10%);
+  text-align: center;
+  font-size: 1rem;
+}
+.deviceList-page-container .device-item:hover{
+  background: #eee;
+}
+.deviceList-page-container .device-item div{
+  display: inline-block;
+  width: 100%;
+  display: flex;
+  padding: 0 1vh;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  white-space:nowrap;
+}
+.deviceList-page-container .device-item div p{
+  font-size: min(2.1vh,0.9rem);
+  overflow: hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+.deviceList-page-container .deviceList-page-right-container{
+  position: relative;
+}
+.deviceList-page-container .curtain{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eee;
+  border-radius: 5px;
+  z-index: 100;
+  color: #aaa;
+  font-weight: bold;
+}
+.device-personal-container{
+  width: 100%;
+  height: 100%;
+  padding: 5%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+}
+.device-personal-container .calibration-btn-container{
+  position: relative;
+  height: 5vh;
+  margin-bottom: 2vh;
+}
+.device-personal-container .calibration-btn{
+  position: absolute;
+  right: 0;
+  width: fit-content;
+  font-size: min(2.3vh, 1rem);
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+  text-align: right;
+  cursor: pointer;
+}
+.device-personal-container .calibration-btn:active{
+  opacity: .3;
+}
+.device-personal-container .calibration-date-container{
+  height: 6vh;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  justify-content: space-between;
+}
+.calibration-date-container .calibration-selected-date-container{
+  height: 100%;
+}
+.calibration-date-container .calibration-selected-date-container>div:nth-child(1){
+  font-weight: bold;
+}
+.calibration-selected-date{
+  display: flex;
+}
+.calibration-selected-date div{
+  font-size: min(2vh, 1rem);
+  margin-right: .5vh;
+}
+.calibration-select-date-btn-container{
+  position: absolute;
+  right: 0;
+  width: fit-content;
+  font-size: min(2.3vh, 1rem);
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+  text-align: right;
+  cursor: pointer;
+  display: flex;
+}
+.calibration-select-date-btn-container:active{
+  opacity: .3;
+}
+.calibration-select-date-btn-container .calenderIcon{
+  margin-right: .7vh;
+  cursor: pointer;
+}
+.calibration-list{
+  width: 100%;
+  margin-top: 3%;
+  height: 88%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+  display: grid;
+  position: relative;
+  grid-template-columns: 1fr;
+  grid-template-rows: 5vh 1fr;
+  overflow: hidden;
+}
+.calibration-list .calibration-item-container{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  /* margin-top: 5vh; */
+  overflow: scroll;
+  scrollbar-width: none;
+}
+.calibration-list .calibration-item-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera*/
+}
+.calibration-item-container .calibration-item{
+  width: 100%;
+  height: min(5vh,35px);
+  display: grid;
+  grid-template-columns: min(25%,110px) 3fr min(15%,50px);
+  cursor: pointer;
+}
+.calibration-item:hover{
+  background: #eee;
+}
+.calibration-item div:first-child{
+  width: 100%;
+  display: flex;
+  padding: 0 1vh;
+  align-items: center;
+  justify-content: center;
+  font-size: min(2vh, .9rem);
+  color: #aaa;
+}
+.calibration-item .calibration-item-date{
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  font-size: min(2.2vh, .9rem);
+}
+.calibration-item-right-chevron{
+  font-size: min(2vh, 1rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.deviceList-selected{
+  background: #eee;
+}
+
+
+
 
 
 

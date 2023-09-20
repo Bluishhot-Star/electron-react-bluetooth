@@ -220,7 +220,7 @@ function ResultPage(){
   useEffect(()=>{
   //   console.log(location.state);
     console.log(123123123);
-    //fvc의 심플카드
+    //svc의 심플카드
     trials = location.state.svc.trials;
     let svcGraphList = [];
     let svcMaxList = [];
@@ -235,7 +235,7 @@ function ResultPage(){
         svcGraphList.push(item.graph.timeVolume);
 
         //현 svc 최대값 찾기
-        svcMaxList.push(parseInt(item.results[0].meas));
+        svcMaxList.push(parseFloat(item.results[0].meas));
       })
       setSvcGraph(svcGraphList);
       setAllSvcGraph(svcGraphList);
@@ -344,7 +344,7 @@ function ResultPage(){
       x: {
         axios: 'x',
         min: 0,
-        max: parseFloat(Math.max(...tvMax)),
+        max: parseInt(Math.max(...tvMax)),
         // suggestedMax: 6.0,
         ticks:{
           autoSkip: false,
@@ -352,6 +352,16 @@ function ResultPage(){
           // precision : 0.1,
           beginAtZero: false,
           max: 12.0,
+        },
+        grid:{
+          color: function(context) {
+            if (context.index === 0){
+              return '#20a0b3';
+            }
+            else{
+              return '#bbdfe4';
+            }
+          },
         }
       },
       y: {
@@ -360,8 +370,7 @@ function ResultPage(){
         },
         axios: 'y',
         // min: -9,
-        // suggestedMax:12,
-        // suggestedMin:-6,
+        grace:"5%",
         ticks: {
           major: true,
           beginAtZero: true,
@@ -370,6 +379,19 @@ function ResultPage(){
           textStrokeColor: 10,
           precision: 1,
         },
+        grid:{
+          color: function(context) {
+            if (context.index === 0){
+              return '#20a0b3';
+            }
+            else if (context.tick.value > 0) {
+              return '#bbdfe4';
+            } else if (context.tick.value < 0) {
+              return '#bbdfe4';
+            }
+            return '#20a0b3';
+          },
+        }
       },
     },
   }
@@ -404,6 +426,16 @@ function ResultPage(){
           beginAtZero: false,
           max: 12.0,
           autoSkip: false,
+        },
+        grid:{
+          color: function(context) {
+            if (context.index === 0){
+              return '#20a0b3';
+            }
+            else{
+              return '#bbdfe4';
+            }
+          },
         }
       },
       y: {
@@ -423,6 +455,16 @@ function ResultPage(){
           textStrokeColor: 10,
           precision: 1,
         },
+        grid:{
+          color: function(context) {
+            if (context.index === 0){
+              return '#20a0b3';
+            }
+            else{
+              return '#bbdfe4';
+            }
+          },
+        }
       },
     },
   }
@@ -456,6 +498,16 @@ function ResultPage(){
           beginAtZero: false,
           max: 12.0,
           autoSkip: false,
+        },
+        grid:{
+          color: function(context) {
+            if (context.index === 0){
+              return '#20a0b3';
+            }
+            else{
+              return '#bbdfe4';
+            }
+          },
         }
       },
       y: {
@@ -475,6 +527,19 @@ function ResultPage(){
           textStrokeColor: 10,
           precision: 1,
         },
+        grid:{
+          color: function(context) {
+            if (context.index === 0){
+              return '#20a0b3';
+            }
+            else if (context.tick.value > 0) {
+              return '#bbdfe4';
+            } else if (context.tick.value < 0) {
+              return '#bbdfe4';
+            }
+            return '#20a0b3';
+          },
+        }
       },
     },
   }
@@ -732,7 +797,7 @@ function ResultPage(){
   return(
     <div className="result-page-container">
         <div className="nav">
-          <div className="nav-logo" onClick={()=>{console.log(graphOption3.scales.y.suggestedMax);}}>
+          <div className="nav-logo" onClick={()=>{console.log(svcMax);}}>
             <h1>The SpiroKit</h1>
           </div>
           <div className="nav-content-container">

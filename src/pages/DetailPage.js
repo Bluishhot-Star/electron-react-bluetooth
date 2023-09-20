@@ -833,6 +833,16 @@ function DetailPage(){
           beginAtZero: false,
           max: 12.0,
         },
+        grid:{
+          color: function(context) {
+            if (context.index === 0){
+              return '#20a0b3';
+            }
+            else{
+              return '#bbdfe4';
+            }
+          },
+        }
       },
       y: {
         gridLines:{
@@ -842,6 +852,7 @@ function DetailPage(){
         // min: -9,
         // suggestedMax:12,
         // suggestedMin:-6,
+        grace:"10%",
         ticks: {
           major: true,
           beginAtZero: true,
@@ -850,6 +861,19 @@ function DetailPage(){
           textStrokeColor: 10,
           precision: 1,
         },
+        grid:{
+          color: function(context) {
+            if (context.index === 0){
+              return '#20a0b3';
+            }
+            else if (context.tick.value > 0) {
+              return '#bbdfe4';
+            } else if (context.tick.value < 0) {
+              return '#bbdfe4';
+            }
+            return '#20a0b3';
+          },
+        }
       },
     },
   }
@@ -884,6 +908,16 @@ function DetailPage(){
           beginAtZero: false,
           max: 12.0,
           autoSkip: false,
+        },
+        grid:{
+          color: function(context) {
+            if (context.index === 0){
+              return '#20a0b3';
+            }
+            else{
+              return '#bbdfe4';
+            }
+          },
         }
       },
       y: {
@@ -903,6 +937,16 @@ function DetailPage(){
           textStrokeColor: 10,
           precision: 1,
         },
+        grid:{
+          color: function(context) {
+            if (context.index === 0){
+              return '#20a0b3';
+            }
+            else{
+              return '#bbdfe4';
+            }
+          },
+        }
       },
     },
   }

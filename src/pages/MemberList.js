@@ -31,20 +31,25 @@ const MemberList = ()=>{
   //     })
   // },[])
 
+  // 클릭한 subject css State
   const [clicked, setClicked] = useState("");
+
+  // 클릭했을때 css 변화
   useEffect(()=>{
     if(clicked == false){return}
     let temp = document.getElementById(clicked);
     console.log(temp);
     temp.classList.add("memberList-selected");
   },[clicked])
+
   const removeCSS=(e)=>{
     let temp = document.getElementById(clicked);
     temp.classList.remove("memberList-selected")
   }
+
   const click = (index,chartNumber, birth) =>{
-    setCurtainStat(false)
-    if(clicked !== ""){removeCSS();}
+    setCurtainStat(false) // 환자 선택 문구 삭제
+    if(clicked !== ""){removeCSS();}//햔재 클릭된 요소css 제거
     setClicked("memberItem"+index);
     setBirth(birth);
     console.log(birth);
@@ -60,6 +65,7 @@ const MemberList = ()=>{
       console.log(err);
     })
   }
+  
   const [goTO, setGoTO] = useState(false)
   // let data1, data2;
   const [data1, setData1] = useState([]);

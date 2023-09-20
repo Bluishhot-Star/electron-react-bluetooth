@@ -94,8 +94,8 @@ const SettingPage = () =>{
         <div className="setting-page-right-container">
           <div className="user-info-change-btn" onClick={()=>{navigator("./subjectSetting")}}><p>유저 정보 변경</p></div>
           <div className="measure-setting-btn"><p>검사 설정</p></div>
-          <div className="clinic-manage-btn"><p>의료진 관리</p></div>
-          <div className="device-manage-btn"><p>디바이스 관리</p></div>
+          <div className="clinic-manage-btn" onClick={()=>{navigator("./mngClncs")}}><p>의료진 관리</p></div>
+          <div className="device-manage-btn" onClick={()=>{navigator("./deviceSetting")}}><p>디바이스 관리</p></div>
           <div className="calibration-btn"><p>보정</p></div>
           <div className="calibration-verification-btn"><p>보정 검증</p></div>
 
