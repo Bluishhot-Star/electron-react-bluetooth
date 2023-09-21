@@ -51,53 +51,7 @@ export default App;
 
 
 
-// 기기 연결
-async function testIt () {
-  try{
-    const device = await navigator.bluetooth.requestDevice({
-      acceptAllDevices: true,
-      optionalServices: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']
-    })
-    console.log(device.id)
-    console.log(device.gatt)
-    document.getElementById('device-name').innerHTML = device.name
-    
-    // Nordic UART Service 가져오기
-    const service = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
-  
-    // 수신 특성 가져오기
-    const rxCharacteristic = await service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
-  
-    // 송신 특성 가져오기
-    const txCharacteristic = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
-    
 
-     // GATT 서버 연결
-    const server = await device.gatt.connect();
-
-    // 검사하기 버튼 누르고 쓸 부분
-    // Notify(구독) 활성화
-    await txCharacteristic.startNotifications();
-  
-    // Notify(구독) 이벤트 핸들러 등록
-    txCharacteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
-  
-    console.log('Connected to BLE device');
-  }
-  catch(error){
-    console.error('Failed to select device:', error);
-    alert('Failed to select device. Please try again.');
-  }
-}
-
-function handleCharacteristicValueChanged(event) {
-  const value = event.target.value;
-  // 데이터 처리 및 UART 프로토콜 해석
-  console.log('Received data:', value);
-}
-function cancelRequest () {
-  window.electronAPI.cancelBluetoothRequest()
-}
 
 
 
