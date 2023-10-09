@@ -6,8 +6,8 @@ import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from "react-router-dom";
 import { Cookies } from 'react-cookie';
 import axios from 'axios';
-
-
+import { Provider } from "react-redux";
+import deviceInfo from "./deviceInfo.js"
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 axios.interceptors.response.use(
@@ -46,9 +46,11 @@ axios.interceptors.response.use(
   }
 )
 root.render(
-  <BrowserRouter>
-    <App />
-  </BrowserRouter>
+  <Provider store={deviceInfo}>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </Provider>
   // <React.StrictMode>   double invoked,,
   // </React.StrictMode>
 );

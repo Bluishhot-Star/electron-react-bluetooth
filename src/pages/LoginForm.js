@@ -99,7 +99,7 @@ const LoginForm = () =>{
       }}).then((res)=>{
         accessExpires.setMinutes(accessExpires.getMinutes() + 14);
         cookie.set('accessToken',res.data.response.accessToken,{expires : accessExpires,secure:"true"});
-        navigate('/memberList');
+        navigate('/memberList', {state: {device:undefined}});
       }).catch((err)=>{
         console.log(err);
         window.location.replace('/');

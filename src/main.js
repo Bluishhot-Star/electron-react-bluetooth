@@ -2,42 +2,22 @@ const { app, BrowserWindow, ipcMain } = require('electron')
 const { Menu, MenuItem, dialog } = require('@electron/remote/main');
 const path = require('path')
 const url = require('url')
+const Store = require('electron-store');
 
-// function createWindow () {  
-//   mainWindow = new BrowserWindow({
-//     width: initialWidth,
-//     height: initialHeight,
-//     minWidth: 800,
-//     minHeight: 600,
-//     webPreferences: {
-//       nodeIntegration: true,
-//       contextIsolation: false,
-//       transparent: false,
-//       frame: true,
-//       resizable: true,
-//       hasShadow: false,
-//       alwaysOnTop: false,
-//       nodeIntegration: true,
-//       contextIsolation: false,
-//       enableRemoteModule: true,
-//       webviewTag: true
-//     },
-//   });
+let bluetoothPinCallback = () =>{};
+let selectBluetoothCallback = ()=>{};
 
-//   mainWindow.loadURL("http://localhost:3000") 
+// new
+let BLEDevicesWindow;
+let BLEDevicesList=[];
+let connectedBLEDevice;
+let callbackForBluetoothEvent = ()=>{};
 
-//   mainWindow.on('closed', () => {
-//     mainWindow = null;
-//   });
-
-//   mainWindow.on('resize', () => {
-//   });
-// }  
-
+let mainWindow;
 function createWindow () {
   return new Promise((resolve, reject) => {
     try{
-      const mainWindow = new BrowserWindow({
+      mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
         minWidth: 800,
@@ -51,49 +31,97 @@ function createWindow () {
           hasShadow: false,
           alwaysOnTop: false,
           nodeIntegration: true,
-          contextIsolation: false,
+          contextIsolation: true,
           enableRemoteModule: true,
           // devTools: false,
           webviewTag: true,
-          preload: path.join(__dirname, 'preload.js')
+          // preload: path.join(__dirname, '/preload.js')
+          preload: path.join(__dirname, "/BLEDevicesPreload.js")
         }
       })
-      mainWindow.webContents.on("select-bluetooth-device", (event, deviceList, callback) => {
-        event.preventDefault();
-        selectBluetoothCallback = callback
+
+
+      //******************************past START******************************************
+      // mainWindow.webContents.on("select-bluetooth-device", (event, deviceList, callback) => {
+      //   event.preventDefault();
+      //   selectBluetoothCallback = callback
+      //   console.log(deviceList);
+      //   const result = deviceList.find((device)=>{
+      //     if ((device.deviceName).split('-')[0] == "SpiroKit"){
+      //       mainWindow.webContents.send("xyz", deviceList);
+      //       return device
+      //     }
+      //   })
+      //   if (result) {
+      //     callback(result.deviceId);
+      //   }else{
+          
+      //   }
+      // });
     
-        const result = deviceList.find((device)=>{
-          if ((device.deviceName).split('-')[0] == "SpiroKit"){
-            mainWindow.webContents.send("xyz", deviceList);
-            return device
-          }
-        })
-        if (result) {
-          callback(result.deviceId);
-        }else{
+      // ipcMain.on('cancel-bluetooth-request', (event) => {
+      //   selectBluetoothCallback('');
+      // })
     
-        }
-      });
-    
-      ipcMain.on('cancel-bluetooth-request', (event) => {
-        selectBluetoothCallback('')
-      })
-    
-      // Listen for a message from the renderer to get the response for the Bluetooth pairing.
-      ipcMain.on('bluetooth-pairing-response', (event, response) => {
-        bluetoothPinCallback(response)
-      })
-      const ses = mainWindow.webContents.session
-      ses.setBluetoothPairingHandler((details, callback) => {
-        bluetoothPinCallback = callback
-        // Send a message to the renderer to prompt the user to confirm the pairing.
-        mainWindow.webContents.send('bluetooth-pairing-request', details)
-      })
-    
+      // // Listen for a message from the renderer to get the response for the Bluetooth pairing.
+      // ipcMain.on('bluetooth-pairing-response', (event, response) => {
+      //   bluetoothPinCallback(response)
+      // })
+      // const ses = mainWindow.webContents.session
+      // ses.setBluetoothPairingHandler((details, callback) => {
+      //   bluetoothPinCallback = callback
+      //   // Send a message to the renderer to prompt the user to confirm the pairing.
+      //   mainWindow.webContents.send('bluetooth-pairing-request', details)
+      // })
+      //******************************past FINISH******************************************
       
+      // NEW START
+      mainWindow.webContents.on(
+        "select-bluetooth-device",
+        (event, deviceList, callback) => 
+        {
+          event.preventDefault(); // do not choose the first one
+    
+          if (deviceList && deviceList.length > 0) {  // find devices?
+            deviceList.forEach((element) => {    
+              if (!BLEDevicesWindow) {
+                console.log(32);
+                createBLEDevicesWindow(); // open new window to show devices
+              }     
+              if (
+                !element.deviceName.includes(                  // reduce noise by filter Devices without name
+                  "알 수 없거나 지원되지 않는 기기" // better use filter options in renderer.js
+                ) &&
+                !element.deviceName.includes("Unknown or Unsupported Device") // better use filter options in renderer.js
+              ) {
+                if (BLEDevicesList.length > 0) {  // BLEDevicesList not empty?
+                  if (
+                    BLEDevicesList.findIndex(     // element is not already in BLEDevicesList
+                      (object) => object.deviceId === element.deviceId
+                    ) === -1
+                  ) {
+                    BLEDevicesList.push(element);
+                    console.log(BLEDevicesList);
+                  }
+                } else {
+                  BLEDevicesList.push(element);
+                  console.log(BLEDevicesList);
+                }
+              }
+              
+            });
+          }
+    
+          callbackForBluetoothEvent = callback; // to make it accessible outside https://technoteshelp.com/electron-web-bluetooth-api-requestdevice-error/
+        }
+      );
+
+
+
+
       mainWindow.loadURL("http://localhost:3000") 
       
-      resolve(mainWindow);
+      // resolve(mainWindow);
     }
     catch(error){
       reject(error);
@@ -103,6 +131,68 @@ function createWindow () {
 }
 
 
+// NEW
+function createBLEDevicesWindow() {
+  BLEDevicesWindow = new BrowserWindow({
+    width: 300,
+    height: 400,
+    parent: mainWindow,
+    title: "Bluetooth Devices near by",
+    modal: true,
+    hasShadow: false,
+    webPreferences: {
+      nodeIntegration: false, // is default value after Electron v5
+      contextIsolation: true, // protect against prototype pollution
+      enableRemoteModule: false, // turn off remote
+      preload: path.join(__dirname, "/BLEDevicesPreload.js"), // use a preload script
+    },
+  });
+  BLEDevicesWindow.setPosition(100,0);
+  BLEDevicesWindow.setWindowButtonVisibility(true);
+
+
+  BLEDevicesWindow.loadFile(__dirname+"/BLEDevicesWindow.html");
+  
+  BLEDevicesWindow.on('close', function () {
+    BLEDevicesWindow = null;    
+    callbackForBluetoothEvent("");
+    BLEDevicesList = [];
+  })
+}
+ipcMain.on("toMain", (event, args) => {
+  console.log(args);
+});
+
+ipcMain.on("BLEScannFinished", (event, args) => {
+  console.log(args);
+  console.log(1);
+  console.log(BLEDevicesList.find((item) => item.deviceId === args));
+  let BLEDevicesChoosen = BLEDevicesList.find((item) => item.deviceId === args);
+  BLEDevicesWindow = null;
+  if (BLEDevicesChoosen) {
+    BLEDevicesWindow = null;
+    callbackForBluetoothEvent(BLEDevicesChoosen.deviceId);
+    connectedBLEDevice = BLEDevicesChoosen;
+  }
+  else {
+    BLEDevicesWindow = null;    
+    callbackForBluetoothEvent("");
+    console.log(2);
+  }
+  BLEDevicesList = [];
+});
+
+ipcMain.on("getBLEDeviceList", (event, args) => {
+  if (BLEDevicesWindow)
+  {
+    BLEDevicesWindow.webContents.send("BLEDeviceList", BLEDevicesList);
+  }
+});
+ipcMain.on("getConnectedDevice", (event, args)=>{
+  console.log(connectedBLEDevice);
+  mainWindow.reload();
+  if(connectedBLEDevice) mainWindow.webContents.send("connectedBLEDevice", connectedBLEDevice);
+})
 
 
 // app.on('ready', createWindow);
@@ -121,3 +211,6 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
+app.commandLine.appendSwitch("enable-experimental-web-platform-features", "true");
+app.commandLine.appendSwitch('enable-web-bluetooth', "true");
+app.commandLine.appendSwitch('enable-web-bluetooth-new-permissions-backend', "true");
