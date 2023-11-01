@@ -87,20 +87,15 @@ const MeasurementPage = () =>{
   useEffect(()=>{
     console.log("a :", dataList)
     console.log(dataList[dataList.length-1]);
-    if(dataList[0] == '2' && dataList[1] == '2' && dataList[2] == '2'){
+    console.log(meaStart)
+    console.log(dataList);
+    if(blow==false && dataList[0] == '2' && dataList[1] == '2' && dataList[2] == '2'){
       console.log("aggferwwer")
       setBlow(true);
     }
-    if(meaStart){
-      console.log("zzzzz")
-      //실제 데이터 들어오면
-      dataResult = dataCalculateStrategyE.analyze(dataList.join(' '), inhaleCoefficient, exhaleCoefficient);
-    }
-  },[dataList])
-  
-  useEffect(()=>{
-    if(blow){
-      if(dataList[dataList.length-1].slice(0) == "0"){
+    if(blow==true&&blowF==false){
+      console.log(dataList[dataList.length-1].slice(0,1))
+      if(dataList[dataList.length-1].slice(0,1) == "0"){
         console.log("asffaafs");
         //css 변화로 검사 활성화
         if(secondBtnRef.current.classList.contains("disabled")){
@@ -108,7 +103,18 @@ const MeasurementPage = () =>{
         }
       }
     }
-  },[blow])
+    if(meaStart){
+      console.log("zzzzz : ", meaStart)
+      //실제 데이터 들어오면
+      dataResult = dataCalculateStrategyE.analyze(dataList.join(' '), inhaleCoefficient, exhaleCoefficient);
+    }
+  },[dataList])
+  
+  // useEffect(()=>{
+  //   if(blow){
+      
+  //   }
+  // },[blow])
   useEffect(()=>{
     if(blowF){
       console.log("메세지 띄우려면")
@@ -117,9 +123,12 @@ const MeasurementPage = () =>{
   },[blowF])
 
   useEffect(()=>{
-    //시작 메세지 띄우기
-    console.log("시작 메세지 띄우기")
-    setMeaStart(true);
+    if(startMsg){
+      //시작 메세지 띄우기
+      console.log("시작 메세지 띄우기")
+      setDataList([])
+      setMeaStart(true);
+    }
   },[startMsg])
 
   let func = ()=>{
@@ -179,7 +188,7 @@ const MeasurementPage = () =>{
     let buffer = temp.buffer;
 
     dataList.push(String.fromCharCode.apply(null, Array.from(new Uint8Array(buffer))).trim());
-    setDataList(dataList);
+    setDataList([...dataList]);
     return String.fromCharCode.apply(null, Array.from(new Uint8Array(buffer))).trim()
   }
   //데이터 핸들링
