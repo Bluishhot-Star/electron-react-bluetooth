@@ -12,7 +12,7 @@ import { changeDeviceInfo, reset } from "./../deviceInfo.js"
 
 const SettingPage = () =>{
   let dispatch = useDispatch()
-  let deviceInfo = useSelector((state) => state.deviceInfo ) 
+  let deviceInfo = useSelector((state) => state.deviceInfo )
   const cookies = new Cookies();
   const [setCookie] = useCookies();
   let navigatorR = useNavigate();
@@ -38,9 +38,6 @@ const SettingPage = () =>{
       }
     );
   }
-  useEffect(()=>{
-    cookies.get("device")
-  },[])
   // async function scanDevice(){
   //   const wait = (timeToDelay) => new Promise((resolve) => setTimeout(resolve, timeToDelay))
   //   const device = new navigator.bluetooth.requestDevice({
@@ -273,6 +270,7 @@ async function onDisconnectButtonClick() {
 function onDisconnected(event) {
   // Object event.target is Bluetooth Device getting disconnected.
   console.log('> Bluetooth Device disconnected');
+  getConnectedDevice()
 }
 const getConnectedDevice = ()=>{
   window.api.send("getConnectedDevice", "");

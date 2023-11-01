@@ -147,12 +147,15 @@ function createBLEDevicesWindow() {
       preload: path.join(__dirname, "/BLEDevicesPreload.js"), // use a preload script
     },
   });
-  BLEDevicesWindow.setPosition(100,0);
+  // BLEDevicesWindow.setPosition(100,0);
+  let current_win = BrowserWindow.getFocusedWindow();
+  const pos = current_win.getPosition();
+  console.log("Heello",pos)
+  BLEDevicesWindow.setPosition(0,0);
   BLEDevicesWindow.setWindowButtonVisibility(true);
 
 
   BLEDevicesWindow.loadFile(__dirname+"/BLEDevicesWindow.html");
-  
   BLEDevicesWindow.on('close', function () {
     BLEDevicesWindow = null;    
     callbackForBluetoothEvent("");

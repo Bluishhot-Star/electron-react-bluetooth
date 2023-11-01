@@ -8,7 +8,7 @@ let deviceInfo = createSlice({
       return action.payload
     },
     reset(state, action) {
-      return "";
+      Object.assign(state, "");;
     }
   },
 })

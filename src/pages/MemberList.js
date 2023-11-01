@@ -22,80 +22,7 @@ const MemberList = ()=>{
   let location = useLocation();
   let navigator = useNavigate();
 
-  async function testIt() {
-    let options = {
-      // filters: [
-      //   { services: [xyz] },
-      //   { name: 'xyz' },       // only devices with ''
-      //   { namePrefix: 'xyz' }, // only devices starts with ''
-      // ],
-      // optionalServices: [
-      //   xyzServiceUuid,
-      // ],
-      acceptAllDevices: true, // show all
-      optionalServices: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e'],
-    };
-    try{
-      // GATT 서버 연결
-      const server = await deviceInfo.gatt.connect();
-      // Nordic UART Service 가져오기
-      const service = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
-    
-      // 수신 특성 가져오기
-      const rxCharacteristic = await service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
-    
-      // 송신 특성 가져오기
-      const txCharacteristic = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
-      // 검사하기 버튼 누르고 쓸 부분
-      // Notify(구독) 활성화
-      await txCharacteristic.startNotifications();
-    
-      // Notify(구독) 이벤트 핸들러 등록
-      txCharacteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
-    
-      console.log('Connected to BLE device');
-      
-      
-    }
-    catch(error){
-      console.log(error);
-      //     console.error('Failed to select device:', error);
-      //     console.log('Failed to select device. Please try again.');
-    }
-  }
-  function onDisconnected(event) {
-    // Object event.target is Bluetooth Device getting disconnected.
-    console.log('> Bluetooth Device disconnected');
-  }
-  let [result, setResult] = useState();
-  let arrayToString = (temp)=>{
-    let buffer = temp[0].buffer;
-    return String.fromCharCode.apply(null, Array.from(new Uint8Array(buffer))).trim()
-  }
-  let deviceDataHandling = (arr)=>{
-    let tempArr = [];
-    arr.forEach((item)=>{
-        tempArr.push(arrayToString(item))
-    })
-    setResult(tempArr.join(' '));
-  }
-  function handleCharacteristicValueChanged(event) {
-    let arr = [];
-    const value = event.target.value;
-    // 데이터 처리 및 UART 프로토콜 해석
-    console.log('Received data:', value);
-    
-    arr.push([value]);
-    
-    // let measurementData = document.createElement("div");
-    // let measurementDataContents = document.createElement("p");
   
-    // let item = document.getElementsByClassName("data");
-  
-    // console.log(item);
-    // measurementDataContents.appendChild(document.createTextNode(value)) 
-    // item[0].appendChild(measurementData);
-  }
 
 
   //페이지 스크롤시 /subjects?page=1&size=10에서 page가 변경되어야 함
@@ -313,13 +240,13 @@ const MemberList = ()=>{
         {dateSelectorStat ? <DateSelector data={inspectionDate} onOff={setDateSelectorStat} select={dateSelect}/> : null}
         <div className="memberList-page-nav">
           <p onClick={()=>{console.log(deviceInfo);
-            testIt()
+            // testIt()
           }}>환자 선택</p>
           <span onClick={()=>{
-            console.log(result)
+            console.log(deviceInfo)
           }}>dfff</span>
           <span onClick={()=>{
-            console.log(result)
+            // console.log(result)
           }}>---jjkj</span>
           <div className='setting-btn-container' onClick={()=>{navigator("/setting")}}>
             <FontAwesomeIcon className='cogIcon' icon={faGear}/>

@@ -797,7 +797,7 @@ function ResultPage(){
   return(
     <div className="result-page-container">
         <div className="nav">
-          <div className="nav-logo" onClick={()=>{console.log(svcMax);}}>
+          <div className="nav-logo" onClick={()=>{console.log(graphData);}}>
             <h1>The SpiroKit</h1>
           </div>
           <div className="nav-content-container">
