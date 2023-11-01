@@ -21,12 +21,22 @@ const MeasurementPage = () =>{
   const [setCookie] = useCookies();
   let navigatorR = useNavigate();
   let dispatch = useDispatch();
+  let secondBtnRef = useRef();
+  let dataResult = "";
   // 기기 없음 메세지
   const [noneDevice, setNoneDevice] = useState(false);
+  // 시작확인 메세지
+  const [startMsg, setStartMsg] = useState(false);
   // 검사 시작 전 구독상태
   const [notifyStart, setNotifyStart] = useState(false);
   // 검사 시작 전 준비완료 상태(구독완)
   const [meaPreStart, setMeaPreStart] = useState(false);
+
+  // 검사 활성화위한 호기 감지
+  const [blow, setBlow] = useState(false);
+  // 호기 감지 후 검사 활성화
+  const [blowF, setBlowF] = useState(false);
+
   // 검사 시작 상태
   const [meaStart, setMeaStart] = useState(false);
   // 데이터 리스트
@@ -69,16 +79,49 @@ const MeasurementPage = () =>{
     if(meaPreStart){ //구독 완료시
       setDataList([])
     }
+    else{
+      secondBtnRef.current.classList += " disabled";
+    }
   },[meaPreStart])
 
   useEffect(()=>{
-    console.log("emefef")
-    if(meaStart != true && dataList.length == 0){
-      //시작전 배열 초기화
-
+    console.log("a :", dataList)
+    console.log(dataList[dataList.length-1]);
+    if(dataList[0] == '2' && dataList[1] == '2' && dataList[2] == '2'){
+      console.log("aggferwwer")
+      setBlow(true);
+    }
+    if(meaStart){
+      console.log("zzzzz")
+      //실제 데이터 들어오면
+      dataResult = dataCalculateStrategyE.analyze(dataList.join(' '), inhaleCoefficient, exhaleCoefficient);
     }
   },[dataList])
   
+  useEffect(()=>{
+    if(blow){
+      if(dataList[dataList.length-1].slice(0) == "0"){
+        console.log("asffaafs");
+        //css 변화로 검사 활성화
+        if(secondBtnRef.current.classList.contains("disabled")){
+          secondBtnRef.current.classList.remove("disabled");
+        }
+      }
+    }
+  },[blow])
+  useEffect(()=>{
+    if(blowF){
+      console.log("메세지 띄우려면")
+      setStartMsg(true);
+    }
+  },[blowF])
+
+  useEffect(()=>{
+    //시작 메세지 띄우기
+    console.log("시작 메세지 띄우기")
+    setMeaStart(true);
+  },[startMsg])
+
   let func = ()=>{
     
   }
@@ -135,10 +178,8 @@ const MeasurementPage = () =>{
   let arrayToString = (temp)=>{
     let buffer = temp.buffer;
 
-    let temp1 = [...dataList];
-    temp1.push(String.fromCharCode.apply(null, Array.from(new Uint8Array(buffer))).trim());
-    setDataList(temp1);
-
+    dataList.push(String.fromCharCode.apply(null, Array.from(new Uint8Array(buffer))).trim());
+    setDataList(dataList);
     return String.fromCharCode.apply(null, Array.from(new Uint8Array(buffer))).trim()
   }
   //데이터 핸들링
@@ -831,7 +872,10 @@ const MeasurementPage = () =>{
     }
   }
 
-  
+  const dataCalculateStrategyE = new DataCalculateStrategyE();
+
+  const inhaleCoefficient = 1.0364756559407444; // 흡기 계수 (API에서 가져올 예정)
+  const exhaleCoefficient = 1.0581318835872322; // 호기 계수
 
   
 
@@ -874,10 +918,14 @@ const MeasurementPage = () =>{
             </div>
           </div>
 
-          <div className="button-container">
-            <div className="two-btn-container">
-
-            </div>
+          <div className="three-btn-container">
+            <div>버튼1</div>
+            <div ref={secondBtnRef} onClick={()=>{
+              setBlowF(true);
+            }}>검사시작</div>
+            <div onClick={()=>{
+              console.log(dataResult);
+            }}>버튼3</div>
           </div>
 
           <div className="history-container">
