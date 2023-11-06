@@ -304,7 +304,7 @@ const MemberList = ()=>{
           }
           <div className="patient-personal-container">
             <div className="measure-btn-container">
-              <div onClick={()=>{navigator("./measureInfo")}} className="measure-btn">검사하기</div>
+              <div onClick={()=>{navigator("./measureInfo", {state: chartNumber})}} className="measure-btn">검사하기</div>
             </div>
             <div className="measure-date-container">
               <div className="measure-selected-date-container">

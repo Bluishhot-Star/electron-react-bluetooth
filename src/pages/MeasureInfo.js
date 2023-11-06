@@ -2,7 +2,7 @@ import { useState, useRef, useEffect} from 'react';
 import axios from 'axios';
 import {Cookies, useCookies } from 'react-cookie';
 
-import { Routes, Route, Link, useNavigate } from 'react-router-dom'
+import { Routes, Route, Link, useNavigate,useLocation } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronDown } from '@fortawesome/free-solid-svg-icons'
@@ -30,7 +30,8 @@ const MeasureInfo = ()=>{
   
   // useNavigate
   const navigatorR = useNavigate();
-
+  const location = useLocation();
+  const state = location.state;
 
 
 

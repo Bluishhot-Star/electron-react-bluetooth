@@ -344,7 +344,7 @@ function ResultPage(){
       x: {
         axios: 'x',
         min: 0,
-        max: parseInt(Math.max(...tvMax)),
+        // max: parseInt(Math.max(...tvMax)),
         // suggestedMax: 6.0,
         ticks:{
           autoSkip: false,
