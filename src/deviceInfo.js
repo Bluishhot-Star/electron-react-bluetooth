@@ -17,11 +17,10 @@ export default configureStore({
   reducer: {
     deviceInfo : deviceInfo.reducer
   },
-  // middleware: (getDefaultMiddleware)=>{
-  //   getDefaultMiddleware({
-  //     serializableCheck:false,
-  //   })
-  // }
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    immutableCheck: false,
+    serializableCheck: false,
+  })
 }) 
 
 export let { changeDeviceInfo, reset } = deviceInfo.actions 

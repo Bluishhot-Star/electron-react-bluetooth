@@ -14,6 +14,7 @@ import { Scatter } from 'react-chartjs-2';
 import { useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux"
 import { changeDeviceInfo, reset } from "./../deviceInfo.js"
+import { da } from 'date-fns/locale';
 
 const MeasurementPage = () =>{
   let deviceInfo = useSelector((state) => state.deviceInfo ) 
@@ -22,13 +23,212 @@ const MeasurementPage = () =>{
   let navigatorR = useNavigate();
   let dispatch = useDispatch();
   let secondBtnRef = useRef();
-  let dataResult = "";
+  // let dataResult = [];
+  class DataCalculateStrategyE {
+    constructor() {
+      this.FREQUENCY = 80_000_000; // 80MHz
+      this.LIMIT_DATA = 100_000_000;
+      this.COEFFICIENT = 0.035;
+      this.SLOPE_ZOOM = 7;
+      this.A = -50.719;
+      this.B = 1.823;
+    }
+    
+    analyze(data, inhaleCoefficient, exhaleCoefficient) {
+      const useData = this.insertZeroBetweenInversionData(this.convertAll(data));
+      const result = [];
+
+      let calibratedLps = 0;
+
+        result.push(new FluidMetrics(0, 0, 0));
+        for (let i = 1; i < useData.length; i++) {
+            const previous = useData[i - 1];
+            const current = useData[i];
+            const time = this.getTime(current);
+            const lps = this.getCalibratedLPS(
+                calibratedLps,
+                previous,
+                current,
+                inhaleCoefficient,
+                exhaleCoefficient
+            );
+            calibratedLps = lps;
+            const volume = this.getVolume(lps, time);
+
+            const metrics = new FluidMetrics(time, lps, volume);
+            metrics.setExhale(this.isExhale(current));
+
+            result.push(metrics);
+        }
+
+        return result[result.length-1];
+    }
+
+    getStrategy() {
+        return 'E';
+    }
+
+    // DONE!
+    getTime(value) {
+        const body = this.getBody(value);
+        const time = body * (1 / this.FREQUENCY);
+
+        if (time === 0) return 0;
+        return time;
+    }
+
+    // DONE!
+    insertZeroBetweenInversionData(data) {
+        const result = [];
+
+        result.push(0);
+        data.unshift(0);
+        for (let i = 1; i < data.length; i++) {
+            const current = data[i];
+            let inversion = true;
+
+            if (this.getBody(current) !== 0) {
+                for (let j = i - 1; j >= 0; j--) {
+                    const past = data[j];
+
+                    if (this.isExhale(past) !== this.isExhale(current)) {
+                        break;
+                    }
+
+                    if (this.getBody(past) !== 0) {
+                        inversion = false;
+                        break;
+                    }
+                }
+            }
+
+            if (inversion) {
+                result.push(this.getZero(this.isExhale(current)));
+            } else {
+                result.push(current);
+            }
+        }
+
+        return result;
+    }
+
+
+    getCalibratedLPS(
+        calibratedPreLps,
+        previous,
+        current,
+        inhale,
+        exhale
+    ) {
+        const time = this.getTime(current);
+        if (time === 0) return 0;
+
+        const previousLps = this.getLps(previous, inhale, exhale);
+        const currentLps = this.getLps(current, inhale, exhale);
+        let calibratedLps = 0;
+
+        // 기울기
+        const slope = (currentLps - previousLps) / time;
+        if (slope >= 0) {
+            calibratedLps = currentLps;
+        } else {
+            if (Math.abs(calibratedPreLps) === 0) return 0;
+            const predSlope = this.A * Math.pow(currentLps, this.B);
+            calibratedLps = currentLps - (currentLps * ((slope / predSlope) * this.SLOPE_ZOOM));
+            if (calibratedLps < 0) return 0;
+        }
+
+        if (!this.isExhale(current)) return -calibratedLps;
+        else return calibratedLps;
+    }
+
+    // DONE
+    getZero(isExhale) {
+        if (isExhale) return 0;
+        else return this.LIMIT_DATA;
+    }
+
+    // DONE
+    getLps(data, inhaleGain, exhaleGain) {
+        const time = this.getTime(data);
+        if (time === 0) return 0;
+        const rps = 1 / time;
+
+        const isExhale = this.isExhale(data);
+
+        if (isExhale) return (rps * this.COEFFICIENT) * exhaleGain;
+        else return (rps * this.COEFFICIENT) * inhaleGain;
+    }
+    
+    // DONE
+    getVolume(lps, time) {
+        return Math.abs(lps) * time;
+    }
+
+    // DONE
+    isExhale(data) {
+        const head = Math.floor(data / this.LIMIT_DATA);
+        return !(head === 1);
+    }
+
+    // DONE
+    convert(data) {
+        if (data.length === 10) return parseInt(data.substring(0, 9));
+        else if (data.length === 9) return parseInt(data);
+        else return 0;
+    }
+
+    // DONE
+    convertAll(allData) {
+        const data = allData.split(" ");
+        const result = [];
+
+        for (let i = 0; i < data.length; i++) {
+            const value = this.convert(data[i]);
+            result.push(value);
+        }
+
+        return result;
+    }
+    
+    // DONE
+    getHead(data) {
+        return Math.floor(data / this.LIMIT_DATA);
+    }
+
+    // DONE
+    getBody(data) {
+        return data % this.LIMIT_DATA;
+    }
+  }
+  class FluidMetrics {
+    constructor(time, lps, volume) {
+        this.time = time;
+        this.lps = lps;
+        this.volume = volume;
+        this.exhale = false;
+    }
+
+    setExhale(value) {
+        this.exhale = value;
+    }
+  }
+
+  const dataCalculateStrategyE = new DataCalculateStrategyE();
+
+  const inhaleCoefficient = 1.0364756559407444; // 흡기 계수 (API에서 가져올 예정)
+  const exhaleCoefficient = 1.0581318835872322; // 호기 계수
+
+
+  const [dataResult, setDataResult] = useState([]);
   // 기기 없음 메세지
   const [noneDevice, setNoneDevice] = useState(false);
   // 시작확인 메세지
   const [startMsg, setStartMsg] = useState(false);
   // 검사 시작 전 구독상태
   const [notifyStart, setNotifyStart] = useState(false);
+  // 구독 완료
+  const [notifyDone, setNotifyDone] = useState(false);
   // 검사 시작 전 준비완료 상태(구독완)
   const [meaPreStart, setMeaPreStart] = useState(false);
 
@@ -41,7 +241,17 @@ const MeasurementPage = () =>{
   const [meaStart, setMeaStart] = useState(false);
   // 데이터 리스트
   const [dataList, setDataList] = useState([]);
-  // 
+  // real데이터 리스트
+  const [realDataList, setRealDataList] = useState([]);
+  // 검사시작 flag, 이 이후로 realData
+  const [flag, setFlag] = useState(-1)
+
+  // volume-flow 그래프 좌표
+  const [volumeFlowList, setVolumeFlowList] = useState([]);
+  const [timeVolumeList, setTimeVolumeList] = useState([]);
+  // let TvolumeFlowList = [];
+  // time-volume 그래프 좌표
+  // const [timeVolumeList, setTimeVolumeList] = useState([]);
   useEffect(()=>{
     if(deviceInfo.gatt){ //리스트에 있으면
       setNoneDevice(false);
@@ -71,13 +281,18 @@ const MeasurementPage = () =>{
     if(notifyStart){
       console.log("연결확인 및 구독")
       testIt()
-      setMeaPreStart(true)
     }
   },[notifyStart])
-
+  useEffect(()=>{
+    if(notifyDone){
+      let time = setTimeout(() => {
+        setMeaPreStart(true);
+      }, 1000);
+    }
+  },[notifyDone])
   useEffect(()=>{
     if(meaPreStart){ //구독 완료시
-      setDataList([])
+      // setDataList([])
     }
     else{
       secondBtnRef.current.classList += " disabled";
@@ -90,6 +305,7 @@ const MeasurementPage = () =>{
     console.log(meaStart)
     console.log(dataList);
     if(blow==false && dataList[0] == '2' && dataList[1] == '2' && dataList[2] == '2'){
+      setNotifyDone(true);
       console.log("aggferwwer")
       setBlow(true);
     }
@@ -103,18 +319,93 @@ const MeasurementPage = () =>{
         }
       }
     }
-    if(meaStart){
-      console.log("zzzzz : ", meaStart)
-      //실제 데이터 들어오면
-      dataResult = dataCalculateStrategyE.analyze(dataList.join(' '), inhaleCoefficient, exhaleCoefficient);
-    }
   },[dataList])
   
-  // useEffect(()=>{
-  //   if(blow){
+  useEffect(()=>{
+    if(meaStart){
+      setFlag({idx: dataList.length-1, rIdx: 1}); // idx : dataList에서의 인덱스, rIdx : realData에서의 인덱스
+    }
+  },[meaStart])
+  
+
+  const [rawDataResultList, setRawDataResultList] = useState([0]); // raw data 처리완료
+  const [rawDataList, setRawDataList] = useState([0]); // raw data 처리 전 (0만 뗀거)
+  const [calDataList, setCalDataList] = useState([new FluidMetrics(0, 0, 0)]);
+  const [calFlag, setCalFlag] = useState(0);
+  useEffect(()=>{
+    if(calDataList[calFlag]){
+      let item = calDataList[calFlag];
+      setVFGraphData(item.volume, item.lps);
+      setTVGraphData(item.time, item.volume, item.exhale);
+      setCalFlag(calFlag+1);
+    }
+  },[flag, calDataList])
+
+  useEffect(()=>{
+    if(flag.idx>0 && dataList[flag.idx]){
+
+      // let data = [...dataList.slice(parseInt(flag))];
+
+      let currItemR = dataList[flag.idx]; //현재 다룰 raw 데이터
+      let currItem = dataCalculateStrategyE.convert(currItemR); // 데이터 전처리 후
+      let preItem = rawDataList[flag.rIdx-1]; //그 이전 데이터
+
+
+      let TrawDataList = [...rawDataList];
+
+      // let currItemR = data[data.length-1]; //방금 들어온 raw 데이터
+      // let currItem = dataCalculateStrategyE.convert(currItemR); // 데이터 전처리 후
+      if(dataCalculateStrategyE.isExhale(preItem) !== dataCalculateStrategyE.isExhale(currItem)){
+        TrawDataList.push(dataCalculateStrategyE.getZero(dataCalculateStrategyE.isExhale(currItem)));
+      }
+      TrawDataList.push(currItem);
+      setRawDataList(TrawDataList);
+      setFlag({idx : flag.idx+1, rIdx: flag.rIdx+1})
       
+      // console.log(123);
+      // setVolumeFlowList(setVFGraphData(item.volume, item.lps));
+    }
+  },[dataList, flag])
+  // calibratedLps -> api에서 추출
+  const [calibratedLps, setCalibratedLps] = useState(-10);
+  const [cTime, setCTime] = useState();
+  const [cVolume, setCVolume] = useState(-999);
+  const [cExhale, setCExhale] = useState();
+  useEffect(()=>{
+    let previous = rawDataList[rawDataList.length-2];
+    let current = rawDataList[rawDataList.length-1];
+    let time = dataCalculateStrategyE.getTime(current);
+    let lps = dataCalculateStrategyE.getCalibratedLPS(calibratedLps, previous, current, inhaleCoefficient, exhaleCoefficient);
+    setCExhale(dataCalculateStrategyE.isExhale(current));
+    setCTime(time);
+    setCalibratedLps(lps)
+  },[rawDataList])
+
+  useEffect(()=>{
+    if(calibratedLps !== -10){
+      let volume = dataCalculateStrategyE.getVolume(calibratedLps, cTime);
+      setCVolume(volume);
+    }
+  },[calibratedLps]);
+  useEffect(()=>{
+    if(cVolume !== -999){
+      let metrics = new FluidMetrics(cTime, calibratedLps, cVolume);
+      metrics.setExhale(cExhale);
+      
+      calDataList.push(metrics);
+      setCalDataList(calDataList);
+
+    }
+  },[cVolume])
+  
+  // useEffect(()=>{
+  //   if(dataResult.length !== 0){
+  //     let item = dataResult[dataResult.length-1];
+  //     setVolumeFlowList(setVFGraphData(item.volume, item.lps));
+  //     setTVGraphData(item.time,item.volume, item.exhale);
   //   }
-  // },[blow])
+  // },[dataResult])
+
   useEffect(()=>{
     if(blowF){
       console.log("메세지 띄우려면")
@@ -126,14 +417,162 @@ const MeasurementPage = () =>{
     if(startMsg){
       //시작 메세지 띄우기
       console.log("시작 메세지 띄우기")
-      setDataList([])
+      // setDataList([])
       setMeaStart(true);
     }
   },[startMsg])
 
-  let func = ()=>{
+  // volume-flow 그래프 좌표 함수
+  // let setVFGraphData = ( rawV, rawF )=>{
+  //   let x, y;
+  //   let preXY; //이전값
+  //   // preXY 값 할당
+  
+  //   let TmpVolumeFlowList = [...volumeFlowList];
+
+  //   //초기값 세팅
+  //   if(TmpVolumeFlowList.length == 0) preXY = {x:0, y:0};
+  //   else preXY = TmpVolumeFlowList[TmpVolumeFlowList.length-1];
+  //   // 흡기 시
+  //   if (rawF < 0){
+  //       //x값 처리
+  //       // x값 최저
+  //       if (preXY['x'] == 0){
+  //           // 현재 x값 오른쪽 밀기
+  //           TmpVolumeFlowList.forEach((item, idx) =>{
+  //               let itemTemp = {...item};
+  //               itemTemp['x'] += rawV;
+  //               TmpVolumeFlowList[idx] = itemTemp; //setState로 변경사항 setState(temp);
+  //           })
+  //           x = 0;
+  //       }
+  //       else{
+  //           let vTemp = preXY['x']-rawV;
+  //           if(vTemp<0){
+  //               // 현재 x값 오른쪽 밀기
+  //               TmpVolumeFlowList.forEach(item =>{
+  //                   let itemTemp = {...item};
+  //                   itemTemp['x'] += Math.abs(vTemp);
+  //                   item = itemTemp; //setState로 변경사항 setState(temp);
+  //               })
+  //               x = 0;
+  //           }
+  //           else{
+  //               x = vTemp;
+  //           }
+  //       }
+        
+  //   }
+  //   //호기 시
+  //   else{
+  //       x = preXY['x'] + rawV;
+  //   }
     
+  //   TmpVolumeFlowList.push({x: x, y:rawF});
+  //   // return {x: x, y:rawF};
+  //   setVolumeFlowList(TmpVolumeFlowList);
+  // }
+
+  let setVFGraphData = ( rawV, rawF )=>{
+    try{
+      let x, y;
+      let preXY; //이전값
+      // preXY 값 할당
+      // let TvolumeFlowList = [...volumeFlowList];
+      //초기값 세팅
+      if(volumeFlowList.length == 0){
+        preXY = {x:0, y:0}
+      }
+      else{
+        preXY = volumeFlowList[volumeFlowList.length-1]
+      }
+  
+      // 흡기 시
+      if (rawF < 0){
+        //x값 처리
+        // x값 최저
+        if (preXY['x'] == 0){
+          // 현재 x값 오른쪽 밀기
+          // TvolumeFlowList.forEach((item, idx) =>{
+          //     let itemTemp = {...item};
+          //     itemTemp['x'] += rawV;
+          //     TvolumeFlowList[idx] = itemTemp; //setState로 변경사항 setState(temp);
+          // })
+          setVolumeFlowList(volumeFlowList.map((item)=>{
+            item['x'] += rawV;
+          }))
+          x = 0;
+        }
+        else{
+          let vTemp = preXY['x']-rawV;
+          if(vTemp<0){
+              // 현재 x값 오른쪽 밀기
+              // TvolumeFlowList.forEach(item =>{
+              //     let itemTemp = {...item};
+              //     itemTemp['x'] += Math.abs(vTemp);
+              //     item = itemTemp; //setState로 변경사항 setState(temp);
+              // })
+              setVolumeFlowList(volumeFlowList.map((item)=>{
+                item['x'] += Math.abs(vTemp);
+              }))
+              x = 0;
+          }
+          else{
+              x = vTemp;
+          }
+        }
+      }
+      //호기 시
+      else{
+          x = preXY['x'] + rawV;
+      }
+      
+      volumeFlowList.push({x: x, y:rawF});
+      setVolumeFlowList(volumeFlowList);
+      // return {x: x, y:rawF};
+    }
+    catch(err){
+      console.log(err)
+    }
+    
+}
+
+  // let setTVGraphData = (rawT, rawV, exhale)=>{
+  //   let x, y;
+  //   let preXY;
+  //   let prefix = 1;
+  //   let TmpTimeVolumeList = [...timeVolumeList];
+  //   if (TmpTimeVolumeList.length==0){
+  //     y = 0;
+  //   }
+  //   else{
+  //     if (exhale !== TmpTimeVolumeList[TmpTimeVolumeList.length-1].exhale) prefix *= -1;
+  //     x = rawT+TmpTimeVolumeList[TmpTimeVolumeList.length-1].x;
+  //     y = TmpTimeVolumeList[TmpTimeVolumeList.length-1].y + (prefix * rawV)
+  //   }
+
+  //   TmpTimeVolumeList.push({x:x, y:y})
+  //   setTimeVolumeList(TmpTimeVolumeList);
+  // }
+  let setTVGraphData = (rawT, rawV, exhale)=>{
+    let x, y;
+    let preXY;
+    let prefix = 1;
+    if (timeVolumeList.length==0){
+      x = 0;
+      y = 0;
+    }
+    else{
+      if (exhale !== timeVolumeList[timeVolumeList.length-1].exhale) prefix *= -1;
+      x = rawT+timeVolumeList[timeVolumeList.length-1].x;
+      y = timeVolumeList[timeVolumeList.length-1].y + (prefix * rawV)
+    }
+
+    timeVolumeList.push({x:x, y:y})
+    setTimeVolumeList(timeVolumeList)
   }
+
+  useEffect(()=>{},[])
 
   // 검사 구독 함수
   async function testIt() {
@@ -160,15 +599,14 @@ const MeasurementPage = () =>{
     
       // 송신 특성 가져오기
       const txCharacteristic = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
+
       // 검사하기 버튼 누르고 쓸 부분
       // Notify(구독) 활성화
       await txCharacteristic.startNotifications();
-    
+      
       // Notify(구독) 이벤트 핸들러 등록
       txCharacteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
-    
       console.log('Connected to BLE device');
-      
       
     }
     catch(error){
@@ -186,8 +624,8 @@ const MeasurementPage = () =>{
   //데이터 문자로 바꾸기
   let arrayToString = (temp)=>{
     let buffer = temp.buffer;
-
-    dataList.push(String.fromCharCode.apply(null, Array.from(new Uint8Array(buffer))).trim());
+    let rawData = String.fromCharCode.apply(null, Array.from(new Uint8Array(buffer))).trim()
+    dataList.push(rawData);
     setDataList([...dataList]);
     return String.fromCharCode.apply(null, Array.from(new Uint8Array(buffer))).trim()
   }
@@ -690,202 +1128,9 @@ const MeasurementPage = () =>{
 
 
 
-  class DataCalculateStrategyE {
-    constructor() {
-      this.FREQUENCY = 80_000_000; // 80MHz
-      this.LIMIT_DATA = 100_000_000;
-      this.COEFFICIENT = 0.035;
-      this.SLOPE_ZOOM = 7;
-      this.A = -50.719;
-      this.B = 1.823;
-    }
-    
-    analyze(data, inhaleCoefficient, exhaleCoefficient) {
-      const useData = this.insertZeroBetweenInversionData(this.convertAll(data));
-      const result = [];
+  
 
-      let calibratedLps = 0;
-
-        result.push(new FluidMetrics(0, 0, 0));
-        for (let i = 1; i < useData.length; i++) {
-            const previous = useData[i - 1];
-            const current = useData[i];
-            const time = this.getTime(current);
-            const lps = this.getCalibratedLPS(
-                calibratedLps,
-                previous,
-                current,
-                inhaleCoefficient,
-                exhaleCoefficient
-            );
-            calibratedLps = lps;
-            const volume = this.getVolume(lps, time);
-
-            const metrics = new FluidMetrics(time, lps, volume);
-            metrics.setExhale(this.isExhale(current));
-
-            result.push(metrics);
-        }
-
-        return result;
-    }
-
-    getStrategy() {
-        return 'E';
-    }
-
-    // DONE!
-    getTime(value) {
-        const body = this.getBody(value);
-        const time = body * (1 / this.FREQUENCY);
-
-        if (time === 0) return 0;
-        return time;
-    }
-
-    // DONE!
-    insertZeroBetweenInversionData(data) {
-        const result = [];
-
-        result.push(0);
-        data.unshift(0);
-        for (let i = 1; i < data.length; i++) {
-            const current = data[i];
-            let inversion = true;
-
-            if (this.getBody(current) !== 0) {
-                for (let j = i - 1; j >= 0; j--) {
-                    const past = data[j];
-
-                    if (this.isExhale(past) !== this.isExhale(current)) {
-                        break;
-                    }
-
-                    if (this.getBody(past) !== 0) {
-                        inversion = false;
-                        break;
-                    }
-                }
-            }
-
-            if (inversion) {
-                result.push(this.getZero(this.isExhale(current)));
-            } else {
-                result.push(current);
-            }
-        }
-
-        return result;
-    }
-
-
-    getCalibratedLPS(
-        calibratedPreLps,
-        previous,
-        current,
-        inhale,
-        exhale
-    ) {
-        const time = this.getTime(current);
-        if (time === 0) return 0;
-
-        const previousLps = this.getLps(previous, inhale, exhale);
-        const currentLps = this.getLps(current, inhale, exhale);
-        let calibratedLps = 0;
-
-        // 기울기
-        const slope = (currentLps - previousLps) / time;
-        if (slope >= 0) {
-            calibratedLps = currentLps;
-        } else {
-            if (Math.abs(calibratedPreLps) === 0) return 0;
-            const predSlope = this.A * Math.pow(currentLps, this.B);
-            calibratedLps = currentLps - (currentLps * ((slope / predSlope) * this.SLOPE_ZOOM));
-            if (calibratedLps < 0) return 0;
-        }
-
-        if (!this.isExhale(current)) return -calibratedLps;
-        else return calibratedLps;
-    }
-
-    // DONE
-    getZero(isExhale) {
-        if (isExhale) return 0;
-        else return this.LIMIT_DATA;
-    }
-
-    // DONE
-    getLps(data, inhaleGain, exhaleGain) {
-        const time = this.getTime(data);
-        if (time === 0) return 0;
-        const rps = 1 / time;
-
-        const isExhale = this.isExhale(data);
-
-        if (isExhale) return (rps * this.COEFFICIENT) * exhaleGain;
-        else return (rps * this.COEFFICIENT) * inhaleGain;
-    }
-    
-    // DONE
-    getVolume(lps, time) {
-        return Math.abs(lps) * time;
-    }
-
-    // DONE
-    isExhale(data) {
-        const head = Math.floor(data / this.LIMIT_DATA);
-        return !(head === 1);
-    }
-
-    // DONE
-    convert(data) {
-        if (data.length === 10) return parseInt(data.substring(0, 9));
-        else if (data.length === 9) return parseInt(data);
-        else return 0;
-    }
-
-    // DONE
-    convertAll(allData) {
-        const data = allData.split(" ");
-        const result = [];
-
-        for (let i = 0; i < data.length; i++) {
-            const value = this.convert(data[i]);
-            result.push(value);
-        }
-
-        return result;
-    }
-    
-    // DONE
-    getHead(data) {
-        return Math.floor(data / this.LIMIT_DATA);
-    }
-
-    // DONE
-    getBody(data) {
-        return data % this.LIMIT_DATA;
-    }
-  }
-
-  class FluidMetrics {
-    constructor(time, lps, volume) {
-        this.time = time;
-        this.lps = lps;
-        this.volume = volume;
-        this.exhale = false;
-    }
-
-    setExhale(value) {
-        this.exhale = value;
-    }
-  }
-
-  const dataCalculateStrategyE = new DataCalculateStrategyE();
-
-  const inhaleCoefficient = 1.0364756559407444; // 흡기 계수 (API에서 가져올 예정)
-  const exhaleCoefficient = 1.0581318835872322; // 호기 계수
-
+  
   
 
 
@@ -894,23 +1139,28 @@ const MeasurementPage = () =>{
     <div className="result-page-container measurement-page-container">
         <div className="measurement-page-nav" onClick={()=>{console.log()}}>
           <div className='measurement-page-backBtn' onClick={()=>{navigatorR(-1)}}>
-            <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
+            <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6"}} />
           </div>
           <p onClick={()=>{
-            console.log(dataList);
+            // console.log(volumeFlowList, timeVolumeList);
+            console.log(calDataList);
           }}>검사</p>
         </div>
 
 
-        <div className="left-container measurement-page-left-container">
-          <div className="patient-info-container">
-            <span onClick={()=>{
-            }}>검사</span>
-            <div className="patient-info">              
-
-            </div>
-            <button onClick={()=>{}}>환자정보 수정</button>
-            {/* <div className="button-container"></div> */}
+        <div className="measurement-page-left-container">
+          <div className="measure-circle-container"></div>
+          <div className="measure-msg-container">
+            <div></div>
+            {
+            meaPreStart?
+            <p className='measure-msg'>{"바람을 불어서 활성화해주세요"}</p>
+            :
+              notifyDone?
+              <p className="measure-msg">준비중입니다...</p>
+              :
+              <p className='measure-msg'>{noneDevice==false?"검사버튼을 눌러주세요":"SpiroKit 연동이 필요합니다."}</p>
+            }
           </div>
         </div>
         <div className="measurement-page-right-container">
@@ -928,12 +1178,14 @@ const MeasurementPage = () =>{
           </div>
 
           <div className="three-btn-container">
-            <div>버튼1</div>
+            <div onClick={()=>{
+              console.log({"nonDevice":noneDevice,"notifyStart":notifyStart,"notifyDone":notifyDone,"meaPreStart":meaPreStart, "blow":blow, "blowF":blowF, "meaStart":meaStart})
+            }}>버튼1</div>
             <div ref={secondBtnRef} onClick={()=>{
               setBlowF(true);
             }}>검사시작</div>
             <div onClick={()=>{
-              console.log(dataResult);
+              console.log(volumeFlowList, timeVolumeList);
             }}>버튼3</div>
           </div>
 

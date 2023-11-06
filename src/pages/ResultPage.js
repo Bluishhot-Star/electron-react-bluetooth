@@ -791,7 +791,7 @@ function ResultPage(){
     }
   },[FvcSvc])
 
-
+useEffect(()=>{console.log(state)},[])
 
 
   return(
@@ -804,7 +804,7 @@ function ResultPage(){
             <div className="nav-left-container">
               <div className="admin">
                 <span>담당자</span>
-                <span>{state.fvc.subject[7].value}</span>
+                {/* <span>{state.subject[7].value}</span> */}
               </div>
             </div>
             <div className="nav-right-container">

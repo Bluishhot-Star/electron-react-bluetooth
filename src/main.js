@@ -89,6 +89,7 @@ function createWindow () {
                 createBLEDevicesWindow(); // open new window to show devices
               }     
               if (
+                element.deviceName.includes("Spiro")&&
                 !element.deviceName.includes(                  // reduce noise by filter Devices without name
                   "알 수 없거나 지원되지 않는 기기" // better use filter options in renderer.js
                 ) &&
@@ -118,7 +119,15 @@ function createWindow () {
 
 
 
-
+      mainWindow.addListener("resize",(event)=>{
+        if(BLEDevicesWindow){
+          console.log("RRR");
+          let size = mainWindow.getSize();
+          let x = size[0];
+          let y = size[1]-30;
+          BLEDevicesWindow.setSize(x, y);
+        }
+      })
       mainWindow.loadURL("http://localhost:3000") 
       
       // resolve(mainWindow);
@@ -130,16 +139,17 @@ function createWindow () {
   })
 }
 
-
 // NEW
 function createBLEDevicesWindow() {
+  let size = mainWindow.getSize();
   BLEDevicesWindow = new BrowserWindow({
-    width: 300,
-    height: 400,
+    width: size[0],
+    height: size[1]-2,
     parent: mainWindow,
     title: "Bluetooth Devices near by",
     modal: true,
     hasShadow: false,
+    resizable: false,
     webPreferences: {
       nodeIntegration: false, // is default value after Electron v5
       contextIsolation: true, // protect against prototype pollution
@@ -147,7 +157,6 @@ function createBLEDevicesWindow() {
       preload: path.join(__dirname, "/BLEDevicesPreload.js"), // use a preload script
     },
   });
-  // BLEDevicesWindow.setPosition(100,0);
   let current_win = BrowserWindow.getFocusedWindow();
   const pos = current_win.getPosition();
   console.log("Heello",pos)

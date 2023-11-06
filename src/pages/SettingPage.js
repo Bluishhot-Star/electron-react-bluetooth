@@ -220,25 +220,25 @@ async function testIt() {
     item[0].appendChild(deviceName);
     item[0].appendChild(deviceId);
 
-    // GATT 서버 연결
+    // // GATT 서버 연결
     const server = await device.gatt.connect();
     dispatch(changeDeviceInfo(device))
-    // Nordic UART Service 가져오기
-    const service = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
+    // // Nordic UART Service 가져오기
+    // const service = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
   
-    // 수신 특성 가져오기
-    const rxCharacteristic = await service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
+    // // 수신 특성 가져오기
+    // const rxCharacteristic = await service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
   
-    // 송신 특성 가져오기
-    const txCharacteristic = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
-    // 검사하기 버튼 누르고 쓸 부분
-    // Notify(구독) 활성화
-    await txCharacteristic.startNotifications();
+    // // 송신 특성 가져오기
+    // const txCharacteristic = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
+    // // 검사하기 버튼 누르고 쓸 부분
+    // // Notify(구독) 활성화
+    // await txCharacteristic.startNotifications();
   
-    // Notify(구독) 이벤트 핸들러 등록
-    txCharacteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+    // // Notify(구독) 이벤트 핸들러 등록
+    // txCharacteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
   
-    console.log('Connected to BLE device');
+    // console.log('Connected to BLE device');
     
     
   }
