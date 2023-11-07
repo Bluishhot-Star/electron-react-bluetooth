@@ -821,24 +821,24 @@ useEffect(()=>{console.log(state)},[])
             <span>환자 정보</span>
             <div className="patient-info">
               <div className="title">이름</div>
-              <div className="content">{state.fvc.subject[1].value}</div>
+              {/* <div className="content">{state.fvc.subject[1].value}</div> */}
               <div className="title">성별</div>
-              <div className="content">{state.fvc.subject[3].value=="m"?"남자":"여자"}</div>
+              {/* <div className="content">{state.fvc.subject[3].value=="m"?"남자":"여자"}</div> */}
               <div className="title">신장</div>
-              <div className="content">{state.fvc.subject[4].value}cm</div>
+              {/* <div className="content">{state.fvc.subject[4].value}cm</div> */}
               <div className="title">몸무게</div>
-              <div className="content">{state.fvc.subject[5].value}kg</div>
+              {/* <div className="content">{state.fvc.subject[5].value}kg</div> */}
               <div className="title">생년월일</div>
               <div className="content">{state.birth}</div>
               <div className="title">연간 흡연량</div>
-              <div className="content">{state.fvc.subject[13].value == "0" ? "-":state.fvc.subject[13].value}</div>
+              {/* <div className="content">{state.fvc.subject[13].value == "0" ? "-":state.fvc.subject[13].value}</div> */}
               <div className="title">흡연 여부</div>
-              <div className="content">{state.fvc.subject[9].value === "false"||state.fvc.subject[9].value === false ? "아니오" : "예"}</div>
+              {/* <div className="content">{state.fvc.subject[9].value === "false"||state.fvc.subject[9].value === false ? "아니오" : "예"}</div> */}
 
 
               {/* // 이부분 api 문제있음 */}
               <div className="title">흡연 기간(연)</div> 
-              <div className="content">{Boolean(parseInt(state.fvc.subject[12].value) - parseInt(state.fvc.subject[11].value)) === false ? "-" :parseInt(state.subject[12].value) - parseInt(state.subject[11].value)}</div>
+              {/* <div className="content">{Boolean(parseInt(state.fvc.subject[12].value) - parseInt(state.fvc.subject[11].value)) === false ? "-" :parseInt(state.subject[12].value) - parseInt(state.subject[11].value)}</div> */}
               
 
               <div className="space"></div>
@@ -884,9 +884,9 @@ useEffect(()=>{console.log(state)},[])
 
           <div className="history-container">
             <div className="slider">
-            {
+            {/* {
               FvcSvc == "fvc" ?
-                location.state.fvc.trials.map((item, index)=>(
+                location.state.trials.map((item, index)=>(
                 <div ref={(el)=>{simpleResultsRef.current[index]=el}} onClick={()=>{console.log(simpleResultsRef.current[index]);console.log(item.measurementId);selectGraph(index)}} key={item.measurementId}  className='simple-result-container'>
                   <div className='simple-result-title-container'>
                     <p className='simple-result-title'>{item.bronchodilator}</p>
@@ -972,8 +972,8 @@ useEffect(()=>{console.log(state)},[])
             }
               
 
-
-            </div>
+            */}
+            </div> 
           </div>
         </div>
       </div>

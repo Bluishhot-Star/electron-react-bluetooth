@@ -484,7 +484,7 @@ const MeasurementPage = () =>{
         preXY = {x:0, y:0}
       }
       else{
-        preXY = volumeFlowList[volumeFlowList.length-1]
+        preXY = volumeFlowList[calFlag-1]
       }
   
       // 흡기 시
@@ -566,12 +566,12 @@ useEffect(()=>{
       y = 0;
     }
     else{
-      if (exhale !== timeVolumeList[timeVolumeList.length-1].exhale) prefix *= -1;
-      x = rawT+timeVolumeList[timeVolumeList.length-1].x;
-      y = timeVolumeList[timeVolumeList.length-1].y + (prefix * rawV)
+      if (exhale !== calDataList[calFlag-1].exhale) prefix *= -1;
+      x = rawT+timeVolumeList[calFlag-1].x;
+      y = timeVolumeList[calFlag-1].y + (prefix * rawV)
     }
 
-    timeVolumeList.push({x:x, y:-y})
+    timeVolumeList.push({x:x, y:y})
     setTimeVolumeList(timeVolumeList)
   }
 
@@ -745,7 +745,7 @@ useEffect(()=>{
     },
     responsive: true,
     animation:{
-      // duration:0
+      duration:0
     },
     maintainAspectRatio: false,
     interaction: false, 
@@ -820,7 +820,7 @@ useEffect(()=>{
     },
     responsive: true,
     animation:{
-      // duration:0
+      duration:0
     },
     maintainAspectRatio: false,
     interaction: false, 
@@ -892,7 +892,7 @@ useEffect(()=>{
     },
     responsive: true,
     animation:{
-      // duration:0
+      duration:0
     },
     maintainAspectRatio: false,
     interaction: false, 
@@ -1157,18 +1157,18 @@ useEffect(()=>{
 
   useEffect(()=>{
     
-    let dataList1=[]
-    console.log(volumeFlowList);
-    volumeFlowList.forEach((item,index)=>{
-      dataList1.push(item)
+    // let dataList1=[]
+    // console.log(volumeFlowList);
+    // volumeFlowList.forEach((item,index)=>{
+    //   dataList1.push(item)
       
-    })
-    console.log(dataList1)
+    // })
+    // console.log(dataList1)
     let data = {
       labels: '',
       datasets: [{
         label: "",
-            data: dataList1,
+            data: volumeFlowList,
             borderColor: `red`,
             borderWidth: 2.5,
             showLine: true,
@@ -1187,22 +1187,22 @@ useEffect(()=>{
   },[graphData])
 
   useEffect(()=>{
-    console.log(dataList[dataList.length-1]);
-    let dataList1=[]
-    if(dataList.length !==0 &&dataList[dataList.length-1].toString().substring(0,1) === '0'){
-      console.log(timeVolumeList);
-      timeVolumeList.forEach((item,index)=>{
-        dataList1.push(item)
+    // console.log(dataList[dataList.length-1]);
+    // let dataList1=[]
+    // if(dataList.length !==0 &&dataList[dataList.length-1].toString().substring(0,1) === '0'){
+    //   console.log(timeVolumeList);
+    //   timeVolumeList.forEach((item,index)=>{
+    //     dataList1.push(item)
         
-      })
-    }
+    //   })
+    // }
     
-    console.log(dataList1)
+    // console.log(timeVolumeList)
     let data = {
       labels: '',
       datasets: [{
         label: "",
-            data: dataList1,
+            data: timeVolumeList,
             borderColor: `red`,
             borderWidth: 2.5,
             showLine: true,
