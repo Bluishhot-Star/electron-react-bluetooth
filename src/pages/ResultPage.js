@@ -846,7 +846,7 @@ useEffect(()=>{console.log(state)},[])
               <div className="space"></div>
             </div>
             <button onClick={updateData}>환자정보 수정</button>
-            {/* <div className="button-container"></div> */}
+             <div className="button-container"></div>
           </div>
         </div>
         <div className="right-container">
@@ -888,7 +888,7 @@ useEffect(()=>{console.log(state)},[])
             <div className="slider">
             {
               FvcSvc == "fvc" ?
-                location.state.fvc.trials.map((item, index)=>(
+                state.fvc.trials.map((item, index)=>(
                 <div ref={(el)=>{simpleResultsRef.current[index]=el}} onClick={()=>{console.log(simpleResultsRef.current[index]);console.log(item.measurementId);selectGraph(index)}} key={item.measurementId}  className='simple-result-container'>
                   <div className='simple-result-title-container'>
                     <p className='simple-result-title'>{item.bronchodilator}</p>

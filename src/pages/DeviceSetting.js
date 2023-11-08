@@ -5,7 +5,7 @@ import Alert from "../components/Alerts.js"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft,faGear, faCog, faSearch, faCalendar, faChevronRight } from '@fortawesome/free-solid-svg-icons'
 
-import { Routes, Route, Link, useNavigate } from 'react-router-dom'
+import { Routes, Route, Link, useNavigate,useLocation } from 'react-router-dom'
 import DateSelector from './DateSelector.js'
 import { useInView } from 'react-intersection-observer';
 const DeviceSetting= () =>{
@@ -22,6 +22,8 @@ const DeviceSetting= () =>{
   });
 
   let navigator = useNavigate();
+  const location = useLocation();
+  const state = location.state;
 
   useEffect(()=>{
     axios.get(`/devices?sort=serialNumber&order=desc`,{
@@ -72,6 +74,18 @@ const DeviceSetting= () =>{
     setInspectionDate(select);
 }
 
+  const gainResult = (calibrationId) =>{
+    axios.get(`/calibrations/${calibrationId}`,{
+      headers: {
+        Authorization: `Bearer ${cookies.get('accessToken')}`
+      }}).then((res)=>{
+        console.log(res.data.response);
+        navigator('/setting/deviceSetting/gainResultPage',{state:{result:res.data.response}});
+      }).catch((err)=>{
+        console.log(err);
+      });
+
+  }
 
   return(
     <div className="deviceList-page-container">
@@ -139,7 +153,7 @@ const DeviceSetting= () =>{
               <div className="calibration-item-container">
                 {calibrations.map((item, index)=>(
                   // <Link key={item} to={`/ss/${examinee}/${item}`}>
-                  <div key={index} className="calibration-item" >
+                  <div key={index} className="calibration-item" onClick={()=>{gainResult(item.calibrationId)}}>
                     <div>보정 일시</div>
                     <div className='calibration-item-date'>{item.date}</div>
                     <div className="calibration-item-right-chevron">
