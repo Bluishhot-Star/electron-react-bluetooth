@@ -245,33 +245,35 @@ function ResultPage(){
   },[])
 
   useEffect(()=>{
-    if(FvcSvc=="svc")return;
-    graphOnOff.forEach((item, index)=>{
-      if(item == 1){
-        simpleResultsRef.current[index].classList+=" selected";
-        simpleResultsRef.current[index].style+="";
-      }
-      else{
-        if(simpleResultsRef.current[index].classList.contains("selected")){
-          simpleResultsRef.current[index].classList.remove("selected");
+    if(FvcSvc=="fvc"){
+      graphOnOff.forEach((item, index)=>{
+        if(item == 1){
+          simpleResultsRef.current[index].classList+=" selected";
+          simpleResultsRef.current[index].style+="";
         }
-      }
-    })
+        else{
+          if(simpleResultsRef.current[index].classList.contains("selected")){
+            simpleResultsRef.current[index].classList.remove("selected");
+          }
+        }
+      })
+    }
   },[graphOnOff])
   
   useEffect(()=>{
-    if(FvcSvc=="fvc")return;
-    svcGraphOnOff.forEach((item, index)=>{
+    if(FvcSvc=="svc"){
+      svcGraphOnOff.forEach((item, index)=>{
       if(item == 1){
-        svcSimpleResultsRef.current[index].classList+=" selected";
-        svcSimpleResultsRef.current[index].style+="";
-      }
-      else{
-        if(svcSimpleResultsRef.current[index].classList.contains("selected")){
-          svcSimpleResultsRef.current[index].classList.remove("selected");
+          svcSimpleResultsRef.current[index].classList+=" selected";
+          svcSimpleResultsRef.current[index].style+="";
         }
-      }
-    })
+        else{
+          if(svcSimpleResultsRef.current[index].classList.contains("selected")){
+            svcSimpleResultsRef.current[index].classList.remove("selected");
+          }
+        }
+      })
+    }
   },[svcGraphOnOff])
 
   const [graphData, setGraphData] = useState({
@@ -821,19 +823,19 @@ useEffect(()=>{console.log(state)},[])
             <span>환자 정보</span>
             <div className="patient-info">
               <div className="title">이름</div>
-              {/* <div className="content">{state.fvc.subject[1].value}</div> */}
+              <div className="content">{state.fvc.subject[1].value}</div>
               <div className="title">성별</div>
-              {/* <div className="content">{state.fvc.subject[3].value=="m"?"남자":"여자"}</div> */}
+              <div className="content">{state.fvc.subject[3].value=="m"?"남자":"여자"}</div>
               <div className="title">신장</div>
-              {/* <div className="content">{state.fvc.subject[4].value}cm</div> */}
+              <div className="content">{state.fvc.subject[4].value}cm</div>
               <div className="title">몸무게</div>
-              {/* <div className="content">{state.fvc.subject[5].value}kg</div> */}
+              <div className="content">{state.fvc.subject[5].value}kg</div>
               <div className="title">생년월일</div>
               <div className="content">{state.birth}</div>
               <div className="title">연간 흡연량</div>
-              {/* <div className="content">{state.fvc.subject[13].value == "0" ? "-":state.fvc.subject[13].value}</div> */}
+              <div className="content">{state.fvc.subject[13].value == "0" ? "-":state.fvc.subject[13].value}</div>
               <div className="title">흡연 여부</div>
-              {/* <div className="content">{state.fvc.subject[9].value === "false"||state.fvc.subject[9].value === false ? "아니오" : "예"}</div> */}
+              <div className="content">{state.fvc.subject[9].value === "false"||state.fvc.subject[9].value === false ? "아니오" : "예"}</div>
 
 
               {/* // 이부분 api 문제있음 */}
@@ -884,9 +886,9 @@ useEffect(()=>{console.log(state)},[])
 
           <div className="history-container">
             <div className="slider">
-            {/* {
+            {
               FvcSvc == "fvc" ?
-                location.state.trials.map((item, index)=>(
+                location.state.fvc.trials.map((item, index)=>(
                 <div ref={(el)=>{simpleResultsRef.current[index]=el}} onClick={()=>{console.log(simpleResultsRef.current[index]);console.log(item.measurementId);selectGraph(index)}} key={item.measurementId}  className='simple-result-container'>
                   <div className='simple-result-title-container'>
                     <p className='simple-result-title'>{item.bronchodilator}</p>
@@ -927,6 +929,7 @@ useEffect(()=>{console.log(state)},[])
                 </div>
                 ))
               :
+              location.state.svc === "Empty resource" ? <div>비어있음</div>:
               location.state.svc.trials.map((item, index)=>(
                 <div ref={(el)=>{svcSimpleResultsRef.current[index]=el}} onClick={()=>{console.log(svcSimpleResultsRef.current[index]);console.log(item.measurementId);selectSvcGraph(index)}} key={item.measurementId}  className='simple-result-container'>
                   <div className='simple-result-title-container'>
@@ -970,9 +973,6 @@ useEffect(()=>{console.log(state)},[])
                 // svcTrials.map((item,index)=>{
                 // })
             }
-              
-
-            */}
             </div> 
           </div>
         </div>

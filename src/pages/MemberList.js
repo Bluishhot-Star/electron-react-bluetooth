@@ -79,8 +79,8 @@ const MemberList = ()=>{
   // let data1, data2;
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
-  const report = (date)=>{
-    axios.get(`/subjects/${chartNumber}/types/fvc/results/${date}` , {
+  const report = async(date)=>{
+    await axios.get(`/subjects/${chartNumber}/types/fvc/results/${date}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
@@ -92,19 +92,23 @@ const MemberList = ()=>{
     }).catch((err)=>{
       console.log(err);
     })
-    axios.get(`/subjects/${chartNumber}/types/svc/results/${date}` , {
+    await axios.get(`/subjects/${chartNumber}/types/svc/results/${date}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
     }).then((res)=>{
       console.log(res);
-      setData2(res.data.response);
+      if(res.data.subCode === 2004){
+        setData2(res.data.message);
+      }
+      else setData2(res.data.response);
     }).catch((err)=>{
       console.log(err);
     })
-    let time = setTimeout(()=>{
-      setGoTO(true);
-    },1000)
+    setGoTO(true);
+    // let time = setTimeout(()=>{
+    //   setGoTO(true);
+    // },1000)
   }
   useEffect(()=>{
     if(goTO){

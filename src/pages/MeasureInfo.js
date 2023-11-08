@@ -74,13 +74,13 @@ const MeasureInfo = ()=>{
               <div className="info-input-container">
                 <label htmlFor="">검사 종류</label>
                 <div className="radio-container">
-                  <div className='radioBtn' >
+                  <div className='radioBtn measure-radio' >
                     <input ref={FVCTypeRef} 
                     // onChange={(e)=>{smokeChange(e,"experience")}} 
                     value="true" type="radio" name="experience" id="expTrue"/>
                     <label htmlFor="expTrue">FVC</label>
                   </div>
-                  <div className='radioBtn'>
+                  <div className='radioBtn measure-radio'>
                     <input ref={SVCTypeRef} 
                     // onChange={(e)=>{smokeChange(e,"experience")}} 
                     value="false" type="radio" name="experience" id="expFalse" />
@@ -91,13 +91,13 @@ const MeasureInfo = ()=>{
               <div className="info-input-container">
                 <label htmlFor="">약물 적용 여부</label>
                 <div className="radio-container">
-                  <div className='radioBtn' >
+                  <div className='radioBtn measure-radio' >
                     <input ref={mediTrueRef} 
                     // onChange={(e)=>{smokeChange(e,"medi")}} 
                     value="true" type="radio" name="medi" id="mediTrue"/>
                     <label htmlFor="mediTrue">예</label>
                   </div>
-                  <div className='radioBtn'>
+                  <div className='radioBtn measure-radio'>
                     <input ref={mediFalseRef} 
                     // onChange={(e)=>{smokeChange(e,"medi")}} 
                     value="false" type="radio" name="medi" id="mediFalse" />
