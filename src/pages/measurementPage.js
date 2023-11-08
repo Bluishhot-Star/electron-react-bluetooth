@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect} from 'react';
+import { useState, useRef, useEffect, useMemo} from 'react';
 import axios from 'axios';
 import { Cookies, useCookies } from 'react-cookie';
 import Alert from "../components/Alerts.js"
@@ -306,13 +306,11 @@ const MeasurementPage = () =>{
     // console.log(dataList);
     if(blow==false && dataList[0] == '2' && dataList[1] == '2' && dataList[2] == '2'){
       setNotifyDone(true);
-      console.log("aggferwwer")
       setBlow(true);
     }
     if(blow==true&&blowF==false){
       console.log(dataList[dataList.length-1].slice(0,1))
       if(dataList[dataList.length-1].slice(0,1) == "0"){
-        console.log("asffaafs");
         //css 변화로 검사 활성화
         if(secondBtnRef.current.classList.contains("disabled")){
           secondBtnRef.current.classList.remove("disabled");
@@ -528,6 +526,7 @@ const MeasurementPage = () =>{
       }
       
       volumeFlowList.push({x: x, y:rawF});
+      console.log(volumeFlowList);
       setVolumeFlowList(volumeFlowList);
       // return {x: x, y:rawF};
     }
@@ -536,9 +535,7 @@ const MeasurementPage = () =>{
     }
     
 }
-useEffect(()=>{
-  console.log("adsfadvkenvewion");
-},[volumeFlowList])
+
 
   // let setTVGraphData = (rawT, rawV, exhale)=>{
   //   let x, y;
@@ -561,21 +558,23 @@ useEffect(()=>{
     let x, y;
     let preXY;
     let prefix = 1;
+
     if (timeVolumeList.length==0){
       x = 0;
       y = 0;
     }
     else{
+      
       if (exhale !== timeVolumeList[timeVolumeList.length-1].exhale) prefix *= -1;
       x = rawT+timeVolumeList[timeVolumeList.length-1].x;
-      y = timeVolumeList[timeVolumeList.length-1].y + (prefix * rawV)
+      
+      y = timeVolumeList[timeVolumeList.length-1].y + (prefix * rawV);
     }
-
-    timeVolumeList.push({x:x, y:-y})
+   
+    timeVolumeList.push({x:x, y:y});
     setTimeVolumeList(timeVolumeList)
   }
 
-  useEffect(()=>{},[])
 
   // 검사 구독 함수
   async function testIt() {
@@ -728,6 +727,7 @@ useEffect(()=>{
     },]
   })
 
+
 // window.addEventListener('beforeprint', () => {
 //   chartRef.current.resize(600, 600);
 // });
@@ -745,7 +745,7 @@ useEffect(()=>{
     },
     responsive: true,
     animation:{
-      // duration:0
+      duration:0
     },
     maintainAspectRatio: false,
     interaction: false, 
@@ -820,7 +820,7 @@ useEffect(()=>{
     },
     responsive: true,
     animation:{
-      // duration:0
+      duration:0
     },
     maintainAspectRatio: false,
     interaction: false, 
@@ -988,16 +988,14 @@ useEffect(()=>{
   useEffect(()=>{
     let time = setTimeout(() => {
       if (first["x"]===second["x"] && first["y"]==second["y"]){
-        console.log("OOOOOOHHH")
         setTemp(true);
         if(chartRef.current){
-          console.log("HELLO")
           chartRef.current.resize();
         };
       }
       else{
         setTemp(false)
-        console.log("HEllt")
+
       };
     },300);
     return()=>{clearTimeout(time)}
@@ -1154,9 +1152,8 @@ useEffect(()=>{
     })
   }
 
-
+  useEffect(()=>{console.log("asdaaaaasdddfdfdjfhdjfhiehfajdhidsgvhkebvlisusehoivhi")},[volumeFlowList])
   useEffect(()=>{
-    
     let dataList1=[]
     console.log(volumeFlowList);
     volumeFlowList.forEach((item,index)=>{
@@ -1169,7 +1166,7 @@ useEffect(()=>{
       datasets: [{
         label: "",
             data: dataList1,
-            borderColor: `red`,
+            borderColor: `rgb(5,128,190)`,
             borderWidth: 2.5,
             showLine: true,
             tension: 0.4
@@ -1178,7 +1175,7 @@ useEffect(()=>{
     console.log(data)
     setGraphData(data);
   },[calFlag])
-
+  
   useEffect(()=>{
     let time = setTimeout(() => {
       setTemp(true);
@@ -1203,7 +1200,7 @@ useEffect(()=>{
       datasets: [{
         label: "",
             data: dataList1,
-            borderColor: `red`,
+            borderColor: `rgb(5,128,190)`,
             borderWidth: 2.5,
             showLine: true,
             tension: 0.4

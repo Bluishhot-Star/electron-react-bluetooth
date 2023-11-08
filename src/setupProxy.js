@@ -43,6 +43,13 @@ module.exports = function(app){
       changeOrigin: true,
     })
   )
+  
+  app.use(
+    createProxyMiddleware('/calibrations',{
+      target:'https://spirokitdev.the-researcher.com/v1',
+      changeOrigin: true,
+    })
+  )
 };
 
 

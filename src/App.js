@@ -20,6 +20,7 @@ import MngClncs from './pages/MngClncs.js'
 import SubjectSetting from './pages/SubjectSetting.js'
 import DeviceSetting from './pages/DeviceSetting.js'
 import MeasurementPage from './pages/measurementPage';
+import GainResultPage from './pages/GainResultPage.js';
 
 
 // Variable & State
@@ -41,6 +42,7 @@ function App() {
         <Route path='/setting/mngClncs' element={<MngClncs/>}/>
         <Route path='/setting/subjectSetting' element={<SubjectSetting/>}/>
         <Route path='/setting/deviceSetting' element={<DeviceSetting/>}/>
+        <Route path='/setting/deviceSetting/gainResultPage' element={<GainResultPage/>}/>
         <Route path='/measurement' element={<MeasurementPage/>}/>
       </Routes>
     </div>
