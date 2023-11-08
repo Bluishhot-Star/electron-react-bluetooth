@@ -154,15 +154,14 @@ const GainResultPage = () =>{
           zeroLineColor:'rgb(0, 0, 255)',
         },
         axios: 'y',
-        // min: -9,
+        min: -9,
+        suggestedMax: 9,
         // grace:"5%",
         tickLength:9,
         ticks: {
           major: true,
           beginAtZero: true,
-          min:-27.00,
-
-          max:27.00,
+          
           // sampleSize:9,
           border:60,
           stepSize : 1,
