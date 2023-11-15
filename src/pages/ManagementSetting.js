@@ -44,12 +44,17 @@ const ManagementSetting= () =>{
     setTime({exhaleT:exhaleT,timerE:timerE});
   }
   useEffect(()=>{
-    console.log(time)
+    cookies.remove("manageTime");
+    cookies.set('manageTime',time);
+    
   },[time])
 
   useEffect(()=>{
-    console.log(rate)
+    cookies.remove("manageRate")
+    cookies.set('manageRate',rate);
   },[rate])
+
+
 
   return(
     <div className="managementSetting-page-container">
