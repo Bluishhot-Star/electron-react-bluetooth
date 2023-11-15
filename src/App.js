@@ -21,8 +21,7 @@ import SubjectSetting from './pages/SubjectSetting.js'
 import DeviceSetting from './pages/DeviceSetting.js'
 import MeasurementPage from './pages/measurementPage';
 import GainResultPage from './pages/GainResultPage.js';
-
-
+import ManagementSetting from './pages/ManagementSetting.js';
 // Variable & State
 const author = "KASSID&HAI";
 
@@ -44,6 +43,7 @@ function App() {
         <Route path='/setting/deviceSetting' element={<DeviceSetting/>}/>
         <Route path='/setting/deviceSetting/gainResultPage' element={<GainResultPage/>}/>
         <Route path='/measurement' element={<MeasurementPage/>}/>
+        <Route path='/setting/managementSetting' element={<ManagementSetting/>}/>
       </Routes>
     </div>
   );
