@@ -43,6 +43,7 @@ const LoginForm = () =>{
     .catch((error)=>{
       setErrorAlertVisible(true);
     })
+    navigate('/memberList')
   };
 
   // 빈칸 알림창

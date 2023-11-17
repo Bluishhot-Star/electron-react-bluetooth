@@ -350,9 +350,7 @@ window.api.receive("connectedBLEDevice", (data)=>{
         </div>
         <div className="setting-page-right-container">
           <div className="user-info-change-btn" onClick={()=>{navigatorR("./subjectSetting")}}><p>유저 정보 변경</p></div>
-          <div className="measure-setting-btn" onClick={()=>{
-            
-          }}><p>검사 설정</p></div>
+          <div className="measure-setting-btn" onClick={()=>{navigatorR("./managementSetting")}}><p>검사 설정</p></div>
           <div className="clinic-manage-btn" onClick={()=>{navigatorR("./mngClncs")}}><p>의료진 관리</p></div>
           <div className="device-manage-btn" onClick={()=>{navigatorR("./deviceSetting")}}><p>디바이스 관리</p></div>
           <div className="calibration-btn" onClick={()=>{onDisconnectButtonClick()}}><p>보정</p></div>
