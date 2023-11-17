@@ -305,9 +305,7 @@ window.api.receive("connectedBLEDevice", (data)=>{
           <div className='setting-page-backBtn' onClick={()=>{navigatorR(-1)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
           </div>
-          <p onClick={()=>{
-            dispatch(reset(""));
-          }}>설정</p>
+          <p>설정</p>
         </div>
 
         <div className="setting-page-left-container">

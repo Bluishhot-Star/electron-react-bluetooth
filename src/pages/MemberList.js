@@ -213,6 +213,7 @@ const MemberList = ()=>{
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }}).then((res)=>{
+        console.log(res);
         console.log(res.data.response.clinicians);
         console.log(res.data.subCode);
         if(res.data.subCode !== 2004){
@@ -247,7 +248,7 @@ const MemberList = ()=>{
             // testIt()
           }}>환자 선택</p>
           <span onClick={()=>{
-            console.log(deviceInfo)
+            navigator("./measureInfo", {state: chartNumber})
           }}>dfff</span>
           <span onClick={()=>{
             // console.log(result)

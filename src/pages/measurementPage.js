@@ -2,12 +2,13 @@ import { useState, useRef, useEffect, useMemo} from 'react';
 import axios from 'axios';
 import { Cookies, useCookies } from 'react-cookie';
 import Alert from "../components/Alerts.js"
+import Confirm from "../components/Confirm.js"
 import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import { FaBluetoothB } from "react-icons/fa6";
 import {} from "@fortawesome/fontawesome-svg-core"
-
+import styled from 'styled-components';
 import { debounce } from 'lodash'
 import {registerables,Chart as ChartJS,RadialLinearScale,LineElement,Tooltip,Legend,} from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
@@ -15,6 +16,8 @@ import { useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux"
 import { changeDeviceInfo, reset } from "./../deviceInfo.js"
 import { da } from 'date-fns/locale';
+import Gauge from "../components/Gauge.js"
+
 
 const MeasurementPage = () =>{
   let deviceInfo = useSelector((state) => state.deviceInfo ) 
@@ -24,6 +27,129 @@ const MeasurementPage = () =>{
   let dispatch = useDispatch();
   let secondBtnRef = useRef();
   // let dataResult = [];
+  
+  // 노력성 호기 전 호흡 횟수 등 쿠키에서 받아오기
+  let breathCount = 3;
+  let strongTime = 6;
+  let stopTime = 15;
+
+  
+
+  // 게이지 UI 전처리
+  let setGaugeUI = (strongTime, stopTime)=>{
+    switch (strongTime) {
+      case 3:
+        itemRef.current[30].classList += " endColor";
+        setTimerTick(100);
+        break;
+      
+      case 10:
+        itemRef.current[30].classList += " endColor";
+        setTimerTick(333)
+        break;
+      
+      case 15:
+        itemRef.current[36].classList += " endColor";
+        setTimerTick(417)
+        break;
+      
+      case 20:
+        itemRef.current[40].classList += " endColor";
+        setTimerTick(500)
+        break;
+      
+      case 30:
+        itemRef.current[30].classList += " endColor";
+        setTimerTick(1000)
+        break;
+      
+      default: //default 6
+        itemRef.current[24].classList += " endColor";
+        setTimerTick(250)
+        break;
+    }
+  }
+
+  useEffect(()=>{
+    setGaugeUI(strongTime, stopTime);
+  },[])
+  
+  // 세션 가이드 컨텐츠
+  const [gaugeContent, setGaugeContent] = useState()
+
+  //흡기 선?
+  const [inF, setInF] = useState(-1);
+  //세션 세팅 완료
+  const [inFDone, setInFDone] = useState(false);
+
+  // 첫 가이드 컨텐츠 세팅 후 전체 세션 진행 수 설정 (흡기 선 breath*2, 호기 breathC *2 -1)
+  const [sessionVol, setSessionVol] = useState(0);
+
+  const [timerReady, setTimerReady] = useState(false);
+  //첫 가이드 컨텐츠 세팅
+  useEffect(()=>{
+    if(inF !== -1){
+      if(inF && timerReady===false){//흡기 선
+        setGaugeContent({r11:"1", r12:breathCount, r2:"IN"})
+        setSessionVol(breathCount*2);
+      }
+      else if(!inF && timerReady===false){//호기 선
+        setGaugeContent({r11:"1", r12:breathCount, r2:"OUT"})
+        setSessionVol(breathCount*2-1);
+      }
+      setSessionCount(1);
+    }
+  },[inF, timerReady])
+  
+  // 세션 카운트
+  const [sessionCount, setSessionCount] = useState(0);
+
+  // in<->out flip
+  let inOutFlip = (val) =>{
+    if(val == "IN"){
+      return "OUT"
+    }
+    else{
+      return "IN"
+    }
+  }
+
+  // 호<->흡 바뀌면서 컨텐츠 바꾸기
+  let sessionFlip = () => {
+    if(sessionCount > sessionVol){
+      setTimerReady(true);
+      return;
+    }
+    if(sessionCount !== 0 && sessionCount%2 == 0){ //짝수면 카운트업
+      let tgC = parseInt(gaugeContent.r11) + 1
+      setGaugeContent({r11:tgC, r12: breathCount, r2: inOutFlip(gaugeContent.r2)});
+    }
+    else{
+      setGaugeContent({...gaugeContent, r2: inOutFlip(gaugeContent.r2)});
+    }
+  }
+  useEffect(()=>{
+    if(sessionCount !== 1 && sessionCount !== 0){
+      sessionFlip();
+    }
+  },[sessionCount])
+
+
+  
+  const [timerTick, setTimerTick] = useState(250); //default 250 (6/15)
+  const [timerRunStat, setTimerRunStat] = useState(false);
+  useEffect(()=>{
+    if(timerRunStat){
+      let i =1;
+      setInterval(() => {
+        if(i>60)return;
+        itemRef.current[i++].classList += " tickColor";
+      }, timerTick);
+    }
+  },[timerRunStat])
+
+
+
   class DataCalculateStrategyE {
     constructor() {
       this.FREQUENCY = 80_000_000; // 80MHz
@@ -283,8 +409,12 @@ const MeasurementPage = () =>{
       testIt()
     }
   },[notifyStart])
+
+  // 준비완료 알림창
+  const [readyAlert, setReadyAlert] = useState(false);
   useEffect(()=>{
     if(notifyDone){
+      setReadyAlert(true);
       let time = setTimeout(() => {
         setMeaPreStart(true);
       }, 1000);
@@ -304,8 +434,10 @@ const MeasurementPage = () =>{
     // console.log(dataList[dataList.length-1]);
     // console.log(meaStart)
     // console.log(dataList);
-    if(blow==false && dataList[0] == '2' && dataList[1] == '2' && dataList[2] == '2'){
+    if(blow==false && dataList[0] == '2'){
       setNotifyDone(true);
+    }
+    if(blow==false && dataList[0] == '2' && dataList[1] == '2' && dataList[2] == '2'){
       setBlow(true);
     }
     if(blow==true&&blowF==false){
@@ -330,6 +462,7 @@ const MeasurementPage = () =>{
   const [rawDataList, setRawDataList] = useState([0]); // raw data 처리 전 (0만 뗀거)
   const [calDataList, setCalDataList] = useState([new FluidMetrics(0, 0, 0)]);
   const [calFlag, setCalFlag] = useState(0);
+
   useEffect(()=>{
     if(calDataList[calFlag]){
       let item = calDataList[calFlag];
@@ -350,12 +483,12 @@ const MeasurementPage = () =>{
 
 
       let TrawDataList = [...rawDataList];
-
+      
       // let currItemR = data[data.length-1]; //방금 들어온 raw 데이터
       // let currItem = dataCalculateStrategyE.convert(currItemR); // 데이터 전처리 후
-      if(dataCalculateStrategyE.isExhale(preItem) !== dataCalculateStrategyE.isExhale(currItem)){
-        TrawDataList.push(dataCalculateStrategyE.getZero(dataCalculateStrategyE.isExhale(currItem)));
-      }
+      // if(dataCalculateStrategyE.isExhale(preItem) !== dataCalculateStrategyE.isExhale(currItem)){
+      //   TrawDataList.push(dataCalculateStrategyE.getZero(dataCalculateStrategyE.isExhale(currItem)));
+      // }
       TrawDataList.push(currItem);
       setRawDataList(TrawDataList);
       setFlag({idx : flag.idx+1, rIdx: flag.rIdx+1})
@@ -415,8 +548,9 @@ const MeasurementPage = () =>{
     if(startMsg){
       //시작 메세지 띄우기
       console.log("시작 메세지 띄우기")
+      setConfirmStat(true);
       // setDataList([])
-      setMeaStart(true);
+      // setMeaStart(true);
     }
   },[startMsg])
 
@@ -487,6 +621,14 @@ const MeasurementPage = () =>{
   
       // 흡기 시
       if (rawF < 0){
+        if(!inFDone && meaStart && rawV!==0){ //흡기선?
+          setInF(true);
+          setInFDone(true);
+        }
+        if(preXY['y']>=0 && sessionVol !== 0 ){
+          let tempSesCnt = sessionCount + 1
+          setSessionCount(tempSesCnt); 
+        }
         //x값 처리
         // x값 최저
         if (preXY['x'] == 0){
@@ -516,13 +658,22 @@ const MeasurementPage = () =>{
               x = 0;
           }
           else{
-              x = vTemp;
+            x = vTemp;
           }
         }
       }
       //호기 시
       else{
-          x = preXY['x'] + rawV;
+        if(!inFDone && meaStart && rawV!==0){ //호기선?
+          setInF(false);
+          // console.log("hererer")
+          setInFDone(true);
+        }
+        if(preXY['y']<=0 && sessionVol !== 0 ){
+          let tempSesCnt = sessionCount + 1
+          setSessionCount(tempSesCnt); 
+        }
+        x = preXY['x'] + rawV;
       }
       
       volumeFlowList.push({x: x, y:rawF});
@@ -1151,7 +1302,6 @@ const MeasurementPage = () =>{
     })
   }
 
-  useEffect(()=>{console.log("asdaaaaasdddfdfdjfhdjfhiehfajdhidsgvhkebvlisusehoivhi")},[volumeFlowList])
   useEffect(()=>{
 
     // let dataList1=[]
@@ -1219,21 +1369,118 @@ const MeasurementPage = () =>{
     console.log(graphData2)
   },[graphData2])
 
+  const [confirmStat, setConfirmStat] = useState(false);
+  let confirmFunc = (val)=>{
+    if(val=="confirm"){
+      setMeaStart(true);
+    }
+  }
+  let itemRef = useRef([]);
+
+  // const Item = styled.span`
+  // position: absolute;
+  // transform: rotate(calc(${props => (props.idx*6+"deg")}));
+  // inset: -16px;
+  // text-align: center;
+  // `
+  
+  
   return(
     <div className="result-page-container measurement-page-container">
+      {confirmStat ? <Confirm content="검사를 시작하시겠습니까?" btn={true} onOff={setConfirmStat} select={confirmFunc}/> : null}
+      {readyAlert ? <Confirm content="준비 중입니다..." btn={false} onOff={setReadyAlert} select={confirmFunc}/> : null}
         <div className="measurement-page-nav" onClick={()=>{console.log()}}>
           <div className='measurement-page-backBtn' onClick={()=>{navigatorR(-1)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6"}} />
           </div>
           <p onClick={()=>{
             
-            console.log(calDataList);
           }}>검사</p>
         </div>
 
 
         <div className="measurement-page-left-container">
-          <div className="measure-circle-container"></div>
+          <div className="measure-gauge-container">
+              <div className="gauge-container">
+                <div className="gaugeItem" ref={el=>itemRef.current[1]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[2]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[3]=el} ><p></p></div>       
+                <div className="gaugeItem" ref={el=>itemRef.current[4]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[5]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[6]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[7]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[8]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[9]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[10]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[11]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[12]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[13]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[14]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[15]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[16]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[17]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[18]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[19]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[20]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[21]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[22]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[23]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[24]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[25]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[26]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[27]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[28]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[29]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[30]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[31]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[32]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[33]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[34]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[35]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[36]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[37]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[38]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[39]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[40]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[41]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[42]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[43]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[44]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[45]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[46]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[47]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[48]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[49]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[50]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[51]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[52]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[53]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[54]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[55]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[56]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[57]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[58]=el} ><p></p></div>
+                <div className="gaugeItem" ref={el=>itemRef.current[59]=el} ><p></p></div>
+                <div className='gaugeItem startColor' ref={el=>itemRef.current[60]=el} ><p></p></div>
+                <div className='gauge-status'>
+                  {
+                    inFDone?
+                      timerReady ? 
+                      <p>타이머</p>
+                      :
+                      sessionVol !== 0 ? 
+                      <div className='gauge-status-content'>
+                        <div>{gaugeContent.r11}/{gaugeContent.r12}</div>
+                        <p>{gaugeContent.r2}</p>
+                      </div> 
+                      :
+                      <p>준비</p>  
+                    :
+                    <p>준비</p>
+                  }
+                </div>
+              </div>
+          </div>
           <div className="measure-msg-container">
             <div></div>
             {
@@ -1241,7 +1488,8 @@ const MeasurementPage = () =>{
             <p className='measure-msg'>{"바람을 불어서 활성화해주세요"}</p>
             :
               notifyDone?
-              <p className="measure-msg">준비중입니다...</p>
+              // <p className="measure-msg">준비중입니다...</p>
+              null
               :
               <p className='measure-msg'>{noneDevice==false?"검사버튼을 눌러주세요":"SpiroKit 연동이 필요합니다."}</p>
             }
