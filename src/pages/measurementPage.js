@@ -507,7 +507,14 @@ const MeasurementPage = () =>{
     let current = rawDataList[rawDataList.length-1];
     let time = dataCalculateStrategyE.getTime(current);
     let lps = dataCalculateStrategyE.getCalibratedLPS(calibratedLps, previous, current, inhaleCoefficient, exhaleCoefficient);
-    setCExhale(dataCalculateStrategyE.isExhale(current));
+    let exhale = dataCalculateStrategyE.isExhale(current);
+    if(cExhale !== exhale){
+      if(sessionVol !== 0 ){
+        let tempSesCnt = sessionCount + 1
+        setSessionCount(tempSesCnt); 
+      }
+    }
+    setCExhale(exhale);
     setCTime(time);
     setCalibratedLps(lps)
   },[rawDataList])
@@ -522,7 +529,6 @@ const MeasurementPage = () =>{
     if(cVolume !== -999){
       let metrics = new FluidMetrics(cTime, calibratedLps, cVolume);
       metrics.setExhale(cExhale);
-      
       calDataList.push(metrics);
       setCalDataList(calDataList);
 
@@ -625,10 +631,12 @@ const MeasurementPage = () =>{
           setInF(true);
           setInFDone(true);
         }
-        if(preXY['y']>=0 && sessionVol !== 0 ){
-          let tempSesCnt = sessionCount + 1
-          setSessionCount(tempSesCnt); 
-        }
+        
+        // if(preXY['y']<=0 && sessionVol !== 0 ){
+        //   let tempSesCnt = sessionCount + 1
+        //   setSessionCount(tempSesCnt); 
+        // }
+
         //x값 처리
         // x값 최저
         if (preXY['x'] == 0){
@@ -669,10 +677,10 @@ const MeasurementPage = () =>{
           // console.log("hererer")
           setInFDone(true);
         }
-        if(preXY['y']<=0 && sessionVol !== 0 ){
-          let tempSesCnt = sessionCount + 1
-          setSessionCount(tempSesCnt); 
-        }
+        // if(preXY['y']<=0 && sessionVol !== 0 ){
+        //   let tempSesCnt = sessionCount + 1
+        //   setSessionCount(tempSesCnt); 
+        // }
         x = preXY['x'] + rawV;
       }
       
@@ -1327,6 +1335,22 @@ const MeasurementPage = () =>{
     setGraphData(data);
   },[calFlag])
   
+  let initGraphData = ()=>{
+    let data = {
+      labels: '',
+      datasets: [{
+        label: "",
+            data: [],
+            borderColor: `red`,
+            borderWidth: 2.5,
+            showLine: true,
+            tension: 0.4
+      }],
+    }
+    console.log(data)
+    setGraphData(data);
+  }
+
   useEffect(()=>{
     let time = setTimeout(() => {
       setTemp(true);
@@ -1511,7 +1535,10 @@ const MeasurementPage = () =>{
 
           <div className="three-btn-container">
             <div onClick={()=>{
-              console.log({"nonDevice":noneDevice,"notifyStart":notifyStart,"notifyDone":notifyDone,"meaPreStart":meaPreStart, "blow":blow, "blowF":blowF, "meaStart":meaStart})
+              // console.log({"nonDevice":noneDevice,"notifyStart":notifyStart,"notifyDone":notifyDone,"meaPreStart":meaPreStart, "blow":blow, "blowF":blowF, "meaStart":meaStart})
+              setMeaStart(false);
+              setVolumeFlowList([]);
+              setTimeVolumeList([]);
             }}>버튼1</div>
             <div ref={secondBtnRef} onClick={()=>{
               setBlowF(true);
