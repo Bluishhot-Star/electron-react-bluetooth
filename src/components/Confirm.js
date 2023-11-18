@@ -33,7 +33,9 @@ function Confirm(props){
                 <input className="confirm-Btn confirm-cancel" type="button" value="취소" onClick={(e)=>{e.preventDefault();click(e, 1)}}/>
               </div>
               :
-              <div className="loader-1 center"><span></span></div>
+              <div className="confirm-loader-container">
+                <div id='loader'><span></span></div>
+              </div>
             }
         </div>
       </div>

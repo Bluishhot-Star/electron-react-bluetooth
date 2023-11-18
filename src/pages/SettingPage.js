@@ -357,7 +357,6 @@ window.api.receive("connectedBLEDevice", (data)=>{
           <div className="calibration-verification-btn" onClick={()=>{
             getConnectedDevice()
           }}><p>보정 검증</p></div>
-
           <div className="log-out-btn" onClick={logOut}><p>로그아웃</p></div>
         </div>
       </div>
