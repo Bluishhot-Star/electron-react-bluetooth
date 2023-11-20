@@ -10,7 +10,7 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import {registerables,Chart as ChartJS,RadialLinearScale,LineElement,Tooltip,Legend,} from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
 import annotationPlugin from 'chartjs-plugin-annotation';
-const GainResultPage = () =>{
+const GainMeasurementPage = () =>{
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
   const cookie = new Cookies();
   const location = useLocation();
@@ -24,10 +24,7 @@ const GainResultPage = () =>{
   const state = location.state;
   let graphConRef = useRef();
   
-  useEffect(()=>{
-    console.log(state.result.graph.volumeFlow);
-  },[])
-  
+
   const [first, setFirst] = useState({x:window.innerWidth, y: window.innerHeight})
   const [second, setSecond] = useState({x:window.innerWidth, y: window.innerHeight})
   const [temp, setTemp] = useState(false);
@@ -83,21 +80,6 @@ const GainResultPage = () =>{
   },[])
 
 
-
-  // useEffect(()=>{
-    
-  // },[])
-  
-  // useEffect(()=>{
-  //   // console.log(chartRef.current);
-  //   // chartRef.current.maxHeight = window.innerHeight-60;
-  //   setWindowHeight(window.innerHeight-200);
-  // },[window.innerHeight])
-
-
-
-
-
   const [graphData, setGraphData] = useState({
     labels: ['Gain'],
     datasets: [{
@@ -112,26 +94,6 @@ const GainResultPage = () =>{
     },]
   })
 
-  useEffect(()=>{
-    const maxData = graphData.datasets[0].data.map((v)=>{
-      return Math.abs(v.y)
-    })
-    let y = Math.max.apply(null,maxData)
-    // if(y < 9){
-    //   y = 9.00;
-    // }
-    // else if(y > Math.round(y)){
-    //   y = Math.round(y)+0.5;
-
-    // }else{
-    //   console.log(y)
-    //   y = Math.round(y);
-      
-    // }
-    console.log(y)
-    setMaxMin(y);
-    
-  },[graphData])
 
   const graphOption={
     plugins:{
@@ -254,28 +216,28 @@ const GainResultPage = () =>{
       },
     },
   }
-  useEffect(()=>{
+//   useEffect(()=>{
     
-    let dataList=[]
+//     let dataList=[]
     
-    state.result.graph.volumeFlow.forEach((item,index)=>{
-      dataList.push(item)
+//     state.result.graph.volumeFlow.forEach((item,index)=>{
+//       dataList.push(item)
       
-    })
-    let data = {
-      labels: '',
-      datasets: [{
-        label: "",
-        data: dataList,
-        borderColor: `rgb(5,128,190)`,
-        borderWidth: 2.5,
-        showLine: true,
-        tension: 0.4
-      }],
-    }
-    console.log(data)
-    setGraphData(data);
-  },[])
+//     })
+//     let data = {
+//       labels: '',
+//       datasets: [{
+//         label: "",
+//         data: dataList,
+//         borderColor: `rgb(5,128,190)`,
+//         borderWidth: 2.5,
+//         showLine: true,
+//         tension: 0.4
+//       }],
+//     }
+//     console.log(data)
+//     setGraphData(data);
+//   },[])
   useEffect(()=>{
     let time = setTimeout(() => {
       setTemp(true);
@@ -284,97 +246,98 @@ const GainResultPage = () =>{
   },[graphData])
 
   return(
-    <div className="gain-page-container">
-      <div className="gain-page-nav">
-        <div className='gain-page-backBtn' onClick={()=>{navigatorR(-1)}}>
+    <div className="gain-measurement-page-container">
+      <div className="gain-measurement-page-nav">
+        <div className='gain-measurement-page-backBtn' onClick={()=>{navigatorR(-1)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
         </div>
         <p>보정 결과</p>
       </div>
+      <div className='gain-measurement-m-page-container'>
+        <div className="gain-measurement-page-left-container" ref={graphConRef}>
+          {temp?<div className="title-y">Flow(l/s)</div>:<></>}
+          {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingG'>화면 조정 중..</p>}
+          {temp?<div className="title-x">Volume(L)</div>:<></>}
+        </div>
 
-      <div className="gain-page-left-container" ref={graphConRef}>
-        {temp?<div className="title-y">Flow(l/s)</div>:<></>}
-        {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingG'>화면 조정 중..</p>}
-        {temp?<div className="title-x">Volume(L)</div>:<></>}
-      </div>
-
-      <div className="gain-page-right-container">
-        <div className='gain-date-container'>
-          <p className='gain-title'>Date</p> 
-          <p>{state.result.date}</p>
-        </div >
-
-        <div className='gain-environment-container'>
-          <div className='gain-environment-title'>
-            <p className='gain-title'> Environmont</p>
+        <div className="gain-measurement-page-right-container">
+          <div className='gain-measurement-gain-container'>
+            <div>
+              <p className='gain-measurement-title'>Gain</p>
+            </div>
+            <div className='gain-measurement-table-container'>
+              <div className='gain-measurement-table-Inhale'>
+                <p>Inhale</p>
+                <p>-</p>
+              </div>
+              <div className='gain-measurement-table-Exhale'>
+                <p>Exhale</p>
+                <p>-</p>
+              </div>
+            </div>           
           </div>
-          <div className='gain-table-container'>
-            <div className='gain-environment-table-Temperature'>
-              <p>Temperature</p>
-              <p>{state.result.temperature}</p>
+          <div className='gain-measurement-calivration-container'>
+            <div>
+              <p className='gain-measurement-title'>Before Calivration</p>
             </div>
-            <div className='gain-environment-table-Humidity'>
-              <p>Humidity</p> 
-              <p>{state.result.humidity}</p>
+
+            <div className='gain-measurement-calivration-table-container'>
+              <div className='gain-measurement-calivration-table-column'>
+                <p></p>
+                <p>Volume(L)</p>
+                <p>Error(%)</p>
+              </div>
+              <div className='gain-measurement-calivration-table-Inhale'>
+                <p>Inhale</p>
+                <p>- </p>
+                <p>-</p>
+              </div>
+              <div className='gain-measurement-calivration-table-Exhale'>
+                <p>Exhale</p>
+                <p>-</p>
+                <p>-</p>
+              </div>
+
             </div>
-            <div className='gain-environment-table-Pressure'>
-              <p>Pressure</p> 
-              <p>{state.result.pressure}</p>
+                    
+          </div>
+          <div className='gain-measurement-calivration-container'>
+            <div>
+              <p className='gain-measurement-title'>After Calivration</p>
             </div>
+
+            <div className='gain-measurement-calivration-table-container'>
+              <div className='gain-measurement-calivration-table-column'>
+                <p></p>
+                <p>Volume(L)</p>
+                <p>Error(%)</p>
+              </div>
+              <div className='gain-measurement-calivration-table-Inhale'>
+                <p>Inhale</p>
+                <p>- </p>
+                <p>-</p>
+              </div>
+              <div className='gain-measurement-calivration-table-Exhale'>
+                <p>Exhale</p>
+                <p>-</p>
+                <p>-</p>
+              </div>
+
+            </div>
+                    
+          </div>
+
         
-          </div>
-
         </div>
-
-        <div className='gain-gain-container'>
-          <div>
-            <p className='gain-title'>Gain</p>
-          </div>
-          <div className='gain-table-container'>
-            <div className='gain-table-Inhale'>
-              <p>Inhale</p>
-              <p>{state.result.gain.inhale}</p>
-            </div>
-            <div className='gain-table-Exhale'>
-              <p>Exhale</p>
-              <p>{state.result.gain.exhale}</p>
-            </div>
-
-
-          </div>
-          
-        </div>
-
-        <div className='gain-calivration-container'>
-          <div>
-            <p className='gain-title'>Calivration</p>
-          </div>
-
-          <div className='gain-calivration-table-container'>
-            <div className='gain-calivration-table-column'>
-              <p></p>
-              <p>Volume(L)</p>
-              <p>Error(%)</p>
-            </div>
-            <div className='gain-calivration-table-Inhale'>
-              <p>Inhale</p>
-              <p>{state.result.inhale.meas} </p>
-              <p>{state.result.inhale.error} </p>
-            </div>
-            <div className='gain-calivration-table-Exhale'>
-              <p>Exhale</p>
-              <p>{state.result.exhale.meas} </p>
-              <p>{state.result.exhale.error} </p>
-            </div>
-
-          </div>
-                   
-        </div>
-
-      
       </div>
+
+      <div className='gain-measure-operation'>
+
+  </div>
+      
+      
     </div>
   );
 }
 
-export default GainResultPage;
+export default GainMeasurementPage;

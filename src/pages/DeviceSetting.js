@@ -116,7 +116,7 @@ const DeviceSetting= () =>{
               {
                 deviceList.map((item,index)=>{
                   return(
-                    <div id={"deviceItem"+index} className='device-item' key={item.serialNumber} onClick={(e)=>click(item.serialNumber)}>
+                    <div id={"deviceItem"+index} className='device-list-item' key={item.serialNumber} onClick={(e)=>click(item.serialNumber)}>
                       <div className='device-item-serialNumber'><p>{item.serialNumber}</p></div>
                       <div className='device-item-calibrationCount'><p>{item.calibrationCount}</p></div>
                     </div>
