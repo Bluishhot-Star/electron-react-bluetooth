@@ -2842,22 +2842,32 @@
   transform: translateY(-10px);
 }
 .measure-msg-container{
+  display: grid;
+  grid-template-rows: 3fr 2fr;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  justify-items: center;
+}
+.measure-msg-container>div:first-child{
+  border: 1px solid #000;
+  width: 120px;
+  height: 120px;
+  border-radius: 50vh;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-.measure-msg-container>div{
-  border: 1px solid #000;
-  width: 100px;
-  height: 100px;
-  border-radius: 50vh;
-}
 .measure-msg-container .measure-msg{
-  display: block;
+  display: inline-block;
   width: 100%;
-  height: 50%;
+  height: 70%;
+  line-height: 1.2rem;
   margin: 0;
+  font-size: min(2vh, 0.83rem);
+  white-space: pre-line;
+  word-break: keep-all;
+  vertical-align: center;
 }
 .measurement-page-right-container{
   width: 100%;
@@ -3267,6 +3277,7 @@
 .endColor > p{
   background: rgb(0, 123, 255);
 }
+
 /* 검사 설정 */
 
 .management-setting-container{
@@ -3519,6 +3530,13 @@
   align-items: center;
   justify-content: center;
 }
+.confirm-msg-container p{
+  display: block;
+  white-space: pre-line;
+  word-break: keep-all;
+  text-align: center;
+  line-height: 1.5rem;
+}
 .confirm-Btn-container{
   position: absolute;
   bottom: 30px;
@@ -3562,6 +3580,7 @@
   justify-content: center;
   padding: 0 10px;
 }
+
 /* Item */
 .gaugeItem{
   position: absolute;
@@ -3675,6 +3694,30 @@
   animation-iteration-count: infinite;
   animation-timing-function: linear; 
 }
+
+/* Timer */
+.timer-container{
+  display: flex;
+  font-size: 1.6rem;
+  align-items: end;
+}
+.timer-container p{
+  all: unset;
+}
+.timer-container .timer-second{
+  display: block;
+  transform: translate(0, -2px);
+}
+
+.timer-container .timer-millisecond{
+  display: block;
+  font-size: 1.3rem;
+  width: 13px;
+  transform: translate(2px, -2px);
+}
+
+
+
 
 input::placeholder{
   color: #bbb;

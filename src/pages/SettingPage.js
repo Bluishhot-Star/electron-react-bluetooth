@@ -167,76 +167,66 @@ function cancelRequest () {
 //   console.log('Received data:', value);
 // }
 function handleCharacteristicValueChanged(event) {
+  console.log(event);
   const value = event.target.value;
   // 데이터 처리 및 UART 프로토콜 해석
   console.log('Received data:', value);
-  
-  let measurementData = document.createElement("div");
-  let measurementDataContents = document.createElement("p");
-
-  let item = document.getElementsByClassName("data");
-
-  console.log(item);
-  measurementDataContents.appendChild(document.createTextNode(value)) 
-  item[0].appendChild(measurementData);
 }
 // 기기 연결 PAST************************************************************************
 
 const [device, setDevice] = useState(undefined);
+const deviceRef = useRef();
+const txCharRef = useRef();
+
 
 const bleDeviceList = document.getElementById("deviceList");
 async function testIt() {
   let options = {
-    // filters: [
-    //   { services: [xyz] },
-    //   { name: 'xyz' },       // only devices with ''
-    //   { namePrefix: 'xyz' }, // only devices starts with ''
-    // ],
-    // optionalServices: [
-    //   xyzServiceUuid,
-    // ],
     acceptAllDevices: true, // show all
     optionalServices: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e'],
   };
   try{
     const device = await navigator.bluetooth.requestDevice(options);
     let bluetoothDevice = device;
+    deviceRef.current = device;
     bluetoothDevice.addEventListener('gattserverdisconnected',onDisconnected);
     // BluetoothDevice 객체 state에 저장
     // setDevice(bluetoothDevice);
     
 
-    let deviceName = document.createElement("div");
-    let deviceId = document.createElement("div");
-    let deviceNameContents = document.createElement("p");
-    let deviceIdContents = document.createElement("p");
-    let item = document.getElementsByClassName("device");
-    console.log(item);
-    deviceNameContents.appendChild(document.createTextNode(device.name)) 
-    deviceIdContents.appendChild(document.createTextNode(device.id)) 
+    // let deviceName = document.createElement("div");
+    // let deviceId = document.createElement("div");
+    // let deviceNameContents = document.createElement("p");
+    // let deviceIdContents = document.createElement("p");
+    // let item = document.getElementsByClassName("device");
+    // console.log(item);
+    // deviceNameContents.appendChild(document.createTextNode(device.name)) 
+    // deviceIdContents.appendChild(document.createTextNode(device.id)) 
 
-    deviceName.appendChild(deviceNameContents);
-    deviceId.appendChild(deviceIdContents);
-    item[0].appendChild(deviceName);
-    item[0].appendChild(deviceId);
+    // deviceName.appendChild(deviceNameContents);
+    // deviceId.appendChild(deviceIdContents);
+    // item[0].appendChild(deviceName);
+    // item[0].appendChild(deviceId);
 
     // // GATT 서버 연결
     const server = await device.gatt.connect();
+    
+    // Nordic UART Service 가져오기
+    const service = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
+  
+    // 수신 특성 가져오기
+    const rxCharacteristic = await service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
+  
+    // 송신 특성 가져오기
+    const txCharacteristic = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
+    txCharRef.current = txCharacteristic;
+    // 검사하기 버튼 누르고 쓸 부분
+    // Notify(구독) 활성화
+    await txCharacteristic.startNotifications();
+  
+    // Notify(구독) 이벤트 핸들러 등록
+    txCharacteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
     dispatch(changeDeviceInfo(device))
-    // // Nordic UART Service 가져오기
-    // const service = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
-  
-    // // 수신 특성 가져오기
-    // const rxCharacteristic = await service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
-  
-    // // 송신 특성 가져오기
-    // const txCharacteristic = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
-    // // 검사하기 버튼 누르고 쓸 부분
-    // // Notify(구독) 활성화
-    // await txCharacteristic.startNotifications();
-  
-    // // Notify(구독) 이벤트 핸들러 등록
-    // txCharacteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
   
     // console.log('Connected to BLE device');
     
@@ -305,7 +295,9 @@ window.api.receive("connectedBLEDevice", (data)=>{
           <div className='setting-page-backBtn' onClick={()=>{navigatorR(-1)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
           </div>
-          <p>설정</p>
+          <p onClick={()=>{
+            console.log(txCharRef.current)
+          }}>설정</p>
         </div>
 
         <div className="setting-page-left-container">

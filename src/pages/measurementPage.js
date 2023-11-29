@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { changeDeviceInfo, reset } from "./../deviceInfo.js"
 import { da } from 'date-fns/locale';
 import Gauge from "../components/Gauge.js"
+import Timer from "../components/Timer.js"
 
 
 const MeasurementPage = () =>{
@@ -34,38 +35,40 @@ const MeasurementPage = () =>{
   let stopTime = 15;
 
   
+  const [measureDone, setMeasureDone] = useState(false);
+
 
   // 게이지 UI 전처리
   let setGaugeUI = (strongTime, stopTime)=>{
     switch (strongTime) {
       case 3:
         itemRef.current[30].classList += " endColor";
-        setTimerTick(100);
+        setTimerTick(10.0);
         break;
       
       case 10:
         itemRef.current[30].classList += " endColor";
-        setTimerTick(333)
+        setTimerTick(33.3)
         break;
       
       case 15:
         itemRef.current[36].classList += " endColor";
-        setTimerTick(417)
+        setTimerTick(41.7)
         break;
       
       case 20:
         itemRef.current[40].classList += " endColor";
-        setTimerTick(500)
+        setTimerTick(50.0)
         break;
       
       case 30:
         itemRef.current[30].classList += " endColor";
-        setTimerTick(1000)
+        setTimerTick(100.0)
         break;
       
       default: //default 6
         itemRef.current[24].classList += " endColor";
-        setTimerTick(250)
+        setTimerTick(25.0)
         break;
     }
   }
@@ -85,7 +88,9 @@ const MeasurementPage = () =>{
   // 첫 가이드 컨텐츠 세팅 후 전체 세션 진행 수 설정 (흡기 선 breath*2, 호기 breathC *2 -1)
   const [sessionVol, setSessionVol] = useState(0);
 
+  // 호/흡 세션 완료 후 timer로 전환 여부
   const [timerReady, setTimerReady] = useState(false);
+  
   //첫 가이드 컨텐츠 세팅
   useEffect(()=>{
     if(inF !== -1){
@@ -133,8 +138,6 @@ const MeasurementPage = () =>{
       sessionFlip();
     }
   },[sessionCount])
-
-
   
   const [timerTick, setTimerTick] = useState(250); //default 250 (6/15)
   const [timerRunStat, setTimerRunStat] = useState(false);
@@ -147,7 +150,7 @@ const MeasurementPage = () =>{
       }, timerTick);
     }
   },[timerRunStat])
-
+  
 
 
   class DataCalculateStrategyE {
@@ -355,6 +358,8 @@ const MeasurementPage = () =>{
   const [notifyStart, setNotifyStart] = useState(false);
   // 구독 완료
   const [notifyDone, setNotifyDone] = useState(false);
+  // 검사버튼 먼저 누르고 온 경우 notify 확인 후 구독 완료
+  const [alNotifyDone, setAlNotifyDone] = useState(false);
   // 검사 시작 전 준비완료 상태(구독완)
   const [meaPreStart, setMeaPreStart] = useState(false);
 
@@ -378,12 +383,17 @@ const MeasurementPage = () =>{
   // let TvolumeFlowList = [];
   // time-volume 그래프 좌표
   // const [timeVolumeList, setTimeVolumeList] = useState([]);
+
+//----------------------------------------------------------------------------------------------- 111111
+
+  // 기기 연결 여부 검사
   useEffect(()=>{
     if(deviceInfo.gatt){ //리스트에 있으면
       setNoneDevice(false);
       if(!deviceInfo.gatt.connected){ //연결여부
         //디바이스 연결X
         setNoneDevice(true);
+        setDisconnectStat(true);
         window.api.send("getConnectedDevice", "");
       }
       else{
@@ -393,6 +403,7 @@ const MeasurementPage = () =>{
     }
     else{ //기기없으면
       setNoneDevice(true);
+      setDisconnectStat(true);
     }
   })
   
@@ -402,13 +413,17 @@ const MeasurementPage = () =>{
       console.log("기기없음 메세지")
     }
   },[noneDevice])
-
+//----------------------------------------------------------------------------------------------- 222222
+  
+  // 연결 확인 & 구독 시작
   useEffect(()=>{
     if(notifyStart){
       console.log("연결확인 및 구독")
       testIt()
     }
   },[notifyStart])
+
+//----------------------------------------------------------------------------------------------- 
 
   // 준비완료 알림창
   const [readyAlert, setReadyAlert] = useState(false);
@@ -429,15 +444,23 @@ const MeasurementPage = () =>{
     }
   },[meaPreStart])
 
+//----------------------------------------------------------------------------------------------- 44444
+  // 구독 완료 후 처리
+
   useEffect(()=>{
-    // console.log("a :", dataList)
-    // console.log(dataList[dataList.length-1]);
-    // console.log(meaStart)
-    // console.log(dataList);
-    if(blow==false && dataList[0] == '2'){
+    if(alNotifyDone){
+      if(dataList.length == 0){
+        // setNotifyDone(true);
+        setBlow(true);
+      }
+    }
+  },[alNotifyDone])
+
+  useEffect(()=>{ 
+    if(dataList[0] == '2'){
       setNotifyDone(true);
     }
-    if(blow==false && dataList[0] == '2' && dataList[1] == '2' && dataList[2] == '2'){
+    if(dataList[0] == '2' && dataList[1] == '2' && dataList[2] == '2'){
       setBlow(true);
     }
     if(blow==true&&blowF==false){
@@ -450,19 +473,24 @@ const MeasurementPage = () =>{
       }
     }
   },[dataList])
-  
+//-----------------------------------------------------------------------------------------------
+  // 시작 확인 시 flag 세우기 -> 처리할 데이터 슬라이싱
   useEffect(()=>{
     if(meaStart){
-      setFlag({idx: dataList.length-1, rIdx: 1}); // idx : dataList에서의 인덱스, rIdx : realData에서의 인덱스
+
+      let time = setTimeout(() => {
+        setFlag({idx: dataList.length, rIdx: 1}); // idx : dataList에서의 인덱스, rIdx : realData에서의 인덱스
+      }, 1000);
     }
   },[meaStart])
   
+//-----------------------------------------------------------------------------------------------
 
-  const [rawDataResultList, setRawDataResultList] = useState([0]); // raw data 처리완료
   const [rawDataList, setRawDataList] = useState([0]); // raw data 처리 전 (0만 뗀거)
-  const [calDataList, setCalDataList] = useState([new FluidMetrics(0, 0, 0)]);
-  const [calFlag, setCalFlag] = useState(0);
+  const [calDataList, setCalDataList] = useState([]); // raw data 처리 -> time/volume/lps/exhale
+  const [calFlag, setCalFlag] = useState(0); // calDataList에서 그래프 좌표로 처리할 index=>현재 처리된 index
 
+  // 그래프 좌표 생성 시작
   useEffect(()=>{
     if(calDataList[calFlag]){
       let item = calDataList[calFlag];
@@ -472,6 +500,7 @@ const MeasurementPage = () =>{
     }
   },[flag, calDataList])
 
+  // raw데이터 들어오면 -> rawDataList에 넣기
   useEffect(()=>{
     if(flag.idx>0 && dataList[flag.idx]){
 
@@ -484,11 +513,13 @@ const MeasurementPage = () =>{
 
       let TrawDataList = [...rawDataList];
       
+      // 호 <-> 흡 바뀔 때 0 넣기 주석
       // let currItemR = data[data.length-1]; //방금 들어온 raw 데이터
       // let currItem = dataCalculateStrategyE.convert(currItemR); // 데이터 전처리 후
       // if(dataCalculateStrategyE.isExhale(preItem) !== dataCalculateStrategyE.isExhale(currItem)){
       //   TrawDataList.push(dataCalculateStrategyE.getZero(dataCalculateStrategyE.isExhale(currItem)));
       // }
+
       TrawDataList.push(currItem);
       setRawDataList(TrawDataList);
       setFlag({idx : flag.idx+1, rIdx: flag.rIdx+1})
@@ -497,6 +528,11 @@ const MeasurementPage = () =>{
       // setVolumeFlowList(setVFGraphData(item.volume, item.lps));
     }
   },[dataList, flag])
+
+
+//-----------------------------------------------------------------------------------------------
+  // raw 데이터 입력 시 처리 process
+
   // calibratedLps -> api에서 추출
   const [calibratedLps, setCalibratedLps] = useState(-10);
   const [cTime, setCTime] = useState();
@@ -508,12 +544,18 @@ const MeasurementPage = () =>{
     let time = dataCalculateStrategyE.getTime(current);
     let lps = dataCalculateStrategyE.getCalibratedLPS(calibratedLps, previous, current, inhaleCoefficient, exhaleCoefficient);
     let exhale = dataCalculateStrategyE.isExhale(current);
+    
+
     if(cExhale !== exhale){
       if(sessionVol !== 0 ){
         let tempSesCnt = sessionCount + 1
         setSessionCount(tempSesCnt); 
       }
     }
+    if(cExhale && timerReady && !timerStart && !measureDone){
+      setTimerStart(true);
+    }
+
     setCExhale(exhale);
     setCTime(time);
     setCalibratedLps(lps)
@@ -535,14 +577,8 @@ const MeasurementPage = () =>{
     }
   },[cVolume])
   
-  // useEffect(()=>{
-  //   if(dataResult.length !== 0){
-  //     let item = dataResult[dataResult.length-1];
-  //     setVolumeFlowList(setVFGraphData(item.volume, item.lps));
-  //     setTVGraphData(item.time,item.volume, item.exhale);
-  //   }
-  // },[dataResult])
-
+//-----------------------------------------------------------------------------------------------
+  // 시작 메세지 띄우기
   useEffect(()=>{
     if(blowF){
       console.log("메세지 띄우려면")
@@ -560,57 +596,9 @@ const MeasurementPage = () =>{
     }
   },[startMsg])
 
+//-----------------------------------------------------------------------------------------------
+
   // volume-flow 그래프 좌표 함수
-  // let setVFGraphData = ( rawV, rawF )=>{
-  //   let x, y;
-  //   let preXY; //이전값
-  //   // preXY 값 할당
-  
-  //   let TmpVolumeFlowList = [...volumeFlowList];
-
-  //   //초기값 세팅
-  //   if(TmpVolumeFlowList.length == 0) preXY = {x:0, y:0};
-  //   else preXY = TmpVolumeFlowList[TmpVolumeFlowList.length-1];
-  //   // 흡기 시
-  //   if (rawF < 0){
-  //       //x값 처리
-  //       // x값 최저
-  //       if (preXY['x'] == 0){
-  //           // 현재 x값 오른쪽 밀기
-  //           TmpVolumeFlowList.forEach((item, idx) =>{
-  //               let itemTemp = {...item};
-  //               itemTemp['x'] += rawV;
-  //               TmpVolumeFlowList[idx] = itemTemp; //setState로 변경사항 setState(temp);
-  //           })
-  //           x = 0;
-  //       }
-  //       else{
-  //           let vTemp = preXY['x']-rawV;
-  //           if(vTemp<0){
-  //               // 현재 x값 오른쪽 밀기
-  //               TmpVolumeFlowList.forEach(item =>{
-  //                   let itemTemp = {...item};
-  //                   itemTemp['x'] += Math.abs(vTemp);
-  //                   item = itemTemp; //setState로 변경사항 setState(temp);
-  //               })
-  //               x = 0;
-  //           }
-  //           else{
-  //               x = vTemp;
-  //           }
-  //       }
-        
-  //   }
-  //   //호기 시
-  //   else{
-  //       x = preXY['x'] + rawV;
-  //   }
-    
-  //   TmpVolumeFlowList.push({x: x, y:rawF});
-  //   // return {x: x, y:rawF};
-  //   setVolumeFlowList(TmpVolumeFlowList);
-  // }
-
   let setVFGraphData = ( rawV, rawF )=>{
     try{
       let x, y;
@@ -687,32 +675,23 @@ const MeasurementPage = () =>{
       volumeFlowList.push({x: x, y:rawF});
       console.log(volumeFlowList);
       setVolumeFlowList(volumeFlowList);
+      if(timerReady && timerStart){
+        if(rawF == 0){
+          setTimerStart(false);
+          setMeasureDone(true);
+        }
+      }
       // return {x: x, y:rawF};
     }
     catch(err){
       console.log(err)
     }
     
-}
-
-
-  // let setTVGraphData = (rawT, rawV, exhale)=>{
-  //   let x, y;
-  //   let preXY;
-  //   let prefix = 1;
-  //   let TmpTimeVolumeList = [...timeVolumeList];
-  //   if (TmpTimeVolumeList.length==0){
-  //     y = 0;
-  //   }
-  //   else{
-  //     if (exhale !== TmpTimeVolumeList[TmpTimeVolumeList.length-1].exhale) prefix *= -1;
-  //     x = rawT+TmpTimeVolumeList[TmpTimeVolumeList.length-1].x;
-  //     y = TmpTimeVolumeList[TmpTimeVolumeList.length-1].y + (prefix * rawV)
-  //   }
-
-  //   TmpTimeVolumeList.push({x:x, y:y})
-  //   setTimeVolumeList(TmpTimeVolumeList);
-  // }
+  }
+//-----------------------------------------------------------------------------------------------
+  // timeVolume flag(흡기 시 설정)
+  const [calFlagTV,setCalFlagTV] = useState(0);
+  // timeVolume 그래프 좌표 생성 함수
   let setTVGraphData = (rawT, rawV, exhale)=>{
     let x, y;
     let preXY;
@@ -724,16 +703,22 @@ const MeasurementPage = () =>{
     }
     else{
       if (exhale !== calDataList[calFlag-1].exhale) prefix *= -1;
-      x = rawT+timeVolumeList[calFlag-1].x;
-      y = timeVolumeList[calFlag-1].y + (prefix * rawV)
+      x = rawT+timeVolumeList[calFlagTV-1].x;
+      y = timeVolumeList[calFlagTV-1].y + (prefix * rawV)
     }
+    if(volumeFlowList[volumeFlowList.length-1].y < 0){
+      setTimeVolumeList([]);
+      setCalFlagTV(0);
+    }else{
+      timeVolumeList.push({x:x, y:y});
 
-    timeVolumeList.push({x:x, y:y})
-
-    setTimeVolumeList(timeVolumeList)
+      setTimeVolumeList(timeVolumeList);
+      setCalFlagTV(calFlagTV+1);
+    }
   }
 
-
+//----------------------------------------------------------------------------------------------- 333333
+  let txCharRef = useRef();
   // 검사 구독 함수
   async function testIt() {
     let options = {
@@ -758,14 +743,18 @@ const MeasurementPage = () =>{
       const rxCharacteristic = await service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
     
       // 송신 특성 가져오기
-      const txCharacteristic = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
+      // const txCharacteristic = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
+      txCharRef.current = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
 
       // 검사하기 버튼 누르고 쓸 부분
       // Notify(구독) 활성화
-      await txCharacteristic.startNotifications();
-      
+      // await txCharacteristic.startNotifications();
+      await txCharRef.current.startNotifications();
+      if(txCharRef.current.properties['notify'] === true){
+        setAlNotifyDone(true);
+      }
       // Notify(구독) 이벤트 핸들러 등록
-      txCharacteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+      txCharRef.current.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
       console.log('Connected to BLE device');
       
     }
@@ -779,7 +768,8 @@ const MeasurementPage = () =>{
     // Object event.target is Bluetooth Device getting disconnected.
     console.log('> Bluetooth Device disconnected');
   }
-
+  
+  // rawData 문자열
   let [result, setResult] = useState();
   //데이터 문자로 바꾸기
   let arrayToString = (temp)=>{
@@ -802,48 +792,18 @@ const MeasurementPage = () =>{
     const value = event.target.value;
     // 데이터 처리 및 UART 프로토콜 해석
 
-
     console.log('Received data:', value);
     arrayToString(value)
-    // let temp = [...dataList];
-    // temp.push(arrayToString(value))
-    // setDataList(temp);
-    // let measurementData = document.createElement("div");
-    // let measurementDataContents = document.createElement("p");
-  
-    // let item = document.getElementsByClassName("data");
-  
-    // console.log(item);
-    // measurementDataContents.appendChild(document.createTextNode(value)) 
-    // item[0].appendChild(measurementData);
   }
 
 
 
-
-
-// function handleCharacteristicValueChanged(event) {
-//   const value = event.target.value;
-//   // 데이터 처리 및 UART 프로토콜 해석
-//   console.log('Received data:', value);
-  
-//   let measurementData = document.createElement("div");
-//   let measurementDataContents = document.createElement("p");
-
-//   let item = document.getElementsByClassName("data");
-
-//   console.log(item);
-//   measurementDataContents.appendChild(document.createTextNode(value)) 
-//   item[0].appendChild(measurementData);
-// }
-// 기기 연결 PAST************************************************************************
-
+//-----------------------------------------------------------------------------------------------
+  // 그래프 설정
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables);
   const location = useLocation();
 
   //결과 그래프 목록 요청 FVC
-  const[volumeFlow,setVolumeFlow] = useState([]);
-  const[timeVolume,setTimeVolume] = useState([]);
 
   const [graphData, setGraphData] = useState({
     labels: ['FVC'],
@@ -871,27 +831,6 @@ const MeasurementPage = () =>{
       tension: 0.4
     },]
   })
-  const [graphData3, setGraphData3] = useState({
-    labels: ['SVC'],
-    datasets: [{
-      label: "",
-      data: [
-        {x: 0.030999999999999996, y: 0.23858681948280723},
-        {x: 0.030999999999999996, y: 0.23858681948280724},
-        {x: 0.030999999999999996, y: 0.23858681948280724}],
-      borderColor: 'rgb(255,255,255)',
-      showLine: true,
-      tension: 0.4
-    },]
-  })
-
-
-// window.addEventListener('beforeprint', () => {
-//   chartRef.current.resize(600, 600);
-// });
-// window.addEventListener('afterprint', () => {
-//   chartRef.current.resize();
-// });
 
   const graphOption={
     plugins:{
@@ -1040,85 +979,10 @@ const MeasurementPage = () =>{
       },
     },
   }
-  const graphOption3={
-    plugins:{
-      legend: {
-          display: false
-      },
-      resizeDelay:0,
-      datalabels: false,
-    },
-    responsive: true,
-    animation:{
-      duration:0
-    },
-    maintainAspectRatio: false,
-    interaction: false, 
-    elements: {
-      point: {
-        radius: 0,
-      },
-    },
-    scales: {
-      x: {
-        axios: 'x',
-        // min: 0,
-        suggestedMax: 60.0,
-        // suggestedMax: 6.0,
-        ticks:{
-          stepSize : 10.0,
-          beginAtZero: false,
-          max: 12.0,
-          autoSkip: false,
-        },
-        grid:{
-          color: function(context) {
-            if (context.index === 0){
-              return '#20a0b3';
-            }
-            else{
-              return '#bbdfe4';
-            }
-          },
-        }
-      },
-      y: {
-        gridLines:{
-          zeroLineColor:'rgba(0, 0, 255, 1)',
-        },
-        axios: 'y',
-        // max: parseFloat(Math.max(...svcMax)),
-        // min: parseFloat(Math.max(...svcMax))*-1,
-        // suggestedMax:0,
-        // suggestedMin:-6,
-        ticks: {
-          major: true,
-          beginAtZero: true,
-          // stepSize : .5,
-          fontSize : 10,
-          textStrokeColor: 10,
-          precision: 1,
-        },
-        grid:{
-          color: function(context) {
-            if (context.index === 0){
-              return '#20a0b3';
-            }
-            else if (context.tick.value > 0) {
-              return '#bbdfe4';
-            } else if (context.tick.value < 0) {
-              return '#bbdfe4';
-            }
-            return '#20a0b3';
-          },
-        }
-      },
-    },
-  }
 
 
-
-
+  
+//-----------------------------------------------------------------------------------------------
 
   // 창 크기 조절에 따른 그래프 크기 조절
   const [first, setFirst] = useState({x:window.innerWidth, y: window.innerHeight})
@@ -1166,7 +1030,6 @@ const MeasurementPage = () =>{
     })
   },[])
 
-
   useEffect(()=>{
     window.addEventListener("resize", handleResize)
     return()=>{
@@ -1175,121 +1038,13 @@ const MeasurementPage = () =>{
   },[])
 
 
-
-
-  // volumeFlow 그리기
-  useEffect(()=>
-  {
-    console.log("VOLVUEEJF : ",volumeFlow)
-    console.log("!#!##")
-
-    let time = setTimeout(()=>{
-      console.log("!#!##!@!@")
-      
-      let time2 = setTimeout(() => {
-        let temp = [];
-        volumeFlow.forEach((item,index)=>{
-          temp.push(item);
-        })
-        let time3 = setTimeout(() => {
-          let dataset = {
-            label: "",
-            data: temp,
-            borderColor: `red`,
-            borderWidth: 2.5,
-            showLine: true,
-            tension: 0.4
-          }
-          let time4 = setTimeout(() => {
-            let data = {
-              labels: '',
-              datasets: [dataset],
-            }
-            let time5 = setTimeout(()=>{
-              console.log(data);
-              setGraphData(data);
-            },50)
-            return()=>{
-              clearTimeout(time5);
-            }
-          }, 50);
-          return()=>{
-            clearTimeout(time4);
-          }
-        }, 50);
-        return()=>{
-          clearTimeout(time3);
-        }
-      }, 50);
-      return()=>{
-        clearTimeout(time2);
-      }
-    },50)
-
-    return()=>{
-      clearTimeout(time);
-    }
-  },[volumeFlow])
-
-
-
-  // timeVolume 그리기
-  useEffect(()=>
-  {
-    console.log("!#!##")
-
-    let time = setTimeout(()=>{
-      console.log("!#!##!@!@")
-      
-      let time2 = setTimeout(() => {
-        let dataset = []
-        timeVolume.forEach((item,index)=>{
-          dataset.push(
-            {
-              label: "",
-              data: item,
-              borderColor: `red`,
-              borderWidth: 2.5,
-              showLine: true,
-              tension: 0.4
-            }
-          )
-        })
-        let time3 = setTimeout(() => {
-          let data = {
-            labels: "",
-            datasets: dataset,
-          }
-          let time4 = setTimeout(() => {
-            setGraphData2(data);
-          }, 50);
-          return()=>{
-            clearTimeout(time4);
-          }
-        }, 50);
-        return()=>{
-          clearTimeout(time3);
-        }
-      }, 50);
-      return()=>{
-        clearTimeout(time2);
-      }
-    },50)
-
-    return()=>{
-      clearTimeout(time);
-    }
-  },[timeVolume])
-
-  
+//-----------------------------------------------------------------------------------------------
+  // 그래프 그리기
 
   const graphStyle = {width:"0px" ,height:"0px", transition:"none"}
 
   const chartRef = useRef();
 
-  const state = location.state;
-
-  
   const measurementEnd = ()=>{
     axios.post(`/subjects/1234/types/fvc/measurements`, 
     {
@@ -1310,6 +1065,7 @@ const MeasurementPage = () =>{
     })
   }
 
+  // volumeFlow 그래프 그리기
   useEffect(()=>{
 
     // let dataList1=[]
@@ -1358,6 +1114,8 @@ const MeasurementPage = () =>{
     console.log(graphData)
   },[graphData])
 
+
+  // timeVolume 그래프 그리기
   useEffect(()=>{
     // console.log(dataList[dataList.length-1]);
     // let dataList1=[]
@@ -1393,32 +1151,64 @@ const MeasurementPage = () =>{
     console.log(graphData2)
   },[graphData2])
 
+
+//-----------------------------------------------------------------------------------------------
+  // 확인창 
   const [confirmStat, setConfirmStat] = useState(false);
   let confirmFunc = (val)=>{
     if(val=="confirm"){
       setMeaStart(true);
     }
   }
+//-----------------------------------------------------------------------------------------------
+  // 확인창 
+  const [disconnectStat, setDisconnectStat] = useState(false);
+  let disconnectConfirmFunc = (val)=>{
+    if(val=="confirm"){
+      navigatorR("/setting");
+    }
+  }
+//-----------------------------------------------------------------------------------------------
+  // 게이지
+
+  //게이지 틱 ref
   let itemRef = useRef([]);
 
-  // const Item = styled.span`
-  // position: absolute;
-  // transform: rotate(calc(${props => (props.idx*6+"deg")}));
-  // inset: -16px;
-  // text-align: center;
-  // `
+  // 런타임 시간
+  const [runTime, setRunTime] = useState(0);
+  // 타이머 시작 여부
+  const [timerStart, setTimerStart] = useState(false);
+  // 틱 색 변화 인덱스
+  const [tickColorIdx, setTickColorIdx] = useState(0);
   
+  // 런타임 중 틱 인덱스 설정
+  useEffect(()=>{
+    if(runTime%timerTick == 0 && runTime != 0){
+      setTickColorIdx(tickColorIdx+1);
+    }
+  },[runTime])
+
+  // 틱 인덱스 설정 시 틱 색깔 설정
+  useEffect(()=>{
+    if(tickColorIdx > 0 && tickColorIdx <= 59){
+      console.log(tickColorIdx)
+      itemRef.current[tickColorIdx].classList += " tickColor"
+    }
+  },[tickColorIdx])
+
+//-----------------------------------------------------------------------------------------------
   
   return(
     <div className="result-page-container measurement-page-container">
       {confirmStat ? <Confirm content="검사를 시작하시겠습니까?" btn={true} onOff={setConfirmStat} select={confirmFunc}/> : null}
+      {disconnectStat ? <Confirm content={"연결된 Spirokit기기가 없습니다.\n설정 페이지로 이동해서 Spirokit을 연결해주세요."} btn={true} onOff={setDisconnectStat} select={disconnectConfirmFunc}/> : null}
       {readyAlert ? <Confirm content="준비 중입니다..." btn={false} onOff={setReadyAlert} select={confirmFunc}/> : null}
         <div className="measurement-page-nav" onClick={()=>{console.log()}}>
           <div className='measurement-page-backBtn' onClick={()=>{navigatorR(-1)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6"}} />
           </div>
           <p onClick={()=>{
-            
+            console.log(txCharRef.current);
           }}>검사</p>
         </div>
 
@@ -1489,14 +1279,14 @@ const MeasurementPage = () =>{
                 <div className='gauge-status'>
                   {
                     inFDone?
-                      timerReady ? 
-                      <p>타이머</p>
+                      timerReady ?
+                      <Timer setRunTime={setRunTime} runTime={runTime} start={timerStart} stop={stopTime}/>
                       :
                       sessionVol !== 0 ? 
                       <div className='gauge-status-content'>
                         <div>{gaugeContent.r11}/{gaugeContent.r12}</div>
                         <p>{gaugeContent.r2}</p>
-                      </div> 
+                      </div>
                       :
                       <p>준비</p>  
                     :
@@ -1506,16 +1296,21 @@ const MeasurementPage = () =>{
               </div>
           </div>
           <div className="measure-msg-container">
-            <div></div>
+            <div>
+              {/* <Timer setRunTime={setRunTime} runTime={runTime} start={timerStart} stop={stopTime}/> */}
+            </div>
             {
             meaPreStart?
-            <p className='measure-msg'>{"바람을 불어서 활성화해주세요"}</p>
+              meaStart? 
+              <p className='measure-msg'>{"편하게 호흡을 시작해주세요."}</p>
+              :
+              <p className='measure-msg'>{"바람을 불어서 활성화해주세요."}</p>
             :
               notifyDone?
               // <p className="measure-msg">준비중입니다...</p>
               null
               :
-              <p className='measure-msg'>{noneDevice==false?"검사버튼을 눌러주세요":"SpiroKit 연동이 필요합니다."}</p>
+              <p className='measure-msg'>{noneDevice==false?"SpiroKit 연동이 완료되었습니다.\nSpiroKit 동작버튼을 켜주시고, 마우스피스 입구에 살짝 입김을 불어 검사 시작 버튼을 활성화 해주세요.":"SpiroKit 연동이 필요합니다."}</p>
             }
           </div>
         </div>
@@ -1536,12 +1331,21 @@ const MeasurementPage = () =>{
           <div className="three-btn-container">
             <div onClick={()=>{
               // console.log({"nonDevice":noneDevice,"notifyStart":notifyStart,"notifyDone":notifyDone,"meaPreStart":meaPreStart, "blow":blow, "blowF":blowF, "meaStart":meaStart})
-              setMeaStart(false);
-              setVolumeFlowList([]);
-              setTimeVolumeList([]);
-            }}>버튼1</div>
+              setInF(-1);
+              setInFDone(false);
+              setVolumeFlowList([{x:0, y:0}]);
+              setTimeVolumeList([{x:0, y:0}]);
+              setCalDataList([calDataList[0]]);
+              setCalFlagTV(1);
+              setCalFlag(1);
+              setTimerReady(false);
+              setRunTime(0);
+              setMeasureDone(false);
+            }}>재검사</div>
             <div ref={secondBtnRef} onClick={()=>{
-              setBlowF(true);
+              if(!(secondBtnRef.current.classList.contains("disabled"))){
+                setBlowF(true);
+              }
             }}>검사시작</div>
             <div onClick={()=>{
               console.log(volumeFlowList, timeVolumeList);

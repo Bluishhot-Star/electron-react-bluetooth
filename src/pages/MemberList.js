@@ -247,12 +247,6 @@ const MemberList = ()=>{
           <p onClick={()=>{console.log(deviceInfo);
             // testIt()
           }}>환자 선택</p>
-          <span onClick={()=>{
-            navigator("./measureInfo", {state: chartNumber})
-          }}>dfff</span>
-          <span onClick={()=>{
-            // console.log(result)
-          }}>---jjkj</span>
           <div className='setting-btn-container' onClick={()=>{navigator("/setting")}}>
             <FontAwesomeIcon className='cogIcon' icon={faGear}/>
             <p className="setting-btn" >설정</p>
