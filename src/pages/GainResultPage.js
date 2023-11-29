@@ -5,7 +5,7 @@ import Alert from "../components/Alerts.js"
 import { Routes, Route, Link,useNavigate,useLocation } from 'react-router-dom'
 import {} from "@fortawesome/fontawesome-svg-core"
 import { FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import { debounce } from 'lodash'
+import { debounce, values } from 'lodash'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import {registerables,Chart as ChartJS,RadialLinearScale,LineElement,Tooltip,Legend,} from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
@@ -82,22 +82,6 @@ const GainResultPage = () =>{
     }
   },[])
 
-
-
-  // useEffect(()=>{
-    
-  // },[])
-  
-  // useEffect(()=>{
-  //   // console.log(chartRef.current);
-  //   // chartRef.current.maxHeight = window.innerHeight-60;
-  //   setWindowHeight(window.innerHeight-200);
-  // },[window.innerHeight])
-
-
-
-
-
   const [graphData, setGraphData] = useState({
     labels: ['Gain'],
     datasets: [{
@@ -111,29 +95,75 @@ const GainResultPage = () =>{
       tension: 0.4
     },]
   })
-
+  // const gainGraph = new ChartJS();
+  
   useEffect(()=>{
-    const maxData = graphData.datasets[0].data.map((v)=>{
-      return Math.abs(v.y)
-    })
-    let y = Math.max.apply(null,maxData)
-    // if(y < 9){
-    //   y = 9.00;
-    // }
-    // else if(y > Math.round(y)){
-    //   y = Math.round(y)+0.5;
+    if(chartRef.current){
+      const chart = chartRef.current.scales.y;
+      let maxM;
+      //max min
+      if(chart.max >= Math.abs(chart.min)){
+        maxM = chart.max;
+      }else{
+        maxM = Math.abs(chart.min);
+      }
+      console.log(maxM);
+      //tick
+      let tick;
+      const length = chart.ticks.length;
+      // console.log(chart.ticks[length-1].value)
+      if(chart.ticks[length-1].value >= Math.abs(chart.ticks[0].value)){
+        tick = chart.ticks[length-1].value
 
-    // }else{
-    //   console.log(y)
-    //   y = Math.round(y);
+      }else{
+        tick = Math.abs(chart.ticks[0].value)
+      }
       
-    // }
-    console.log(y)
-    setMaxMin(y);
-    
-  },[graphData])
+      console.log(maxM,tick)
+      setMaxMin(maxM >= tick ? maxM : tick);
+      // console.log(graphOption.scales.y);
+      if(!graphOption.scales.y.max){
+        setGraphOption({
+          ...graphOption,
+          scales:{
+            y:{
+              gridLines:{
+                zeroLineColor:'rgb(0, 0, 255)',
+              },
+              axios: 'y',
+              tickLength:9,
+              start:100,
+              min : tick >= maxM ? -tick : undefined,
+              max : tick >= maxM ? tick : undefined,
+              
+              ticks: {
+                major: true,
+                beginAtZero: true,
+                // sampleSize:9,
+                border:60,
+                stepSize : maxMin < 10.00 ? 1 : maxMin <= 24 ? 2.5 : 3,
+                // fontSize : 10,
+                textStrokeColor: 10,
+                precision: 1,
+              },
+              grid:{
+                tickLength:9,
+                color:'#bbdfe4',
+              }
 
-  const graphOption={
+            }
+          }
+
+        });
+      }
+        
+     
+
+    }
+  })
+
+
+  const [graphOption,setGraphOption]= useState({
     plugins:{
       legend: {
           display: false
@@ -199,7 +229,7 @@ const GainResultPage = () =>{
     //그래프 비율설정!!!!!!!
     aspectRatio: 0.6,
     animation:{
-      // duration:0
+      duration:1
     },
     maintainAspectRatio: false,
     interaction: false, 
@@ -233,16 +263,17 @@ const GainResultPage = () =>{
           zeroLineColor:'rgb(0, 0, 255)',
         },
         axios: 'y',
-
-        // grace:"5%",
         tickLength:9,
+        start:100,
+
         ticks: {
+
           major: true,
           beginAtZero: true,
           
           // sampleSize:9,
           border:60,
-          stepSize : maxMin < 10.00 ? 1 : maxMin < 25 ? 2.5 : 3,
+          stepSize : maxMin < 10.00 ? 1 : maxMin <= 25 ? 2.5 : 3,
           // fontSize : 10,
           textStrokeColor: 10,
           precision: 1,
@@ -253,7 +284,14 @@ const GainResultPage = () =>{
         }
       },
     },
-  }
+  })
+  useEffect(()=>{
+    if(chartRef.current){
+      console.log(graphOption.scales)
+
+    }
+  },[graphOption])
+
   useEffect(()=>{
     
     let dataList=[]
@@ -280,7 +318,7 @@ const GainResultPage = () =>{
     let time = setTimeout(() => {
       setTemp(true);
     },1000);
-    console.log(graphData)
+    
   },[graphData])
 
   return(

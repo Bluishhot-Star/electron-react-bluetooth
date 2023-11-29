@@ -165,11 +165,13 @@ const MeasurementPage = () =>{
       const result = [];
 
       let calibratedLps = 0;
-
+      console.log(useData)
         result.push(new FluidMetrics(0, 0, 0));
         for (let i = 1; i < useData.length; i++) {
             const previous = useData[i - 1];
             const current = useData[i];
+
+            
             const time = this.getTime(current);
             const lps = this.getCalibratedLPS(
                 calibratedLps,
@@ -472,6 +474,8 @@ const MeasurementPage = () =>{
     }
   },[flag, calDataList])
 
+
+  //여기가 문제일듯
   useEffect(()=>{
     if(flag.idx>0 && dataList[flag.idx]){
 
@@ -489,8 +493,9 @@ const MeasurementPage = () =>{
       // if(dataCalculateStrategyE.isExhale(preItem) !== dataCalculateStrategyE.isExhale(currItem)){
       //   TrawDataList.push(dataCalculateStrategyE.getZero(dataCalculateStrategyE.isExhale(currItem)));
       // }
-      TrawDataList.push(currItem);
-      setRawDataList(TrawDataList);
+      rawDataList.push(currItem);
+      console.log(rawDataList);
+      setRawDataList(rawDataList);
       setFlag({idx : flag.idx+1, rIdx: flag.rIdx+1})
       
       // console.log(123);
@@ -504,7 +509,7 @@ const MeasurementPage = () =>{
   const [cExhale, setCExhale] = useState();
   useEffect(()=>{
     let previous = rawDataList[rawDataList.length-2];
-    let current = rawDataList[rawDataList.length-1];
+    let current = [rawDataList.length-1];
     let time = dataCalculateStrategyE.getTime(current);
     let lps = dataCalculateStrategyE.getCalibratedLPS(calibratedLps, previous, current, inhaleCoefficient, exhaleCoefficient);
     let exhale = dataCalculateStrategyE.isExhale(current);
@@ -514,6 +519,7 @@ const MeasurementPage = () =>{
         setSessionCount(tempSesCnt); 
       }
     }
+    console.log(time);
     setCExhale(exhale);
     setCTime(time);
     setCalibratedLps(lps)
@@ -713,6 +719,7 @@ const MeasurementPage = () =>{
   //   TmpTimeVolumeList.push({x:x, y:y})
   //   setTimeVolumeList(TmpTimeVolumeList);
   // }
+  const [calFlagTV,setCalFlagTV] = useState(0);
   let setTVGraphData = (rawT, rawV, exhale)=>{
     let x, y;
     let preXY;
@@ -724,13 +731,19 @@ const MeasurementPage = () =>{
     }
     else{
       if (exhale !== calDataList[calFlag-1].exhale) prefix *= -1;
-      x = rawT+timeVolumeList[calFlag-1].x;
-      y = timeVolumeList[calFlag-1].y + (prefix * rawV)
+      x = rawT+timeVolumeList[calFlagTV-1].x;
+      y = timeVolumeList[calFlagTV-1].y + (prefix *rawV)
+    }
+    if(volumeFlowList[volumeFlowList.length-1].y < 0){
+      setTimeVolumeList([]);
+      setCalFlagTV(0);
+    }else{
+      timeVolumeList.push({x:x, y:y});
+
+      setTimeVolumeList(timeVolumeList);
+      setCalFlagTV(calFlagTV+1);
     }
 
-    timeVolumeList.push({x:x, y:y})
-
-    setTimeVolumeList(timeVolumeList)
   }
 
 
@@ -1311,7 +1324,7 @@ const MeasurementPage = () =>{
   }
 
   useEffect(()=>{
-
+    console.log(rawDataList)
     // let dataList1=[]
     // console.log(volumeFlowList);
     // volumeFlowList.forEach((item,index)=>{
@@ -1418,7 +1431,7 @@ const MeasurementPage = () =>{
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6"}} />
           </div>
           <p onClick={()=>{
-            
+            navigatorR('/setting')
           }}>검사</p>
         </div>
 
@@ -1545,6 +1558,7 @@ const MeasurementPage = () =>{
             }}>검사시작</div>
             <div onClick={()=>{
               console.log(volumeFlowList, timeVolumeList);
+
               // measurementEnd();
             }}>버튼3</div>
           </div>

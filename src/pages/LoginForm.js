@@ -103,7 +103,6 @@ const LoginForm = () =>{
         navigate('/memberList', {state: {device:undefined}});
       }).catch((err)=>{
         console.log(err);
-        window.location.replace('/');
       });
     }
   },[])
