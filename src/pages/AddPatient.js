@@ -7,6 +7,7 @@ import { Routes, Route, Link, useNavigate,useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 const AddPatient = ()=>{
+
   const [examinee,setExaminee] = useState({
     chartNumber: "",
     name: "",
@@ -264,12 +265,18 @@ const AddPatient = ()=>{
   const [addUpdate,setAddUpdate] = useState(false);
 
   useEffect(()=>{
+    console.log(location.state)
     if(location.state){
-      axios.get(`/subjects/${location.state.id}`,{
+      // setExaminee({...examinee,
+        
+      // })
+      
+      axios.get(`/subjects/${location.state.fvc.subject[0].value}`,{
         headers: {
           Authorization: `Bearer ${cookies.get('accessToken')}`
       }}).then((res)=>{
         const exData = res.data.response;
+        console.log(exData)
         setAddUpdate(location.state.update);
         //흡연 경혐
         if(exData.subjectDetails.smoking){
