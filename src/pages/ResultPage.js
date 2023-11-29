@@ -75,6 +75,7 @@ function ResultPage(){
   
   const updateData = ()=>{
     let patientDate = location.state;
+    console.log(location.state)
     patientDate['update'] = true;
     navigator('/memberList/addPatient', {state: patientDate})
   }

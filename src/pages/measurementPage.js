@@ -168,11 +168,13 @@ const MeasurementPage = () =>{
       const result = [];
 
       let calibratedLps = 0;
-
+      console.log(useData)
         result.push(new FluidMetrics(0, 0, 0));
         for (let i = 1; i < useData.length; i++) {
             const previous = useData[i - 1];
             const current = useData[i];
+
+            
             const time = this.getTime(current);
             const lps = this.getCalibratedLPS(
                 calibratedLps,
@@ -540,7 +542,7 @@ const MeasurementPage = () =>{
   const [cExhale, setCExhale] = useState();
   useEffect(()=>{
     let previous = rawDataList[rawDataList.length-2];
-    let current = rawDataList[rawDataList.length-1];
+    let current = [rawDataList.length-1];
     let time = dataCalculateStrategyE.getTime(current);
     let lps = dataCalculateStrategyE.getCalibratedLPS(calibratedLps, previous, current, inhaleCoefficient, exhaleCoefficient);
     let exhale = dataCalculateStrategyE.isExhale(current);
@@ -1067,7 +1069,7 @@ const MeasurementPage = () =>{
 
   // volumeFlow 그래프 그리기
   useEffect(()=>{
-
+    console.log(rawDataList)
     // let dataList1=[]
     // console.log(volumeFlowList);
     // volumeFlowList.forEach((item,index)=>{
@@ -1349,6 +1351,7 @@ const MeasurementPage = () =>{
             }}>검사시작</div>
             <div onClick={()=>{
               console.log(volumeFlowList, timeVolumeList);
+
               // measurementEnd();
             }}>버튼3</div>
           </div>
