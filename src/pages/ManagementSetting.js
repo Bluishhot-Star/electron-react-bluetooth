@@ -62,7 +62,7 @@ const ManagementSetting= () =>{
         <div className='backBtn' onClick={()=>{navigator(-1)}}>
           <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
         </div>
-        <p>유저 정보 변경</p>
+        <p>검사 설정</p>
       </div>
         <div className="respiration-container">
           

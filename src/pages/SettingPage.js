@@ -292,7 +292,7 @@ window.api.receive("connectedBLEDevice", (data)=>{
   return(
     <div className="setting-page-container">
         <div className="setting-page-nav" onClick={()=>{console.log()}}>
-          <div className='setting-page-backBtn' onClick={()=>{navigatorR(-1)}}>
+          <div className='setting-page-backBtn' onClick={()=>{navigatorR('/memberList')}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
           </div>
           <p onClick={()=>{

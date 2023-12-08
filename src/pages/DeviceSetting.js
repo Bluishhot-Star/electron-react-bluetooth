@@ -26,7 +26,7 @@ const DeviceSetting= () =>{
   const state = location.state;
 
   useEffect(()=>{
-    axios.get(`/devices?sort=serialNumber&order=desc`,{
+    axios.get(`/devices?sort=serialNumber&order=asc`,{
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }}).then((res)=>{

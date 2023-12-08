@@ -23,7 +23,7 @@ function itemDone(element) {
 // Called when message received from main process
 window.api.receive("BLEDeviceList", (data) => {
 
-  console.log(data);
+  
 
   let oldLength = BLEDevicesListarray.length;
   let diff = data.length - BLEDevicesListarray.length;
@@ -41,6 +41,7 @@ window.api.receive("BLEDeviceList", (data) => {
     item.className = "device-item";
 
     let deviceName = document.createElement("div");
+    console.log(deviceName)
     let deviceId = document.createElement("div");
     let deviceNameContents = document.createElement("p");
     let deviceIdContents = document.createElement("p");

@@ -830,11 +830,16 @@ const resetChart = () => {
 //-----------------------------------------------------------------------------------------------
   // 확인창 
   const [disconnectStat, setDisconnectStat] = useState(false);
+  const [confirm,setConfirm] = useState(true);
   let disconnectConfirmFunc = (val)=>{
+    
     if(val=="confirm"){
       navigatorR("/setting");
+    }else{
+      setConfirm(false);
     }
   }
+  useEffect(()=>{console.log(confirm)},[confirm])
 //-----------------------------------------------------------------------------------------------
 
 
@@ -945,6 +950,7 @@ useEffect(()=>{
       },
       resizeDelay:0,
       datalabels: false,
+
       annotation: {
         annotations: {
           box1: {
@@ -1003,10 +1009,11 @@ useEffect(()=>{
     responsive: true,
     //그래프 비율설정!!!!!!!
     aspectRatio: 0.6,
+    maintainAspectRatio: false,
+
     animation:{
       duration:0
     },
-    maintainAspectRatio: false,
     interaction: false, 
     elements: {
       point: {
@@ -1016,6 +1023,7 @@ useEffect(()=>{
     scales: {
       x: {
         axios: 'x',
+        tickLength:5,
         suggestedMax: 5.0,
         ticks:{
           autoSkip: false,
@@ -1181,7 +1189,7 @@ const [calivration,setCalivration] = useState({
 
   return(
     <div className="gain-measurement-page-container">
-      {disconnectStat ? <Confirm content={"연결된 Spirokit기기가 없습니다.\n설정 페이지로 이동해서 Spirokit을 연결해주세요."} btn={true} onOff={setDisconnectStat} select={disconnectConfirmFunc}/> : null}
+      {disconnectStat&&confirm ? <Confirm content={"연결된 Spirokit기기가 없습니다.\n설정 페이지로 이동해서 Spirokit을 연결해주세요."} btn={true} onOff={setDisconnectStat} select={disconnectConfirmFunc}/> : null}
       {readyAlert ? <Confirm content="준비 중입니다..." btn={false} onOff={setReadyAlert} select={confirmFunc}/> : null}
       <div className="gain-measurement-page-nav">
         <div className='gain-measurement-page-backBtn' onClick={()=>{navigatorR(-1)}}>
@@ -1191,121 +1199,123 @@ const [calivration,setCalivration] = useState({
 
         }}>보정</p>
       </div>
-      <div className='gain-measurement-m-page-container'>
-        <div className="gain-measurement-page-left-container" ref={graphConRef}>
-          {temp?<div className="title-y">Flow(l/s)</div>:<></>}
-          {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingG'>화면 조정 중..</p>}
-          {temp?<div className="title-x">Volume(L)</div>:<></>}
-        </div>
-
-        <div className="gain-measurement-page-right-container">
-          <div className='gain-measurement-gain-container'>
-            <div>
-              <p className='gain-measurement-title'>Gain</p>
-            </div>
-            <div className='gain-measurement-table-container'>
-              <div className='gain-measurement-table-Inhale'>
-                <p>Inhale</p>
-                <p>{calivration.gain.inhale? calivration.gain.inhale:'-'}</p>
-
-              </div>
-              <div className='gain-measurement-table-Exhale'>
-                <p>Exhale</p>
-                <p>{calivration.gain.exhale? calivration.gain.exhale:'-'}</p>
-              </div>
-            </div>           
-          </div>
-          <div className='gain-measurement-calivration-container'>
-            <div>
-              <p className='gain-measurement-title'>Before Calivration</p>
-            </div>
-
-            <div className='gain-measurement-calivration-table-container'>
-              <div className='gain-measurement-calivration-table-column'>
-                <p></p>
-                <p>Volume(L)</p>
-                <p>Error(%)</p>
-              </div>
-              <div className='gain-measurement-calivration-table-Inhale'>
-                <p>Inhale</p>
-                <p>{calivration.before.inhale.meas? calivration.before.inhale.meas:'-'}</p>
-                <p>{calivration.before.inhale.error? calivration.before.inhale.error:'-'}</p>
-              </div>
-              <div className='gain-measurement-calivration-table-Exhale'>
-                <p>Exhale</p>
-                <p>{calivration.before.exhale.meas? calivration.before.exhale.meas:'-'}</p>
-                <p>{calivration.before.exhale.error? calivration.before.exhale.error:'-'}</p>
-              </div>
-
-            </div>
-                    
-          </div>
-          <div className='gain-measurement-calivration-container'>
-            <div>
-              <p className='gain-measurement-title'>After Calivration</p>
-            </div>
-
-            <div className='gain-measurement-calivration-table-container'>
-              <div className='gain-measurement-calivration-table-column'>
-                <p></p>
-                <p>Volume(L)</p>
-                <p>Error(%)</p>
-              </div>
-              <div className='gain-measurement-calivration-table-Inhale'>
-                <p>Inhale</p>
-                <p>{calivration.after.inhale.meas? calivration.after.inhale.meas:'-'}</p>
-                <p>{calivration.after.inhale.error? calivration.after.inhale.error:'-'}</p>
-              </div>
-              <div className='gain-measurement-calivration-table-Exhale'>
-                <p>Exhale</p>
-                <p>{calivration.after.exhale.meas? calivration.after.exhale.meas:'-'}</p>
-                <p>{calivration.after.exhale.error? calivration.after.exhale.error:'-'}</p>
-              </div>
-
-            </div>
-                    
+      <div className='gain-measurement-page-graph-operation-container'>
+        <div className='gain-measurement-m-page-container'>
+          <div className="gain-measurement-page-left-container" ref={graphConRef}>
+            {temp?<div className="title-y"><p>Flow(l/s)</p></div>:<></>}
+            {temp?<div><Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/></div>:<p className='loadingG'>화면 조정 중..</p>}
+            {temp?<div className="title-x"><p>Volume(L)</p></div>:<></>}
           </div>
 
-        
-        </div>
-      </div>
+          <div className="gain-measurement-page-right-container">
+            <div className='gain-measurement-gain-container'>
+              <div>
+                <p className='gain-measurement-title'>Gain</p>
+              </div>
+              <div className='gain-measurement-table-container'>
+                <div className='gain-measurement-table-Inhale'>
+                  <p>Inhale</p>
+                  <p>{calivration.gain.inhale? calivration.gain.inhale:'-'}</p>
 
-      <div className='gain-measure-operation'>
-        <div ref={firstBtnRef} onClick={()=>{
-            
-            if(!(firstBtnRef.current.classList.contains("disabled"))){
-              setBlowF(true);
-            setMeaStart(true);
-            secondBtnRef.current.classList.remove("disabled");
-            thirdBtnRef.current.classList.remove("disabled");
-            firstBtnRef.current.classList += " disabled";
-            console.log(deviceInfo);
-            }
-          }}>
-            시작
-        </div>
-        <div ref={secondBtnRef} onClick={()=>{
-          if(!secondBtnRef.current.classList.contains("disabled")){
-            resetChart()
+                </div>
+                <div className='gain-measurement-table-Exhale'>
+                  <p>Exhale</p>
+                  <p>{calivration.gain.exhale? calivration.gain.exhale:'-'}</p>
+                </div>
+              </div>           
+            </div>
+            <div className='gain-measurement-calivration-container'>
+              <div>
+                <p className='gain-measurement-title'>Before Calivration</p>
+              </div>
 
-          }
-          }}>재측정</div>
-        <div ref={thirdBtnRef} onClick={()=>{
-          if(!thirdBtnRef.current.classList.contains("disabled")){
-            calivrationApply()
-            fourTBtnRef.current.classList.remove("disabled");
-            secondBtnRef.current.classList += " disabled";
-            thirdBtnRef.current.classList += " disabled";
-            fourTBtnRef.current.classList += " disabled";
-          }
+              <div className='gain-measurement-calivration-table-container'>
+                <div className='gain-measurement-calivration-table-column'>
+                  <p></p>
+                  <p>Volume(L)</p>
+                  <p>Error(%)</p>
+                </div>
+                <div className='gain-measurement-calivration-table-Inhale'>
+                  <p>Inhale</p>
+                  <p>{calivration.before.inhale.meas? calivration.before.inhale.meas:'-'}</p>
+                  <p>{calivration.before.inhale.error? calivration.before.inhale.error:'-'}</p>
+                </div>
+                <div className='gain-measurement-calivration-table-Exhale'>
+                  <p>Exhale</p>
+                  <p>{calivration.before.exhale.meas? calivration.before.exhale.meas:'-'}</p>
+                  <p>{calivration.before.exhale.error? calivration.before.exhale.error:'-'}</p>
+                </div>
+
+              </div>
+                      
+            </div>
+            <div className='gain-measurement-calivration-container'>
+              <div>
+                <p className='gain-measurement-title'>After Calivration</p>
+              </div>
+
+              <div className='gain-measurement-calivration-table-container'>
+                <div className='gain-measurement-calivration-table-column'>
+                  <p></p>
+                  <p>Volume(L)</p>
+                  <p>Error(%)</p>
+                </div>
+                <div className='gain-measurement-calivration-table-Inhale'>
+                  <p>Inhale</p>
+                  <p>{calivration.after.inhale.meas? calivration.after.inhale.meas:'-'}</p>
+                  <p>{calivration.after.inhale.error? calivration.after.inhale.error:'-'}</p>
+                </div>
+                <div className='gain-measurement-calivration-table-Exhale'>
+                  <p>Exhale</p>
+                  <p>{calivration.after.exhale.meas? calivration.after.exhale.meas:'-'}</p>
+                  <p>{calivration.after.exhale.error? calivration.after.exhale.error:'-'}</p>
+                </div>
+
+              </div>
+                      
+            </div>
+
           
-        }}>적용</div>
-        <div ref={fourTBtnRef} onClick={()=>{
-           resetChart()
-          calivrationDispos();
-          fourTBtnRef.current.classList += " disabled";
-        }}>폐기</div>
+          </div>
+        </div>
+
+        <div className='gain-measure-operation'>
+          <div ref={firstBtnRef} onClick={()=>{
+              
+              if(!(firstBtnRef.current.classList.contains("disabled"))){
+                setBlowF(true);
+              setMeaStart(true);
+              secondBtnRef.current.classList.remove("disabled");
+              thirdBtnRef.current.classList.remove("disabled");
+              firstBtnRef.current.classList += " disabled";
+              }
+            }}>
+              시작
+          </div>
+          <div ref={secondBtnRef} onClick={()=>{
+            if(!secondBtnRef.current.classList.contains("disabled")){
+              resetChart()
+
+            }
+            }}>재측정</div>
+          <div ref={thirdBtnRef} onClick={()=>{
+            if(!thirdBtnRef.current.classList.contains("disabled")){
+              calivrationApply()
+              fourTBtnRef.current.classList.remove("disabled");
+              secondBtnRef.current.classList += " disabled";
+              thirdBtnRef.current.classList += " disabled";
+              fourTBtnRef.current.classList += " disabled";
+            }
+            
+          }}>적용</div>
+          <div ref={fourTBtnRef} onClick={()=>{
+            resetChart()
+            calivrationDispos();
+            fourTBtnRef.current.classList += " disabled";
+          }}>폐기</div>
+        </div>
       </div>
+      
       
       
     </div>

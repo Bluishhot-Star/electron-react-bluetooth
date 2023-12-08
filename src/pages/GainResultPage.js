@@ -241,18 +241,17 @@ const GainResultPage = () =>{
     scales: {
       x: {
         axios: 'x',
-
-        suggestedMax: 6.0,
+        tickLength:5,
+        suggestedMax: 5.0,
         ticks:{
           autoSkip: false,
-          min: 0.00,
-          max: 15.00,
+          // min: 0.00,
+          // max: 15.00,
           // stepSize : 1.5,
           // sampleSize:9,
-
+          stepSize : 1.0,
           // precision : 0.1,
           beginAtZero: true,
-          max: 12.0,
         },
         grid:{
           color: '#bbdfe4'
@@ -329,88 +328,90 @@ const GainResultPage = () =>{
         </div>
         <p>보정 결과</p>
       </div>
-
-      <div className="gain-page-left-container" ref={graphConRef}>
-        {temp?<div className="title-y">Flow(l/s)</div>:<></>}
-        {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingG'>화면 조정 중..</p>}
-        {temp?<div className="title-x">Volume(L)</div>:<></>}
-      </div>
-
-      <div className="gain-page-right-container">
-        <div className='gain-date-container'>
-          <p className='gain-title'>Date</p> 
-          <p>{state.result.date}</p>
-        </div >
-
-        <div className='gain-environment-container'>
-          <div className='gain-environment-title'>
-            <p className='gain-title'> Environmont</p>
-          </div>
-          <div className='gain-table-container'>
-            <div className='gain-environment-table-Temperature'>
-              <p>Temperature</p>
-              <p>{state.result.temperature}</p>
-            </div>
-            <div className='gain-environment-table-Humidity'>
-              <p>Humidity</p> 
-              <p>{state.result.humidity}</p>
-            </div>
-            <div className='gain-environment-table-Pressure'>
-              <p>Pressure</p> 
-              <p>{state.result.pressure}</p>
-            </div>
-        
-          </div>
-
+      <div className='gain-page-left-right-container'>
+        <div className="gain-page-left-container" ref={graphConRef}>
+          {temp?<div className="title-y">Flow(l/s)</div>:<></>}
+          {temp?<div><Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/></div>:<p className='loadingG'>화면 조정 중..</p>}
+          {temp?<div className="title-x">Volume(L)</div>:<></>}
         </div>
 
-        <div className='gain-gain-container'>
-          <div>
-            <p className='gain-title'>Gain</p>
-          </div>
-          <div className='gain-table-container'>
-            <div className='gain-table-Inhale'>
-              <p>Inhale</p>
-              <p>{state.result.gain.inhale}</p>
-            </div>
-            <div className='gain-table-Exhale'>
-              <p>Exhale</p>
-              <p>{state.result.gain.exhale}</p>
-            </div>
+        <div className="gain-page-right-container">
+          <div className='gain-date-container'>
+            <p className='gain-title'>Date</p> 
+            <p>{state.result.date}</p>
+          </div >
 
-
-          </div>
+          <div className='gain-environment-container'>
+            <div className='gain-environment-title'>
+              <p className='gain-title'> Environmont</p>
+            </div>
+            <div className='gain-table-container'>
+              <div className='gain-environment-table-Temperature'>
+                <p>Temperature</p>
+                <p>{state.result.temperature}</p>
+              </div>
+              <div className='gain-environment-table-Humidity'>
+                <p>Humidity</p> 
+                <p>{state.result.humidity}</p>
+              </div>
+              <div className='gain-environment-table-Pressure'>
+                <p>Pressure</p> 
+                <p>{state.result.pressure}</p>
+              </div>
           
-        </div>
-
-        <div className='gain-calivration-container'>
-          <div>
-            <p className='gain-title'>Calivration</p>
-          </div>
-
-          <div className='gain-calivration-table-container'>
-            <div className='gain-calivration-table-column'>
-              <p></p>
-              <p>Volume(L)</p>
-              <p>Error(%)</p>
-            </div>
-            <div className='gain-calivration-table-Inhale'>
-              <p>Inhale</p>
-              <p>{state.result.inhale.meas} </p>
-              <p>{state.result.inhale.error} </p>
-            </div>
-            <div className='gain-calivration-table-Exhale'>
-              <p>Exhale</p>
-              <p>{state.result.exhale.meas} </p>
-              <p>{state.result.exhale.error} </p>
             </div>
 
           </div>
-                   
-        </div>
 
-      
+          <div className='gain-gain-container'>
+            <div>
+              <p className='gain-title'>Gain</p>
+            </div>
+            <div className='gain-table-container'>
+              <div className='gain-table-Inhale'>
+                <p>Inhale</p>
+                <p>{state.result.gain.inhale}</p>
+              </div>
+              <div className='gain-table-Exhale'>
+                <p>Exhale</p>
+                <p>{state.result.gain.exhale}</p>
+              </div>
+
+
+            </div>
+            
+          </div>
+
+          <div className='gain-calivration-container'>
+            <div>
+              <p className='gain-title'>Calivration</p>
+            </div>
+
+            <div className='gain-calivration-table-container'>
+              <div className='gain-calivration-table-column'>
+                <p></p>
+                <p>Volume(L)</p>
+                <p>Error(%)</p>
+              </div>
+              <div className='gain-calivration-table-Inhale'>
+                <p>Inhale</p>
+                <p>{state.result.inhale.meas} </p>
+                <p>{state.result.inhale.error} </p>
+              </div>
+              <div className='gain-calivration-table-Exhale'>
+                <p>Exhale</p>
+                <p>{state.result.exhale.meas} </p>
+                <p>{state.result.exhale.error} </p>
+              </div>
+
+            </div>
+                    
+          </div>
+
+        
+        </div>
       </div>
+      
     </div>
   );
 }
