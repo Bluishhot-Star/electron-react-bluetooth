@@ -9,6 +9,8 @@ import { FaBluetoothB } from "react-icons/fa6";
 import {} from "@fortawesome/fontawesome-svg-core"
 import { useDispatch, useSelector } from "react-redux"
 import { changeDeviceInfo, reset } from "./../deviceInfo.js"
+import { current } from '@reduxjs/toolkit';
+import SerialSetting from "../components/SerialSetting.js"
 
 const SettingPage = () =>{
   let dispatch = useDispatch()
@@ -38,6 +40,41 @@ const SettingPage = () =>{
       }
     );
   }
+  // 기기 없음 메세지
+  const [noneDevice, setNoneDevice] = useState(true);
+  useEffect(()=>{
+    if(deviceInfo.gatt){ //리스트에 있으면
+      setNoneDevice(false);
+      if(!deviceInfo.gatt.connected){ //연결여부
+        //디바이스 연결X
+        setNoneDevice(true);
+      }
+      else{
+        // 연결 O
+      }
+    }
+    else{ //기기없으면
+      setNoneDevice(true);
+    }
+  })
+  
+  // 블루투스 아이콘 ref
+  const blueIconRef = useRef();
+
+  // 기기 연결 확인 시 아이콘 변화
+  useEffect(() => {
+    if(!noneDevice){
+      blueIconRef.current.classList += " connect";
+    }
+    else{
+      if(blueIconRef.current.classList.contains("connect")){
+        blueIconRef.current.classList.remove("connect");
+      }
+      // console.log(blueIconRef.current);
+    }
+  }, [noneDevice])
+  
+
   // async function scanDevice(){
   //   const wait = (timeToDelay) => new Promise((resolve) => setTimeout(resolve, timeToDelay))
   //   const device = new navigator.bluetooth.requestDevice({
@@ -289,27 +326,40 @@ window.api.receive("connectedBLEDevice", (data)=>{
 //   connected(data.deviceName);
 // })
 
+
+
+  // 씨리얼넘버 설정창
+  const [serialSettingStat, setSerialSettingStat] = useState(false);
+  let serialFunc = (val)=>{
+    if(val=="confirm"){
+      // setMeaStart(true);
+    }
+  }
+
   return(
     <div className="setting-page-container">
+      {serialSettingStat ? <SerialSetting content="검사를 시작하시겠습니까?" btn={true} onOff={setSerialSettingStat} select={serialFunc}/> : null}
         <div className="setting-page-nav" onClick={()=>{console.log()}}>
           <div className='setting-page-backBtn' onClick={()=>{navigatorR(-1)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
           </div>
           <p onClick={()=>{
-            console.log(txCharRef.current)
+            // console.log(txCharRef.current)
+            console.log(deviceInfo);
+            // console.log(blueIconRef.current);
           }}>설정</p>
         </div>
 
         <div className="setting-page-left-container">
           <div className="setting-page-left-container-nav">
             <p onClick={()=>{getConnectedDevice()}}>디바이스 정보</p>
-            <div className="device-connect" onClick={()=>{
-              
-
-              console.log(deviceInfo)
-
-              }}>
-              <p>연결되지 않음</p>
+            <div ref={blueIconRef} className="device-connect">
+              {
+                noneDevice ?
+                  <p>연결되지 않음</p>
+                  :
+                  <p>연결됨</p>
+              }
               <FaBluetoothB/>
             </div>
           </div>
@@ -329,9 +379,16 @@ window.api.receive("connectedBLEDevice", (data)=>{
             </div>
             <div className="device-item-container">
                 <div className="device"></div>
-              {/* <div className="device-item">
-              </div> */}
-            </div>
+                {
+                  deviceInfo.id ?
+                  <div className="device-item" onClick={()=>{setSerialSettingStat(true)}}>
+                    <div>{deviceInfo.name}</div>
+                    <div>-</div>
+                    <div>-</div>
+                  </div>
+                  : null
+                }
+                </div>
           </div>
           <div className='device-scan-btn-container'>
             <div className='device-scan-btn' onClick={()=>{testIt()}}>

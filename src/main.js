@@ -83,35 +83,27 @@ function createWindow () {
           event.preventDefault(); // do not choose the first one
     
           if (deviceList && deviceList.length > 0) {  // find devices?
-            deviceList.forEach((element) => {    
+            deviceList.forEach((element) => {  
               if (!BLEDevicesWindow) {
-                console.log(32);
                 createBLEDevicesWindow(); // open new window to show devices
-              }     
-              if (
-                element.deviceName.includes("Spiro")&&
-                !element.deviceName.includes(                  // reduce noise by filter Devices without name
-                  "알 수 없거나 지원되지 않는 기기" // better use filter options in renderer.js
-                ) &&
-                !element.deviceName.includes("Unknown or Unsupported Device") // better use filter options in renderer.js
-              ) {
-                if (BLEDevicesList.length > 0) {  // BLEDevicesList not empty?
-                  if (
-                    BLEDevicesList.findIndex(     // element is not already in BLEDevicesList
-                      (object) => object.deviceId === element.deviceId
-                    ) === -1
-                  ) {
-                    BLEDevicesList.push(element);
-                    console.log(BLEDevicesList);
-                  }
-                } else {
-                  BLEDevicesList.push(element);
-                  console.log(BLEDevicesList);
-                }
               }
-              
+              if (element.deviceName.includes("Spiro")&&
+                !element.deviceName.includes("알 수 없거나 지원되지 않는 기기") &&
+                !element.deviceName.includes("Unknown or Unsupported Device")) 
+              {
+                if (BLEDevicesList.length > 0) {
+                  if (BLEDevicesList.findIndex((object) => object.deviceId === element.deviceId) === -1) {
+                    BLEDevicesList.push(element);
+                  }
+                } 
+                else {
+                  BLEDevicesList.push(element);
+                }
+                // console.log(BLEDevicesList,"HELL", deviceList);
+              }              
             });
           }
+          console.log("YO:",deviceList)
     
           callbackForBluetoothEvent = callback; // to make it accessible outside https://technoteshelp.com/electron-web-bluetooth-api-requestdevice-error/
         }
@@ -158,8 +150,6 @@ function createBLEDevicesWindow() {
     },
   });
   let current_win = BrowserWindow.getFocusedWindow();
-  const pos = current_win.getPosition();
-  console.log("Heello",pos)
   BLEDevicesWindow.setPosition(0,0);
   BLEDevicesWindow.setWindowButtonVisibility(true);
 
@@ -176,22 +166,28 @@ ipcMain.on("toMain", (event, args) => {
 });
 
 ipcMain.on("BLEScannFinished", (event, args) => {
-  console.log(args);
-  console.log(1);
-  console.log(BLEDevicesList.find((item) => item.deviceId === args));
-  let BLEDevicesChoosen = BLEDevicesList.find((item) => item.deviceId === args);
-  BLEDevicesWindow = null;
-  if (BLEDevicesChoosen) {
+  try {
+    console.log("ScanDone");
+    console.log(args); //MAC주소
+    console.log(1);
+    console.log(BLEDevicesList.find((item) => item.deviceId === args));
+    let BLEDevicesChoosen = BLEDevicesList.find((item) => item.deviceId === args);
     BLEDevicesWindow = null;
-    callbackForBluetoothEvent(BLEDevicesChoosen.deviceId);
-    connectedBLEDevice = BLEDevicesChoosen;
+    if (BLEDevicesChoosen) {
+      BLEDevicesWindow = null;
+      callbackForBluetoothEvent(BLEDevicesChoosen.deviceId);
+      connectedBLEDevice = BLEDevicesChoosen;
+    }
+    else {
+      BLEDevicesWindow = null;    
+      callbackForBluetoothEvent("");
+      console.log(2);
+    }
+    BLEDevicesList = [];  
+  } catch (error) {
+    console.log("Error:",error);
+    BLEDevicesList = [];
   }
-  else {
-    BLEDevicesWindow = null;    
-    callbackForBluetoothEvent("");
-    console.log(2);
-  }
-  BLEDevicesList = [];
 });
 
 ipcMain.on("getBLEDeviceList", (event, args) => {
