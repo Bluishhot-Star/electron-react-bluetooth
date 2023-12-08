@@ -10,7 +10,7 @@ const GainPage = () =>{
   const [gainInfo, setGainInfo] = useState({
     temperature : "",
 	  humidity : "",
-    atm:""
+    pressure:""
   });
   
   const chBtn = useRef();
@@ -18,7 +18,8 @@ const GainPage = () =>{
   let navigator = useNavigate();
   
   useEffect(()=>{
-    if(gainInfo.temperature !=="" && gainInfo.humidity !=="" && gainInfo.atm !== ""){
+    console.log(gainInfo)
+    if(gainInfo.temperature !=="" && gainInfo.humidity !=="" && gainInfo.pressure !== ""){
         chBtn.current.disabled =false;
     }else{
         chBtn.current.disabled = true;
@@ -26,7 +27,7 @@ const GainPage = () =>{
   },[gainInfo])
   
   const GainMeasurement = () =>{
-    console.log("aa")
+    console.log(gainInfo)
     navigator("./gainMeasurementPage",{state:gainInfo})
   }
   return(
@@ -43,8 +44,8 @@ const GainPage = () =>{
                 온도
               </label>
               <input
-                type="number" name='temperature'
-                onChange={(e)=>{setGainInfo({...gainInfo,temperature : e.target.value})}}
+                type="number" name='temperature'step="0.01"
+                onChange={(e)=>{setGainInfo({...gainInfo,temperature : parseFloat(e.target.value).toFixed(2).toString()})}}
               />
             </div>
 
@@ -53,17 +54,17 @@ const GainPage = () =>{
                 습도
               </label>
               <input
-                type="number"  name='humidity'
-                onChange={(e)=>{setGainInfo({...gainInfo,humidity:e.target.value})}}
+                type="number"  name='humidity'step="0.01"
+                onChange={(e)=>{setGainInfo({...gainInfo,humidity:parseFloat(e.target.value).toFixed(2).toString()})}}
               />
             </div>
           <div className='gain-field'>
-            <label htmlFor="atm">
+            <label htmlFor="pressure">
               기압
             </label>
             <input
-              type="numbe" name='atm'
-              onChange={(e)=>{setGainInfo({...gainInfo,atm:e.target.value})}}
+              type="numbe" name='pressure' step="0.01"
+              onChange={(e)=>{setGainInfo({...gainInfo,pressure:parseFloat(e.target.value).toFixed(2).toString()})}}
             />
           </div>
         <button ref={chBtn} className ='chBtn' onClick={GainMeasurement}>보정 하기</button>

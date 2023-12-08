@@ -24,6 +24,7 @@ import GainResultPage from './pages/GainResultPage.js';
 import ManagementSetting from './pages/ManagementSetting.js';
 import GainMeasurementPage from './pages/GainMeasurementPage.js';
 import GainPage from './pages/GainPage.js';
+import VerificationPage from './pages/VerificationPage.js';
 // Variable & State
 const author = "KASSID&HAI";
 
@@ -48,6 +49,7 @@ function App() {
         <Route path='/setting/managementSetting' element={<ManagementSetting/>}/>
         <Route path='/setting/gainPage' element={<GainPage/>}/>
         <Route path='/setting/gainPage/gainMeasurementPage' element={<GainMeasurementPage/>}/>
+        <Route path='/setting/verificationPage' element={<VerificationPage/>}/>
       </Routes>
     </div>
   );

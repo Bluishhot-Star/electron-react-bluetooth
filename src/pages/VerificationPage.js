@@ -4,16 +4,16 @@ import { Cookies, useCookies } from 'react-cookie';
 import Alert from "../components/Alerts.js"
 import { Routes, Route, Link,useNavigate,useLocation } from 'react-router-dom'
 import {} from "@fortawesome/fontawesome-svg-core"
-import { FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import Confirm from "../components/Confirm.js"
+import { FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import { debounce } from 'lodash'
 import { faChevronLeft, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons'
 import {registerables,Chart as ChartJS,RadialLinearScale,LineElement,Tooltip,Legend,} from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
 import annotationPlugin from 'chartjs-plugin-annotation';
-import { changeDeviceInfo, reset } from "./../deviceInfo.js"
+import { changeDeviceInfo, reset } from "../deviceInfo.js"
 import { useDispatch, useSelector } from "react-redux"
-const GainMeasurementPage = () =>{
+const VerificationPage = () =>{
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
   const cookie = new Cookies();
   const location = useLocation();
@@ -21,7 +21,6 @@ const GainMeasurementPage = () =>{
   let firstBtnRef = useRef();
   let secondBtnRef = useRef();
   let thirdBtnRef = useRef();
-  let fourTBtnRef = useRef();
   let graphConRef = useRef();
 
 
@@ -409,7 +408,6 @@ const GainMeasurementPage = () =>{
     firstBtnRef.current.classList += " disabled";
     secondBtnRef.current.classList += " disabled";
     thirdBtnRef.current.classList += " disabled";
-    fourTBtnRef.current.classList += " disabled";
    }
  },[meaPreStart])
 
@@ -568,54 +566,25 @@ const GainMeasurementPage = () =>{
 //------------------------------------------------------------------------------------------------
 //재검사
 const resetChart = () => {
+  setApply(false)
   const initialV = [2,2,2] 
   setDataList([initialV]);
-  setCalivration({
-    "gain": {
-            "exhale": "",
-            "inhale": ""
-        
-    },
-    "before": {
-        "exhale": {
-            "meas": "",
-            "error": ""
-        },
-        "inhale": {
-            "meas": "",
-            "error": ""
-        }
-        
-    },
-    "after": {
-        "exhale": {
-            "meas": "",
-            "error": ""
-        },
-        "inhale": {
-            "meas": "",
-            "error": ""
-        }
-
-    },
-    "graph": {
-        "time-volume": [
-            {
-                "x": 0.0,
-                "y": 0.0
-            }
-        ],
-        "volume-flow": [
-            {
-                "x": 0.0,
-                "y": 0.0
-            }
-        ],
-
-    },
-    
-    "calibrationId": ""
-})
+  setVerify({
+    "strength": "",
+    "pass": "",
+    "meas": "",
+    "error": "",
+    "flow": "",
+    "gain": ""
+  })
+  setPass({
+    "firstP":false,
+    "firstM":false,
+    "secondP":false,
+    "secondM":false,
+    "thirdP":false,
+    "thirdM":false
+  })
   setInF(-1);
   setInFDone(false);
   setVolumeFlowList([{x:0, y:0}]);
@@ -1134,133 +1103,186 @@ const [calivration,setCalivration] = useState({
 				
         "calibrationId": ""
 });
-  const calivrationApply = ()=>{
-    console.log()
-    let rDataList = [];
-    
-    rawDataList.map((num)=>rDataList.push(String(num).padStart(9, "0"))) 
-    axios.post(`/devices/000255/calibrations`, 
+//----------------------------------------------
+//보정검사
+  const [pass,setPass] = useState({
+    "firstP":false,
+    "firstM":false,
+    "secondP":false,
+    "secondM":false,
+    "thirdP":false,
+    "thirdM":false
+  });
+  const [verify,setVerify] = useState([])
+  const [apply,setApply] = useState(false);
+  const verification = ()=>{
+    axios.post(`/devices/000001/verify`, 
     {
-      temperature: state.temperature,
-      humidity: state.humidity,
-      pressure: state.pressure,
-      data:rDataList.join(' '),
+      data:dataList.slice(3,-1).join(' '),
     },{
       headers: {
         Authorization: `Bearer ${cookie.get('accessToken')}`
     }},
     {withCredentials : true})
     .then((res)=>{
-      console.log(res.data.response.calibrationId);
-      fourTBtnRef.current.classList.remove("disabled")
-      setCalivration(res.data.response);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
-  }
-  //----------------------------------------------
-  //캘리브레이션 폐기
-  const  calivrationDispos = ( )=>{
-    axios.delete(`/calibrations/${calivration.calibrationId}`, 
-    {
-      headers: {
-        Authorization: `Bearer ${cookie.get('accessToken')}`
-    }},
-    {withCredentials : true})
-    .then((res)=>{
       console.log(res.data.response);
+      // setCalivration(res.data.response);
+      // setVolumeFlowList(res.data.response.volumeFlow);
+      // let passList = new Object();
+      res.data.response.verify.map((value,index)=>{
+        if(value.strength === 'LOW'){
+          
+          if(Math.sign(value.flow) === -1){
+            console.log('low')
+            pass["firstM"] = value.pass;
+          }else{
+            console.log('low')
+            pass["firstP"] = value.pass;
+          }
+        }
+        else if(value.strength === 'MID'){
+          console.log('mid')
+          if(Math.sign(value.flow) === -1){
+            pass["secondM"] = value.pass;
+          }else{
+            pass["secondP"] = value.pass;
+          }
+        }else if(value.strength === 'HIGH'){
+          console.log('high')
+          if(Math.sign(value.flow) === -1){
+            pass["thirdM"] = value.pass;
+          }else{
+            pass["thirdP"] = value.pass;
+          }
+        }
+      })
+      setPass(pass);
+      setVerify(res.data.response.verify);
+      setApply(true);
+      console.log(pass);
+      
     })
     .catch((err)=>{
       console.log(err);
     })
   }
-  useEffect(()=>{console.log(state.temperature)},[])
-  // useEffect(()=>{console.log(JSON.stringfy(rawDataList))},[rawDataList])
-
+  
+  //----------------------------------------------
+  useEffect(()=>{
+    
+    if(!apply){
+      console.log(verify)
+      verify.map((value)=>{console.log(value)})
+    }
+  },[verify])
 
   return(
-    <div className="gain-measurement-page-container">
+    <div className="verify-measurement-page-container">
       {disconnectStat ? <Confirm content={"연결된 Spirokit기기가 없습니다.\n설정 페이지로 이동해서 Spirokit을 연결해주세요."} btn={true} onOff={setDisconnectStat} select={disconnectConfirmFunc}/> : null}
       {readyAlert ? <Confirm content="준비 중입니다..." btn={false} onOff={setReadyAlert} select={confirmFunc}/> : null}
-      <div className="gain-measurement-page-nav">
-        <div className='gain-measurement-page-backBtn' onClick={()=>{navigatorR(-1)}}>
+      <div className="verify-measurement-page-nav">
+        <div className='verify-measurement-page-backBtn' onClick={()=>{navigatorR(-1)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
         </div>
         <p onClick={()=>{
 
-        }}>보정</p>
+
+          console.log(verify.strength ? '-':pass.firstP? 'SUCCESS':'NORMAL')
+        }}>보정 결과</p>
       </div>
-      <div className='gain-measurement-m-page-container'>
-        <div className="gain-measurement-page-left-container" ref={graphConRef}>
-          {temp?<div className="title-y">Flow(l/s)</div>:<></>}
-          {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingG'>화면 조정 중..</p>}
-          {temp?<div className="title-x">Volume(L)</div>:<></>}
+      <div className='verify-measurement-m-page-container'>
+        <div className="verify-measurement-page-left-container" ref={graphConRef}>
+          <div className='verify-measure-graph'>
+            {temp?<div className="title-y">Flow(l/s)</div>:<></>}
+            {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingG'>화면 조정 중..</p>}
+            {temp?<div className="title-x">Volume(L)</div>:<></>}
+          </div>
+          <div className='verify-measure-operation'>
+            <div ref={firstBtnRef} onClick={()=>{
+                
+                if(!(firstBtnRef.current.classList.contains("disabled"))){
+                  setBlowF(true);
+                  setMeaStart(true); 
+                  secondBtnRef.current.classList.remove("disabled");
+                
+                  firstBtnRef.current.classList += " disabled";
+                  thirdBtnRef.current.classList.remove("disabled");
+                }
+                }}>
+                  시작
+            </div>
+            <div ref={secondBtnRef} onClick={()=>{
+              if(!secondBtnRef.current.classList.contains("disabled")){
+                resetChart()
+                
+              }
+              }}>재측정</div>
+            <div ref={thirdBtnRef} onClick={()=>{
+              verification()
+              // secondBtnRef.current.classList += " disabled";
+              // thirdBtnRef.current.classList += " disabled";
+            }}>분석</div>
+          </div>
+
         </div>
 
-        <div className="gain-measurement-page-right-container">
-          <div className='gain-measurement-gain-container'>
-            <div>
-              <p className='gain-measurement-title'>Gain</p>
-            </div>
-            <div className='gain-measurement-table-container'>
-              <div className='gain-measurement-table-Inhale'>
-                <p>Inhale</p>
-                <p>{calivration.gain.inhale? calivration.gain.inhale:'-'}</p>
+        
 
-              </div>
-              <div className='gain-measurement-table-Exhale'>
-                <p>Exhale</p>
-                <p>{calivration.gain.exhale? calivration.gain.exhale:'-'}</p>
-              </div>
-            </div>           
-          </div>
-          <div className='gain-measurement-calivration-container'>
+        <div className="verify-measurement-page-right-container">
+          
+          <div className='verify-measurement-flow-container'>
             <div>
-              <p className='gain-measurement-title'>Before Calivration</p>
+              <p className='verify-measurement-title'>Flow</p>
             </div>
 
-            <div className='gain-measurement-calivration-table-container'>
-              <div className='gain-measurement-calivration-table-column'>
+            <div className='verify-measurement-flow-table-container'>
+              <div className='verify-measurement-flow-table-column'>
                 <p></p>
-                <p>Volume(L)</p>
-                <p>Error(%)</p>
+                <p>Low(±0 ~ 0.6)</p>
+                <p>Mid(±0.6 ~ 1.4)</p>
+                <p>High(±4 ~ 8)</p>
               </div>
-              <div className='gain-measurement-calivration-table-Inhale'>
-                <p>Inhale</p>
-                <p>{calivration.before.inhale.meas? calivration.before.inhale.meas:'-'}</p>
-                <p>{calivration.before.inhale.error? calivration.before.inhale.error:'-'}</p>
+              <div className='verify-measurement-flow-table-Inhale'>
+                <p>Insp</p>
+                <p>{!apply||!pass.firstP ? '-':pass.firstP==='true'? 'SUCCESS':'NORMAL'}</p>
+                <p>{!apply||!pass.secondP ? '-':pass.secondP==='true'? 'SUCCESS':'NORMAL'}</p>
+                <p>{!apply||!pass.thirdP? '-':pass.thirdP==='true'? 'SUCCESS':'NORMAL'}</p>
               </div>
-              <div className='gain-measurement-calivration-table-Exhale'>
-                <p>Exhale</p>
-                <p>{calivration.before.exhale.meas? calivration.before.exhale.meas:'-'}</p>
-                <p>{calivration.before.exhale.error? calivration.before.exhale.error:'-'}</p>
+              <div className='verify-measurement-flow-table-Exhale'>
+                <p>Exp</p>
+                <p>{!apply||!pass.firstM ? '-':pass.firstM==='true'? 'SUCCESS':'NORMAL'}</p>
+                <p>{!apply||!pass.secondM ? '-':pass.secondM==='true'? 'SUCCESS':'NORMAL'}</p>
+                <p>{!apply||!pass.thirdM ? '-':pass.thirdM==='true'? 'SUCCESS':'NORMAL'}</p>
               </div>
 
             </div>
                     
           </div>
-          <div className='gain-measurement-calivration-container'>
-            <div>
-              <p className='gain-measurement-title'>After Calivration</p>
-            </div>
+          <div className='verify-measurement-calivration-container'>
 
-            <div className='gain-measurement-calivration-table-container'>
-              <div className='gain-measurement-calivration-table-column'>
-                <p></p>
+            <div className='verify-measurement-calivration-table-container'>
+              <div className='verify-measurement-calivration-table-column'>
                 <p>Volume(L)</p>
+                <p>Flow(L/s)</p>
                 <p>Error(%)</p>
               </div>
-              <div className='gain-measurement-calivration-table-Inhale'>
-                <p>Inhale</p>
-                <p>{calivration.after.inhale.meas? calivration.after.inhale.meas:'-'}</p>
-                <p>{calivration.after.inhale.error? calivration.after.inhale.error:'-'}</p>
-              </div>
-              <div className='gain-measurement-calivration-table-Exhale'>
-                <p>Exhale</p>
-                <p>{calivration.after.exhale.meas? calivration.after.exhale.meas:'-'}</p>
-                <p>{calivration.after.exhale.error? calivration.after.exhale.error:'-'}</p>
-              </div>
+              <div className='verify-measurement-calivration-table-value'>
+              
+                {!apply ? "":
+                  verify.map((value)=>{
+                    if(value.pass){
+                    return(
+                      <div>
+                        <p>Inhale</p>
+                        <p>{value.flow}</p>
+                        <p>{value.error}</p>
+                      </div>
+                    )}
+                  })
+                  
+                }
+                </div>
+  
 
             </div>
                     
@@ -1270,46 +1292,11 @@ const [calivration,setCalivration] = useState({
         </div>
       </div>
 
-      <div className='gain-measure-operation'>
-        <div ref={firstBtnRef} onClick={()=>{
-            
-            if(!(firstBtnRef.current.classList.contains("disabled"))){
-              setBlowF(true);
-            setMeaStart(true);
-            secondBtnRef.current.classList.remove("disabled");
-            thirdBtnRef.current.classList.remove("disabled");
-            firstBtnRef.current.classList += " disabled";
-            console.log(deviceInfo);
-            }
-          }}>
-            시작
-        </div>
-        <div ref={secondBtnRef} onClick={()=>{
-          if(!secondBtnRef.current.classList.contains("disabled")){
-            resetChart()
-
-          }
-          }}>재측정</div>
-        <div ref={thirdBtnRef} onClick={()=>{
-          if(!thirdBtnRef.current.classList.contains("disabled")){
-            calivrationApply()
-            fourTBtnRef.current.classList.remove("disabled");
-            secondBtnRef.current.classList += " disabled";
-            thirdBtnRef.current.classList += " disabled";
-            fourTBtnRef.current.classList += " disabled";
-          }
-          
-        }}>적용</div>
-        <div ref={fourTBtnRef} onClick={()=>{
-           resetChart()
-          calivrationDispos();
-          fourTBtnRef.current.classList += " disabled";
-        }}>폐기</div>
-      </div>
+      
       
       
     </div>
   );
 }
 
-export default GainMeasurementPage;
+export default VerificationPage;
