@@ -82,18 +82,18 @@ const MeasurementPage = () =>{
    // 세션 가이드 컨텐츠
   const [gaugeContent, setGaugeContent] = useState()
 
-  //흡기 선?
+   //흡기 선?
   const [inF, setInF] = useState(-1);
-  //세션 세팅 완료
+   //세션 세팅 완료
   const [inFDone, setInFDone] = useState(false);
 
-  // 첫 가이드 컨텐츠 세팅 후 전체 세션 진행 수 설정 (흡기 선 breath*2, 호기 breathC *2 -1)
+   // 첫 가이드 컨텐츠 세팅 후 전체 세션 진행 수 설정 (흡기 선 breath*2, 호기 breathC *2 -1)
   const [sessionVol, setSessionVol] = useState(0);
 
-  // 호/흡 세션 완료 후 timer로 전환 여부
+   // 호/흡 세션 완료 후 timer로 전환 여부
   const [timerReady, setTimerReady] = useState(false);
   
-  //첫 가이드 컨텐츠 세팅
+   //첫 가이드 컨텐츠 세팅
   useEffect(()=>{
     if(inF !== -1){
       if(inF && timerReady===false){//흡기 선
@@ -724,14 +724,6 @@ const MeasurementPage = () =>{
   // 검사 구독 함수
   async function testIt() {
     let options = {
-      // filters: [
-      //   { services: [xyz] },
-      //   { name: 'xyz' },       // only devices with ''
-      //   { namePrefix: 'xyz' }, // only devices starts with ''
-      // ],
-      // optionalServices: [
-      //   xyzServiceUuid,
-      // ],
       acceptAllDevices: true, // show all
       optionalServices: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e'],
     };
@@ -743,7 +735,7 @@ const MeasurementPage = () =>{
     
       // 수신 특성 가져오기
       const rxCharacteristic = await service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
-    
+      
       // 송신 특성 가져오기
       // const txCharacteristic = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
       txCharRef.current = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
@@ -1202,7 +1194,7 @@ const MeasurementPage = () =>{
 //-----------------------------------------------------------------------------------------------
   
   return(
-    <div className="result-page-container measurement-page-container">
+    <div className="measurement-page-container">
       {confirmStat ? <Confirm content="검사를 시작하시겠습니까?" btn={true} onOff={setConfirmStat} select={confirmFunc}/> : null}
       {disconnectStat ? <Confirm content={"연결된 Spirokit기기가 없습니다.\n설정 페이지로 이동해서 Spirokit을 연결해주세요."} btn={true} onOff={setDisconnectStat} select={disconnectConfirmFunc}/> : null}
       {readyAlert ? <Confirm content="준비 중입니다..." btn={false} onOff={setReadyAlert} select={confirmFunc}/> : null}
