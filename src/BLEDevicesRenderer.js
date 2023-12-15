@@ -1,11 +1,19 @@
 // Empty
 const BLEDevicesList = document.getElementById("DeviceList");
 const closeBtn = document.getElementById("closeModal");
-closeModal.addEventListener("click", ()=>{
+closeBtn.addEventListener("click", ()=>{
   // window.electronAPI.cancelBluetoothRequest()
   window.api.send("BLEScannFinished", "");
   window.close();
 });
+const closeButton = document.getElementsByClassName("close");
+for (let i = 0; i < closeButton.length; i++) {
+  closeButton[i].addEventListener("click", ()=>{
+    // window.electronAPI.cancelBluetoothRequest()
+    window.api.send("BLEScannFinished", "");
+    window.close();
+  });
+}
 let BLEDevicesListarray = [];
 
 // close windows if user does not choose a device

@@ -5,9 +5,9 @@ function Confirm(props){
     if(num === 0){ //확인
       props.select("confirm");
     }
-    // else if(num === 1){
-      
-    // }
+    else if(num === 1){
+      props.select("cancel");
+    }
     props.onOff(false);
   }
 

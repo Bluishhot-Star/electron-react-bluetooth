@@ -2102,6 +2102,7 @@
   height: 97vh;
   scrollbar-width: none;
   overflow: scroll;
+  padding: 10px;
 }
 .deviceList-body::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera*/
@@ -2171,6 +2172,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 .device-scan-btn{
   width: 100%;
@@ -2185,6 +2189,7 @@
 }
 .device-scan-btn p{
   margin: 0;
+  margin-right: 10px;
   font-size: min(2.5vh, 1rem);
   color: rgb(75, 117, 214);
   font-weight: bold;
@@ -2204,6 +2209,12 @@
   padding-left: 10px;
   cursor: pointer;
 }
+.setting-page-right-container>div.disabled{
+  background: #eee;
+  color: #aaa;
+  border: 1px solid #eee;
+  cursor: default;
+}
 .setting-page-right-container>div p{
   font-size: min(2.3vh, 1rem);
   font-weight: bold;
@@ -2221,7 +2232,23 @@
 .setting-page-right-container .log-out-btn p{
   color: rgb(255, 63, 63);
 }
-
+.connectDoneMsg{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #aaa;
+  font-weight: bold;
+}
+.device-scan-btn #loader{
+  height: 16px;
+	width: 16px;
+  border:solid 3px rgb(75, 117, 214);
+  border-radius: 50%;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+}
 
 
 /* 회원정보 변경 */
@@ -2829,7 +2856,7 @@
   width: 100%;
   height : 100%;
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 3fr 4fr;
   grid-template-rows: 40px 1fr;
   grid-column-gap: 10px;
 }
@@ -2856,10 +2883,35 @@
   align-items: center;
   cursor: pointer;
 }
+.measurement-page-nav .device-connect{
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  border-radius: 100vh;
+  cursor: pointer;
+  color: #ccc;
+  font-weight: bold;
+}
+.measurement-page-nav .device-connect p{
+  font-size: 0.7rem;
+}
+.measurement-page-nav .device-connect:active{
+  opacity: 0.3;
+}
+.measurement-page-nav .device-connect.connect{
+  color: rgb(75, 117, 214);
+  border: 1px solid rgb(75, 117, 214);
+
+}
 .measurement-page-left-container{
   width: 100%;
   border-radius: 5px;
-  border: #ccc 1px solid;
+  border:  rgb(75, 117, 214) 2px solid;
   display: grid;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr 1fr;
@@ -2908,10 +2960,44 @@
   display: grid;
   grid-template-rows: 10fr 40px 8fr;
 }
+.measurement-page-right-container .fvc-graph-container{
+  border: 1px solid #ccc;
+  grid-template-rows: 5fr 1fr;
+  border-radius: 5px;
+}
+.measurement-page-right-container .fvc-graph-container .graph{
+  border: none;
+}
+.measurement-page-right-container .fvc-graph-container .graph:first-child{
+  border-radius: 0;
+  border-right: 1px solid #ccc;
+  padding: 3vh 1vh;
+}
+.measurement-page-right-container .fvc-graph-container .graph:nth-child(2){
+  border-radius: 0 5px 5px 0;
+  border-left: 0;
+  padding: 3vh 1vh;
+  transform: translate(-2px,0);
+}
 .measurement-page-right-container .three-btn-container{
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+}
+.volume-bar{
+  border-top: 1px solid #ccc;
+  width: 100%;
+  height: 100%;
+  grid-column: -1/1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.volume-bar>div{
+  width: 95%;
+  height: 40%;
+  border-radius: 100vh;
+  border: 1px solid #ccc;
 }
 .three-btn-container>div{
   border: #000 1px solid;
@@ -3271,8 +3357,10 @@
 }
 
 .gauge-container{
-  width: 150px;
-  height: 150px;
+  width: 35vh;
+  height: 35vh;
+  /* width: 150px;
+  height: 150px; */
   /* background: #efefef; */
   border: 1px solid #afafaf;
   position: relative;
@@ -3283,13 +3371,13 @@
 }
 .gauge-container p{
   display: inline-block;
-  width: 3px;
-  height: 20px;
+  width: 0.75vh;
+  height: 5vh;
   background: #aaa;
 }
 .gauge-status p{
   all: unset;
-  font-size: 1.6rem;
+  font-size: 7vh;
 }
 .gauge-status-content{
   display: flex;
@@ -3297,10 +3385,10 @@
   align-items: center;
 }
 .gauge-status-content>p:first-child{
-  font-size: 1.2rem;
+  font-size: 6vh;
 }
 .gauge-status-content>p:nth-child(2){
-  font-size: 2rem;
+  font-size: 6.5vh;
 }
 .startColor > p{
   background: rgb(112, 171, 189);
@@ -3733,7 +3821,7 @@
 /* Timer */
 .timer-container{
   display: flex;
-  font-size: 1.6rem;
+  font-size: 6vh;
   align-items: end;
 }
 .timer-container p{
@@ -3741,14 +3829,14 @@
 }
 .timer-container .timer-second{
   display: block;
-  transform: translate(0, -2px);
+  transform: translate(0, -0.65vh);
 }
 
 .timer-container .timer-millisecond{
   display: block;
-  font-size: 1.3rem;
-  width: 13px;
-  transform: translate(2px, -2px);
+  font-size: 4.5vh;
+  width: 2.65vh;
+  transform: translate(0.5vh, -0.75vh);
 }
 
 /* 보정 정보 */
@@ -4276,6 +4364,112 @@
 .verify-measure-operation>div:active{
   opacity: 0.3;
 }
+
+
+
+/* SerialSetting */
+.serial-bg{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, .5);
+  z-index: 50;
+}
+.serial-container{
+  position: fixed;
+  left: 50%;
+  bottom: 50%;
+  width: 80vw;
+  height: 80vh;
+  min-width: 600px;
+  min-height: 400px;
+  max-width: 980px;
+  max-height: 650px;
+  border-radius: .7vw;
+  z-index: 1;
+  transform: translate(-50%, 50%);
+  background: #fff;
+  padding: 10px;
+  display: grid;
+  grid-template-rows: 1fr 50px 50px 50px;
+  align-items: center;
+}
+.serial-logo{
+  position: absolute;
+  top: 0;
+  left: 10px;
+  font-size: 1.2rem;
+  color: rgb(77, 174, 226);
+  font-weight: bold;
+}
+.serial-msg-container{
+  width: 100%;
+  padding: 10px;
+}
+.serial-msg-container div{
+  display: block;
+  white-space: pre-line;
+  word-break: keep-all;
+  line-height: 1.6rem;
+}
+.serial-Btn-container{
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 10px;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 10px;
+}
+
+.serial-Btn{
+  all: unset;
+  border: 1px solid #aaa;
+  color: #aaa;
+  border-radius: 5px;
+  text-align: center;
+  width: 100%;
+  margin-top: 10px;
+  height: 2rem;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: .8rem;
+  cursor: pointer;
+}
+.serial-Btn:active{
+  opacity: .3;
+}
+.serial-enter, .serial-enter:active, .serial-enter:focus{
+  border: 1px solid rgb(75, 117, 214);
+  color: rgb(75, 117, 214);
+} 
+.serial-cancel:active, .serial-cancel:focus{
+  border: 1px solid #333;
+}
+.serial-input-container{
+  width: 100%;
+  height: 100%;
+  /* padding: 10px; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.serial-input-container input{
+  all: unset;
+  display: block;
+  margin: 0 10px;
+  width: 100%;
+  height: 70%;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding-left: 15px;
+}
+.serial-input-container input:focus{
+  border: 1px solid rgb(34, 110, 177);
+}
+
 
 
 input::placeholder{
