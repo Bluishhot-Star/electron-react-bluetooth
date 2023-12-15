@@ -15,17 +15,17 @@ import SerialSetting from "../components/SerialSetting.js"
 const SettingPage = () =>{
   let dispatch = useDispatch()
   let deviceInfo = useSelector((state) => state.deviceInfo )
-  const cookies = new Cookies();
-  const [setCookie] = useCookies();
+  const cookiess = new Cookies();
+  const [cookies, setCookie] = useCookies();
   let navigatorR = useNavigate();
 
   const logOut = () => {
     axios.post(`/auth/sign-out`,{
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${cookiess.get('accessToken')}`
       }}).then((res)=>{
-        cookies.remove('refreshToken',{path : '/'});
-        cookies.remove('accessToken',{path : '/'});
+        cookiess.remove('refreshToken',{path : '/'});
+        cookiess.remove('accessToken',{path : '/'});
         window.location.replace('/');
       }).catch((err)=>{
         console.log(err);
@@ -40,6 +40,7 @@ const SettingPage = () =>{
       }
     );
   }
+
   // 기기 없음 메세지
   const [noneDevice, setNoneDevice] = useState(true);
   useEffect(()=>{
@@ -74,7 +75,6 @@ const SettingPage = () =>{
     }
   }, [noneDevice])
   
-
   // async function scanDevice(){
   //   const wait = (timeToDelay) => new Promise((resolve) => setTimeout(resolve, timeToDelay))
   //   const device = new navigator.bluetooth.requestDevice({
@@ -267,7 +267,7 @@ async function testIt() {
   
     // console.log('Connected to BLE device');
     
-    
+    setSerialSettingStat(true)
   }
   catch(error){
     console.log(error);
@@ -330,15 +330,25 @@ window.api.receive("connectedBLEDevice", (data)=>{
 
   // 씨리얼넘버 설정창
   const [serialSettingStat, setSerialSettingStat] = useState(false);
-  let serialFunc = (val)=>{
+  const [serialNum, setSerialNum] = useState("");
+  const [deviceSerialSetting, setDeviceSerialSetting] = useState(false);
+  let serialFunc = async (val, data)=>{
     if(val=="confirm"){
-      // setMeaStart(true);
+      setSerialNum(data);
+      await setCookie("serialNum", data,{secure:"true"});
+      setDeviceSerialSetting(true);
     }
   }
+  useEffect(()=>{
+    setSerialNum(cookiess.get('serialNum'))
+    if(deviceInfo.id){
+      setDeviceSerialSetting(true);
+    }
+  },[])
 
   return(
     <div className="setting-page-container">
-      {serialSettingStat ? <SerialSetting content="검사를 시작하시겠습니까?" btn={true} onOff={setSerialSettingStat} select={serialFunc}/> : null}
+      {serialSettingStat ? <SerialSetting content="검사를 시작하시겠습니까?" btn={true} onOff={setSerialSettingStat} select={serialFunc} serialNum={serialNum} setSerialNum={setSerialNum} /> : null}
         <div className="setting-page-nav" onClick={()=>{console.log()}}>
           <div className='setting-page-backBtn' onClick={()=>{navigatorR('/memberList')}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
@@ -381,19 +391,30 @@ window.api.receive("connectedBLEDevice", (data)=>{
                 <div className="device"></div>
                 {
                   deviceInfo.id ?
-                  <div className="device-item" onClick={()=>{setSerialSettingStat(true)}}>
-                    <div>{deviceInfo.name}</div>
-                    <div>-</div>
-                    <div>-</div>
-                  </div>
-                  : null
+                    deviceSerialSetting ? 
+                      <div className='connectDoneMsg'><p>{deviceInfo.name}이 연결되었습니다.</p></div>
+                    :
+                    <div className="device-item" onClick={()=>{}}>
+                      <div>{deviceInfo.name}</div>
+                      <div>-</div>
+                      <div>-</div>
+                    </div>
+                    : null
                 }
                 </div>
           </div>
           <div className='device-scan-btn-container'>
-            <div className='device-scan-btn' onClick={()=>{testIt()}}>
-              <p>스캔</p>
-            </div>
+            {
+              deviceSerialSetting ?
+                <div className='device-scan-btn' onClick={()=>{onDisconnected()}}>
+                  <p>연결끊기</p>
+                </div>
+              :
+                <div className='device-scan-btn' onClick={()=>{testIt()}}>
+                  <p>스캔</p>
+                </div>
+
+            }
           </div>
 
         </div>
@@ -402,8 +423,18 @@ window.api.receive("connectedBLEDevice", (data)=>{
           <div className="measure-setting-btn" onClick={()=>{navigatorR("./managementSetting")}}><p>검사 설정</p></div>
           <div className="clinic-manage-btn" onClick={()=>{navigatorR("./mngClncs")}}><p>의료진 관리</p></div>
           <div className="device-manage-btn" onClick={()=>{navigatorR("./deviceSetting")}}><p>디바이스 관리</p></div>
-          <div className="calibration-btn" onClick={()=>{navigatorR("./gainPage")}}><p>보정</p></div>
-          <div className="calibration-verification-btn" onClick={()=>{navigatorR("./verificationPage")}}><p>보정 검증</p></div>
+          {
+            deviceInfo.id ?
+              <>
+                <div className="calibration-btn" onClick={()=>{navigatorR("./gainPage")}}><p>보정</p></div>
+                <div className="calibration-verification-btn" onClick={()=>{navigatorR("./verificationPage")}}><p>보정 검증</p></div>
+              </>
+              :
+              <>
+                <div className="calibration-btn disabled"><p>보정</p></div>
+                <div className="calibration-verification-btn disabled"><p>보정 검증</p></div>
+              </>
+          }
           <div className="log-out-btn" onClick={logOut}><p>로그아웃</p></div>
         </div>
       </div>

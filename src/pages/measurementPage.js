@@ -27,6 +27,7 @@ const MeasurementPage = () =>{
   const [setCookie] = useCookies();
   let navigatorR = useNavigate();
   let dispatch = useDispatch();
+  let firstBtnRef = useRef();
   let secondBtnRef = useRef();
 
   // let dataResult = [];
@@ -152,7 +153,16 @@ const MeasurementPage = () =>{
       }, timerTick);
     }
   },[timerRunStat])
-  
+  let removeTick = ()=>{
+    for (let i = 1; i < 61; i++) {
+      if(itemRef.current[i].classList.contains("tickColor")){
+        itemRef.current[i].classList.remove("tickColor");
+      }
+      else{
+        return;
+      }
+    }
+  }
 
 
   class DataCalculateStrategyE {
@@ -404,8 +414,11 @@ const MeasurementPage = () =>{
       }
     }
     else{ //기기없으면
-      setNoneDevice(true);
-      setDisconnectStat(true);
+      if(!disconnectConfirm){
+        setNoneDevice(true);
+        setDisconnectStat(true);
+        setDisconnectConfirm(true);
+      }
     }
   })
   
@@ -442,6 +455,7 @@ const MeasurementPage = () =>{
       // setDataList([])
     }
     else{
+      firstBtnRef.current.classList += " disabled"
       secondBtnRef.current.classList += " disabled";
     }
   },[meaPreStart])
@@ -470,6 +484,7 @@ const MeasurementPage = () =>{
       if(dataList[dataList.length-1].slice(0,1) == "0"){
         //css 변화로 검사 활성화
         if(secondBtnRef.current.classList.contains("disabled")){
+          firstBtnRef.current.classList.remove("disabled");
           secondBtnRef.current.classList.remove("disabled");
         }
       }
@@ -518,9 +533,9 @@ const MeasurementPage = () =>{
       // 호 <-> 흡 바뀔 때 0 넣기 주석
       // let currItemR = data[data.length-1]; //방금 들어온 raw 데이터
       // let currItem = dataCalculateStrategyE.convert(currItemR); // 데이터 전처리 후
-      // if(dataCalculateStrategyE.isExhale(preItem) !== dataCalculateStrategyE.isExhale(currItem)){
-      //   TrawDataList.push(dataCalculateStrategyE.getZero(dataCalculateStrategyE.isExhale(currItem)));
-      // }
+      if(dataCalculateStrategyE.isExhale(preItem) !== dataCalculateStrategyE.isExhale(currItem)){
+        TrawDataList.push(dataCalculateStrategyE.getZero(dataCalculateStrategyE.isExhale(currItem)));
+      }
 
       TrawDataList.push(currItem);
       setRawDataList(TrawDataList);
@@ -876,14 +891,16 @@ const MeasurementPage = () =>{
         },
         axios: 'y',
         // min: -9,
+        suggestedMax: 0.6,
+        suggestedMin: -0.4,
         grace:"5%",
         ticks: {
           major: true,
           beginAtZero: true,
-          stepSize : 1,
+          stepSize : 0.2,
           fontSize : 10,
           textStrokeColor: 10,
-          precision: 1,
+          precision: 0,
         },
         grid:{
           color: function(context) {
@@ -1063,14 +1080,6 @@ const MeasurementPage = () =>{
   // volumeFlow 그래프 그리기
   useEffect(()=>{
     console.log(rawDataList)
-    // let dataList1=[]
-    // console.log(volumeFlowList);
-    // volumeFlowList.forEach((item,index)=>{
-    //   dataList1.push(item)
-
-      
-    // })
-    // console.log(dataList1)
     let data = {
       labels: '',
       datasets: [{
@@ -1112,17 +1121,6 @@ const MeasurementPage = () =>{
 
   // timeVolume 그래프 그리기
   useEffect(()=>{
-    // console.log(dataList[dataList.length-1]);
-    // let dataList1=[]
-    // if(dataList.length !==0 &&dataList[dataList.length-1].toString().substring(0,1) === '0'){
-    //   console.log(timeVolumeList);
-    //   timeVolumeList.forEach((item,index)=>{
-    //     dataList1.push(item)
-        
-    //   })
-    // }
-    
-    // console.log(timeVolumeList)
     let data = {
       labels: '',
       datasets: [{
@@ -1156,11 +1154,15 @@ const MeasurementPage = () =>{
     }
   }
 //-----------------------------------------------------------------------------------------------
-  // 확인창 
+  // 기기연결 확인창 
   const [disconnectStat, setDisconnectStat] = useState(false);
+  const [disconnectConfirm, setDisconnectConfirm] = useState(false);
   let disconnectConfirmFunc = (val)=>{
     if(val=="confirm"){
       navigatorR("/setting");
+    }
+    else if(val=="cancel"){
+      setDisconnectStat(false);
     }
   }
 //-----------------------------------------------------------------------------------------------
@@ -1190,6 +1192,27 @@ const MeasurementPage = () =>{
       itemRef.current[tickColorIdx].classList += " tickColor"
     }
   },[tickColorIdx])
+//-----------------------------------------------------------------------------------------------
+
+  // 블루투스 아이콘 ref
+  const blueIconRef = useRef();
+
+  // 기기 연결 확인 시 아이콘 변화
+  useEffect(() => {
+    if(!noneDevice){
+      blueIconRef.current.classList += " connect";
+    }
+    else{
+      if(blueIconRef.current.classList.contains("connect")){
+        blueIconRef.current.classList.remove("connect");
+      }
+      // console.log(blueIconRef.current);
+    }
+  }, [noneDevice])
+  
+
+
+
 
 //-----------------------------------------------------------------------------------------------
   
@@ -1206,6 +1229,15 @@ const MeasurementPage = () =>{
             console.log(txCharRef.current);
             console.log(location.state.info);
           }}>검사</p>
+          <div ref={blueIconRef} className="device-connect" onClick={()=>{navigatorR("/setting")}}>
+              {
+                noneDevice ?
+                  <p>연결되지 않음</p>
+                  :
+                  <p>연결됨</p>
+              }
+              <FaBluetoothB/>
+            </div>
         </div>
 
       
@@ -1322,21 +1354,29 @@ const MeasurementPage = () =>{
               {temp?<Scatter style={graphStyle} data={graphData2} options={graphOption2}/>:<p className='loadingG'>화면 조정 중..</p>}
               {temp?<div className="title-x">Time(s)</div>:<></>}
             </div>
+            <div className='volume-bar'>
+              <div></div>
+            </div>
           </div>
 
           <div className="three-btn-container">
-            <div onClick={()=>{
+            <div ref={firstBtnRef} onClick={()=>{
               // console.log({"nonDevice":noneDevice,"notifyStart":notifyStart,"notifyDone":notifyDone,"meaPreStart":meaPreStart, "blow":blow, "blowF":blowF, "meaStart":meaStart})
-              setInF(-1);
-              setInFDone(false);
-              setVolumeFlowList([{x:0, y:0}]);
-              setTimeVolumeList([{x:0, y:0}]);
-              setCalDataList([calDataList[0]]);
-              setCalFlagTV(1);
-              setCalFlag(1);
-              setTimerReady(false);
-              setRunTime(0);
-              setMeasureDone(false);
+              if(!(firstBtnRef.current.classList.contains("disabled"))){
+                setTimeout(() => {
+                  removeTick()
+                  setInF(-1);
+                  setInFDone(false);
+                  setVolumeFlowList([{x:0, y:0}]);
+                  setTimeVolumeList([{x:0, y:0}]);
+                  setCalDataList([calDataList[0]]);
+                  setCalFlagTV(1);
+                  setCalFlag(1);
+                  setTimerReady(false);
+                  setRunTime(0);
+                  setMeasureDone(false);
+                }, 500);
+              }
             }}>재검사</div>
             <div ref={secondBtnRef} onClick={()=>{
               if(!(secondBtnRef.current.classList.contains("disabled"))){
