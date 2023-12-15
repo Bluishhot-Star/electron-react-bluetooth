@@ -93,7 +93,7 @@ const MeasureInfo = ()=>{
                 <label htmlFor="">검사 종류</label>
                 <div className="radio-container">
                   <div className='radioBtn measure-radio' >
-                    <input ref={FVCTypeRef}  onClick={(e)=>{console.log(e.target.value        );type(e.target.value)}}
+                    <input ref={FVCTypeRef}  onClick={(e)=>{console.log(e.target.value);type(e.target.value)}}
                     value="FVC" type="radio" name="type" id="fvc"/>
                     <label htmlFor="fvc">FVC</label>
                   </div>

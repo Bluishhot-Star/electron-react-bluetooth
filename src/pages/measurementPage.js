@@ -22,12 +22,14 @@ import Timer from "../components/Timer.js"
 
 const MeasurementPage = () =>{
   let deviceInfo = useSelector((state) => state.deviceInfo ) 
+  let measureInfo = useSelector((state)=>state.info);
   const cookies = new Cookies();
   const [setCookie] = useCookies();
   let navigatorR = useNavigate();
   let dispatch = useDispatch();
   let firstBtnRef = useRef();
   let secondBtnRef = useRef();
+
   // let dataResult = [];
   
   // 노력성 호기 전 호흡 횟수 등 쿠키에서 받아오기
@@ -1225,6 +1227,7 @@ const MeasurementPage = () =>{
           </div>
           <p onClick={()=>{
             console.log(txCharRef.current);
+            console.log(location.state.info);
           }}>검사</p>
           <div ref={blueIconRef} className="device-connect" onClick={()=>{navigatorR("/setting")}}>
               {
@@ -1237,7 +1240,7 @@ const MeasurementPage = () =>{
             </div>
         </div>
 
-
+      
         <div className="measurement-page-left-container">
           <div className="measure-gauge-container">
               <div className="gauge-container">

@@ -158,14 +158,19 @@ function DetailPage(){
       const fev1Meas = parseFloat(preResult[1].meas);
       setPreFev1(preResult[1]);
       setPreFev1Per(preResult[2]);
-      const x = fvcMeas/fvcPred
-      const y = fev1Meas/fvcMeas
-      if(x < 0 || y < 0){
-        x = 0;
-        y = 0;
-      }else if(x > 1 || y > 1){
-        x = 1;
-        y = 1;
+      let x = fvcMeas/fvcPred
+      let y = fev1Meas/fvcMeas
+      if(y < 0){
+        y = 0.00;
+
+      }else if(y > 1) {
+        y = 1.00
+      }
+      if(x > 1){
+        x = 1.00;
+      }
+      else if(x < 0){
+        x = 0.00;
       }
       setQuadrant4XY({
           ...quadrant4XY,

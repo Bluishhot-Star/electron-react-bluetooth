@@ -44,7 +44,7 @@ const GainPage = () =>{
                 온도
               </label>
               <input
-                type="number" name='temperature'step="0.01"
+                type="number" name='temperature'step="0.01" placeholder='°C'
                 onChange={(e)=>{setGainInfo({...gainInfo,temperature : parseFloat(e.target.value).toFixed(2).toString()})}}
               />
             </div>
@@ -54,7 +54,7 @@ const GainPage = () =>{
                 습도
               </label>
               <input
-                type="number"  name='humidity'step="0.01"
+                type="number"  name='humidity'step="0.01" placeholder='%'
                 onChange={(e)=>{setGainInfo({...gainInfo,humidity:parseFloat(e.target.value).toFixed(2).toString()})}}
               />
             </div>
@@ -63,7 +63,7 @@ const GainPage = () =>{
               기압
             </label>
             <input
-              type="numbe" name='pressure' step="0.01"
+              type="numbe" name='pressure' step="0.01" placeholder='cmH2O'
               onChange={(e)=>{setGainInfo({...gainInfo,pressure:parseFloat(e.target.value).toFixed(2).toString()})}}
             />
           </div>

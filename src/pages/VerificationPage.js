@@ -13,6 +13,7 @@ import { Scatter } from 'react-chartjs-2';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { changeDeviceInfo, reset } from "../deviceInfo.js"
 import { useDispatch, useSelector } from "react-redux"
+import { useInView } from 'react-intersection-observer';
 const VerificationPage = () =>{
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
   const cookie = new Cookies();
@@ -22,7 +23,7 @@ const VerificationPage = () =>{
   let secondBtnRef = useRef();
   let thirdBtnRef = useRef();
   let graphConRef = useRef();
-
+  const [ref, inView] = useInView();
 
   let deviceInfo = useSelector((state) => state.deviceInfo ) 
   // const graphStyle = {width:"0" ,height:"0", transition:"none"}
@@ -426,7 +427,7 @@ const VerificationPage = () =>{
  },[alNotifyDone])
 
  useEffect(()=>{ 
-  console.log(dataList)
+  // console.log(dataList)
    if(dataList[0] == '2'){
      setNotifyDone(true);
    }
@@ -567,16 +568,7 @@ const VerificationPage = () =>{
 //재검사
 const resetChart = () => {
   setApply(false)
-  const initialV = [2,2,2] 
-  setDataList([initialV]);
-  setVerify({
-    "strength": "",
-    "pass": "",
-    "meas": "",
-    "error": "",
-    "flow": "",
-    "gain": ""
-  })
+  setVerify([])
   setPass({
     "firstP":false,
     "firstM":false,
@@ -585,6 +577,7 @@ const resetChart = () => {
     "thirdP":false,
     "thirdM":false
   })
+  setRawDataList([])
   setInF(-1);
   setInFDone(false);
   setVolumeFlowList([{x:0, y:0}]);
@@ -767,6 +760,7 @@ const resetChart = () => {
  let arrayToString = (temp)=>{
    let buffer = temp.buffer;
    let rawData = String.fromCharCode.apply(null, Array.from(new Uint8Array(buffer))).trim()
+   console.log('rawdata',rawData)
    dataList.push(rawData);
    setDataList([...dataList]);
    return String.fromCharCode.apply(null, Array.from(new Uint8Array(buffer))).trim()
@@ -799,11 +793,16 @@ const resetChart = () => {
 //-----------------------------------------------------------------------------------------------
   // 확인창 
   const [disconnectStat, setDisconnectStat] = useState(false);
+  const [confirm,setConfirm] = useState(true);
   let disconnectConfirmFunc = (val)=>{
+    
     if(val=="confirm"){
       navigatorR("/setting");
+    }else{
+      setConfirm(false);
     }
   }
+  useEffect(()=>{console.log(confirm)},[confirm])
 //-----------------------------------------------------------------------------------------------
 
 
@@ -985,12 +984,13 @@ useEffect(()=>{
     scales: {
       x: {
         axios: 'x',
+        tickLength:5,
+
         suggestedMax: 5.0,
         ticks:{
           autoSkip: false,
           // min: 0.00,
           // max: 15.00,
-
           stepSize : 1.0,
           // sampleSize:9,
 
@@ -998,7 +998,8 @@ useEffect(()=>{
           beginAtZero: true,
         },
         grid:{
-          color: '#bbdfe4'
+          color: '#bbdfe4',
+
         }
       },
       y: {
@@ -1113,12 +1114,22 @@ const [calivration,setCalivration] = useState({
     "thirdP":false,
     "thirdM":false
   });
-  const [verify,setVerify] = useState([])
+  const [verify,setVerify] = useState([]);
   const [apply,setApply] = useState(false);
+  const getGainVolume = (graph,flow) =>{
+    
+    return graph.find((element) => {
+      if(element.y.toFixed(3) === flow)  {
+        console.log(flow+",,,,"+element.y.toFixed(3))
+        return true;
+      }}).x.toFixed(3);
+  }
   const verification = ()=>{
+    let rDataList = [];
+    rawDataList.map((num)=>rDataList.push(String(num).padStart(9, "0"))) 
     axios.post(`/devices/000001/verify`, 
     {
-      data:dataList.slice(3,-1).join(' '),
+      data:rDataList.join(' '),
     },{
       headers: {
         Authorization: `Bearer ${cookie.get('accessToken')}`
@@ -1129,37 +1140,91 @@ const [calivration,setCalivration] = useState({
       // setCalivration(res.data.response);
       // setVolumeFlowList(res.data.response.volumeFlow);
       // let passList = new Object();
+      console.log(volumeFlowList);
+      let veri = [];
       res.data.response.verify.map((value,index)=>{
+        
         if(value.strength === 'LOW'){
           
           if(Math.sign(value.flow) === -1){
             console.log('low')
             pass["firstM"] = value.pass;
+            console.log(getGainVolume(res.data.response.graph.volumeFlow,value.flow))
+            veri = {
+              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+              flow : value.flow, 
+              error:value.error
+            }
+            verify.push(veri);
           }else{
             console.log('low')
             pass["firstP"] = value.pass;
+            veri = {
+              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+              flow : value.flow, 
+              error:value.error,
+              pass:value.pass
+            }
+            verify.push(veri);
+
           }
         }
         else if(value.strength === 'MID'){
           console.log('mid')
           if(Math.sign(value.flow) === -1){
             pass["secondM"] = value.pass;
+            veri = {
+              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+              flow : value.flow, 
+              error:value.error,
+              pass:value.pass
+            }
+            verify.push(veri);
+
           }else{
             pass["secondP"] = value.pass;
+            veri = {
+              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+              flow : value.flow, 
+              error:value.error,
+              pass:value.pass
+            }
+            verify.push(veri);
+
+
           }
         }else if(value.strength === 'HIGH'){
           console.log('high')
           if(Math.sign(value.flow) === -1){
             pass["thirdM"] = value.pass;
+            veri = {
+              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+              flow : value.flow, 
+              error:value.error,
+              pass:value.pass
+            }
+            console.log(veri)
+            verify.push(veri);
+
+
           }else{
             pass["thirdP"] = value.pass;
+            veri = {
+              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+              flow : value.flow, 
+              error:value.error,
+              pass:value.pass
+            }
+            verify.push(veri);
+
           }
         }
       })
+
       setPass(pass);
-      setVerify(res.data.response.verify);
       setApply(true);
       console.log(pass);
+      setVerify(verify);
       
     })
     .catch((err)=>{
@@ -1178,7 +1243,7 @@ const [calivration,setCalivration] = useState({
 
   return(
     <div className="verify-measurement-page-container">
-      {disconnectStat ? <Confirm content={"연결된 Spirokit기기가 없습니다.\n설정 페이지로 이동해서 Spirokit을 연결해주세요."} btn={true} onOff={setDisconnectStat} select={disconnectConfirmFunc}/> : null}
+      {disconnectStat&&confirm ? <Confirm content={"연결된 Spirokit기기가 없습니다.\n설정 페이지로 이동해서 Spirokit을 연결해주세요."} btn={true} onOff={setDisconnectStat} select={disconnectConfirmFunc}/> : null}
       {readyAlert ? <Confirm content="준비 중입니다..." btn={false} onOff={setReadyAlert} select={confirmFunc}/> : null}
       <div className="verify-measurement-page-nav">
         <div className='verify-measurement-page-backBtn' onClick={()=>{navigatorR(-1)}}>
@@ -1186,25 +1251,25 @@ const [calivration,setCalivration] = useState({
         </div>
         <p onClick={()=>{
 
+          console.log(deviceInfo);
 
-          console.log(verify.strength ? '-':pass.firstP? 'SUCCESS':'NORMAL')
         }}>보정 결과</p>
       </div>
       <div className='verify-measurement-m-page-container'>
         <div className="verify-measurement-page-left-container" ref={graphConRef}>
           <div className='verify-measure-graph'>
-            {temp?<div className="title-y">Flow(l/s)</div>:<></>}
-            {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingG'>화면 조정 중..</p>}
-            {temp?<div className="title-x">Volume(L)</div>:<></>}
+            {temp?<div className="title-y"><p>Flow(l/s)</p></div>:<></>}
+            {temp?<div><Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/></div>:<p className='loadingG'>화면 조정 중..</p>}
+            {temp?<div className="title-x"><p>Volume(L)</p></div>:<></>}
           </div>
           <div className='verify-measure-operation'>
             <div ref={firstBtnRef} onClick={()=>{
                 
                 if(!(firstBtnRef.current.classList.contains("disabled"))){
+                  resetChart()
                   setBlowF(true);
                   setMeaStart(true); 
                   secondBtnRef.current.classList.remove("disabled");
-                
                   firstBtnRef.current.classList += " disabled";
                   thirdBtnRef.current.classList.remove("disabled");
                 }
@@ -1218,9 +1283,12 @@ const [calivration,setCalivration] = useState({
               }
               }}>재측정</div>
             <div ref={thirdBtnRef} onClick={()=>{
-              verification()
-              // secondBtnRef.current.classList += " disabled";
-              // thirdBtnRef.current.classList += " disabled";
+              if(!thirdBtnRef.current.classList.contains("disabled")){
+                verification()
+                firstBtnRef.current.classList.remove("disabled");
+                thirdBtnRef.current.classList += " disabled";
+                secondBtnRef.current.classList += " disabled";
+              }
             }}>분석</div>
           </div>
 
@@ -1270,19 +1338,19 @@ const [calivration,setCalivration] = useState({
               
                 {!apply ? "":
                   verify.map((value)=>{
-                    if(value.pass){
                     return(
                       <div>
-                        <p>Inhale</p>
+                        <p>{value.volume}</p>
                         <p>{value.flow}</p>
                         <p>{value.error}</p>
                       </div>
-                    )}
+                    )
                   })
                   
                 }
+                <div className='patient-loading' ref={ref}></div>
+
                 </div>
-  
 
             </div>
                     

@@ -79,7 +79,7 @@ const MngClncs = () =>{
         <p onClick={()=>{console.log(cliniciansMngRef.current[0].children[0])}} >의료진 관리</p>
       </div>
       <div className="manage-clinics-body-container">
-        <div>매니저 검색</div>
+        <div>의료진 검색</div>
         <div className="search-patient-container">
           <FontAwesomeIcon className='searchIcon' icon={faSearch} style={{color: "#4b75d6",}} />
           <form 
