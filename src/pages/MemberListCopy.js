@@ -10,8 +10,8 @@ import { faChevronLeft,faGear, faCog, faSearch, faCalendar, faChevronRight } fro
 import DateSelector from './DateSelector.js'
 import { useInView } from 'react-intersection-observer';
 import { useDispatch, useSelector } from "react-redux"
-import { changeDeviceInfo } from "./../deviceInfo.js"
-const MemberList = ()=>{
+import { changeDeviceInfo } from "../deviceInfo.js"
+const MemberListCopy = ()=>{
   let deviceInfo = useSelector((state) => state.deviceInfo ) 
   const [examinees, setExaminees] = useState([]);
   const [date, setDate] = useState([]);
@@ -66,21 +66,19 @@ const MemberList = ()=>{
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
     }).then((res)=>{
-      setDate(res.data.response);
-      setChartNumber(chartNumber);
+      // setDate(res.data.response[0]);
+      // setChartNumber(chartNumber);
+      report(res.data.response,chartNumber);
     }).catch((err)=>{
       console.log(err);
     })
   }
-  useEffect(()=>{
-    
-  },[])
   const [goTO, setGoTO] = useState(false)
   // let data1, data2;
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
-  const report = async(date)=>{
-    await axios.get(`/subjects/${chartNumber}/types/fvc/results/${date}` , {
+  const report = async(date,chartNum)=>{
+    await axios.get(`/subjects/${chartNum}/types/fvc/results/${date[0]}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
@@ -92,7 +90,17 @@ const MemberList = ()=>{
     }).catch((err)=>{
       console.log(err);
     })
-    await axios.get(`/subjects/${chartNumber}/types/svc/results/${date}` , {
+    await axios.get(`/subjects/${chartNum}/histories`
+     , {
+      headers: {
+        Authorization: `Bearer ${cookies.get('accessToken')}`
+    }}).then((res)=>{
+      console.log(res.data.response);
+      setDate(res.data.response);
+    }).catch((err)=>{
+      console.log(err);
+    })
+    await axios.get(`/subjects/${chartNum}/types/svc/results/${date[0]}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
@@ -105,6 +113,8 @@ const MemberList = ()=>{
     }).catch((err)=>{
       console.log(err);
     })
+    
+
     setGoTO(true);
     // let time = setTimeout(()=>{
     //   setGoTO(true);
@@ -114,7 +124,8 @@ const MemberList = ()=>{
     if(goTO){
       console.log(data1);
       console.log(data2);
-      navigator('/memberList/resultPage', {state: {fvc:data1, svc:data2, date:date, birth:birth}});
+      console.log(date)
+      navigator('./resultPage', {state: {fvc:data1, svc:data2, date:date, birth:birth}});
     }
     else{}
   },[goTO])
@@ -160,7 +171,7 @@ const MemberList = ()=>{
 
   useEffect(()=>{
     console.log(date)
-  })
+  },[])
   const dateSelect = (select) =>{
       console.log(select);
       setInspectionDate(select);
@@ -208,15 +219,12 @@ const MemberList = ()=>{
   // },);
   const [searchVal, setSearchVal] = useState("")
   // useEffect(()=>{console.log(searchVal)},[searchVal])
-  const MemberList = useCallback(async () => {
+  const MemberListCopy = useCallback(async () => {
     setLoading(true)
     axios.get(`/subjects?page=${page}&size=10&name=${searchVal}`,{
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }}).then((res)=>{
-        console.log(res);
-        console.log(res.data.response.clinicians);
-        console.log(res.data.subCode);
         if(res.data.subCode !== 2004){
           setExaminees([...examinees, ...res.data.response.subjects]);
           setPage((page) => page + 1);
@@ -225,10 +233,10 @@ const MemberList = ()=>{
         console.log(err);
       });
     setLoading(false)
-  },[page])
+  },[page,searchVal])
 
   useEffect(()=>{
-    MemberList()
+    MemberListCopy()
   },[examinees])
 
   // useEffect(() => {
@@ -242,107 +250,75 @@ const MemberList = ()=>{
 
 
   return (
-      <div className="memberList-page-container">
+      <div className="memberList-page-containerC">
         {dateSelectorStat ? <DateSelector data={inspectionDate} onOff={setDateSelectorStat} select={dateSelect}/> : null}
-        <div className="memberList-page-nav">
+        <div className="memberList-page-navC">
           <p onClick={()=>{console.log(deviceInfo);
             // testIt()
             navigator('/memberlistcopy');
-
           }}>환자 선택</p>
-          <div className='setting-btn-container' onClick={()=>{navigator("/setting")}}>
-            <FontAwesomeIcon className='cogIcon' icon={faGear}/>
-            <p className="setting-btn" >설정</p>
+          <div className='setting-btn-containerC' onClick={()=>{navigator("/setting")}}>
+            <FontAwesomeIcon className='cogIconC' icon={faGear}/>
+            <p className="setting-btnC" >설정</p>
           </div>
         </div>
-        <div className="memberList-page-left-container">
-          <div className="patient-list-container">
-            <div className="add-patient-btn-container">
-              <div className="add-patient-btn" onClick={()=>{navigator("./addPatient", {state: {update:false}})}}>
+        <div className="memberList-page-left-containerC">
+          <div className="patient-list-containerC">
+            <div className="add-patient-btn-containerC">
+              <div className="add-patient-btnC" onClick={()=>{navigator("./addPatientCopy", {state: {update:false}})}}>
                 + 환자 추가
               </div>
             </div>
-            <div className="search-patient-container">
-              <FontAwesomeIcon className='searchIcon' icon={faSearch} style={{color: "#4b75d6",}} />
+            <div className="search-patient-containerC">
+              <FontAwesomeIcon className='searchIconC' icon={faSearch} style={{color: "#4b75d6",}} />
               <form 
                 onSubmit={(e)=>{
                 e.preventDefault(); // 전체 리렌더링 방지
                 setExaminees([]);
-                MemberList();
+                MemberListCopy();
                 setPage(1)}}>
-              <input type="text" placeholder='환자 이름을 입력해주세요.'
-                onChange={(e)=>{setSearchVal(e.target.value);}}/>
+              <input type="text" placeholder='찾고자 하는 환자의 이름 또는 차트넘버를 입력해주세요.'
+                onChange={(e)=>{setSearchVal(e.target.value); }}/>
               </form>
             </div>
-            <div className="patient-list">
-              <div className="patient-list-column">
-                <div className="patient-list-column-name">차트넘버</div>
-                <div className="patient-list-column-name">환자 이름</div>
-                <div className="patient-list-column-name">성별</div>
-                <div className="patient-list-column-name">생년월일</div>
+            <div className="patient-listC">
+              <div className="patient-list-columnC">
+                <div className="patient-list-column-nameC">차트넘버</div>
+                <div className="patient-list-column-nameC">환자 이름</div>
+                <div className="patient-list-column-nameC">성별</div>
+                <div className="patient-list-column-nameC">생년월일</div>
+                <div className="patient-list-column-nameC"></div>
+                <div className="patient-list-column-nameC"></div>
               </div>
-              <div className="patient-item-container">
+              <div className="patient-item-containerC">
                 {
                   examinees.map((item, index)=>{
                     return(
-                    <div id={"memberItem"+index} className="patient-item" key={item.chartNumber} onClick={(e)=>{click(index,item.chartNumber,item.birthday);}}>
-                      <div className="patient-item-chartNumber"><p>{item.chartNumber}</p></div>
-                      <div className="patient-item-name"><p>{item.name}</p></div>
-                      <div className="patient-item-gender"><p>{item.gender == "m" ? "남자" : "여자"}</p></div>
-                      <div className="patient-item-birthday"><p>{item.birthday}</p></div>
+                    <div id={"memberItem"+index} className="patient-itemC" key={item.chartNumber} onClick={(e)=>{click(index,item.chartNumber,item.birthday);}}>
+                      <div className="patient-item-chartNumberC"><p>{item.chartNumber}</p></div>
+                      <div className="patient-item-nameC"><p>{item.name}</p></div>
+                      <div className="patient-item-genderC"><p>{item.gender == "m" ? "남자" : "여자"}</p></div>
+                      <div className="patient-item-birthdayC"><p>{item.birthday}</p></div>
+                      <div className="btn">
+                        <input type='button' id='measurmentBtn' className='measurmentBtn'onClick={()=>{navigator("./addPatientCopy", {state: {chartNumber:item.chartNumber,update:true}})}}/>
+                        <label htmlFor='measurmentBtn'>검사하기</label>
+                      </div>
+                      <div className="btn">
+                        <input type='button' id='resultBtn' className='resultBtn' onChange={(e)=>{click(index,item.chartNumber,item.birthday);}}/>
+                        <label htmlFor='resultBtn'>결과보기</label>
+                      </div>
                     </div>
                     )
                   })
                   //아래 요소가 마지막(무한로딩 트리거)
                 }
-                <div className='patient-loading' ref={ref}></div>
+                <div className='patient-loadingC' ref={ref}></div>
               </div>
             </div>
           </div>
         </div>
-        <div className="memberList-page-right-container">
-          {
-            curtainStat ?  <div className="curtain"><p>환자를 먼저 선택해주세요.</p></div> : null
-          }
-          <div className="patient-personal-container">
-            <div className="measure-btn-container">
-              <div onClick={()=>{navigator("./measureInfo", {state: chartNumber})}} className="measure-btn">검사하기</div>
-            </div>
-            <div className="measure-date-container">
-              <div className="measure-selected-date-container">
-                <div>검사 이력</div>
-                <div className='measure-selected-date'>
-                  <div className="measure-selected-date-start">{inspectionDate.start ? inspectionDate.start : "0000-00-00"}</div>
-                  <div>~</div>
-                  <div className="measure-selected-date-end">{inspectionDate.end ? inspectionDate.end : "0000-00-00"}</div>
-                </div>
-              </div>
-              <div className="measure-select-date-btn-container" onClick={()=>{
-                  setDateSelectorStat(!dateSelectorStat)
-                }}>
-              <FontAwesomeIcon className='calenderIcon' icon={faCalendar} style={{color: "#4b75d6",}} />
-                <div className="measure-select-date-btn">기간선택</div>
-              </div>
-            </div>
-            <div className="measure-list">
-              <div className="measure-item-container">
-                {date.map((item, index)=>(
-                  // <Link key={item} to={`/ss/${examinee}/${item}`}>
-                  <div key={item} className="measure-item" onClick={()=>{report(item);}}>
-                    <div>검사일시</div>
-                    <div className='measure-item-date'>{item}</div>
-                    <div className="measure-item-right-chevron">
-                      <FontAwesomeIcon icon={faChevronRight} style={{color: "#4b75d6",}} />
-                    </div>
-                  </div>
-                ))}
-                
-              </div>
-            </div>
-          
-          </div>
-        </div>
+        
       </div>
   );
 }
-export default MemberList;
+export default MemberListCopy;

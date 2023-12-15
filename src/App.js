@@ -25,6 +25,9 @@ import ManagementSetting from './pages/ManagementSetting.js';
 import GainMeasurementPage from './pages/GainMeasurementPage.js';
 import GainPage from './pages/GainPage.js';
 import VerificationPage from './pages/VerificationPage.js';
+import MemberListCopy from './pages/MemberListCopy.js';
+import AddPatientCopy from './pages/AddPatientC.js';
+import ResultPageCopy from './pages/ResultPageCopy.js';
 // Variable & State
 const author = "KASSID&HAI";
 
@@ -50,6 +53,9 @@ function App() {
         <Route path='/setting/gainPage' element={<GainPage/>}/>
         <Route path='/setting/gainPage/gainMeasurementPage' element={<GainMeasurementPage/>}/>
         <Route path='/setting/verificationPage' element={<VerificationPage/>}/>
+        <Route path='/memberlistcopy' element={<MemberListCopy/>}/>
+        <Route path='/memberlistcopy/addPatientCopy' element={<AddPatientCopy/>}/>
+        <Route path='/memberlistcopy/resultPage' element={<ResultPageCopy/>}/>
       </Routes>
     </div>
   );

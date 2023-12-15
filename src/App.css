@@ -16,7 +16,7 @@
   width: 100%;
   height : 100%;
   display: grid;
-  grid-template-columns: 150px 1fr;
+  grid-template-columns: 20% 80%;
   grid-template-rows: 40px 1fr;
   grid-column-gap: 10px;
 }
@@ -103,9 +103,160 @@
 
 .result-page-container .left-container{
   position: relative;
-  width: 150px;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  height: 100%;
+  grid-row-gap: 10px;
+  width: 100%;
+}
+/* ------------------------------------------------- */
+
+
+
+
+
+.patient-measure-list{
+  width: 100%;
+  margin-bottom: 10px;
+  height: 100%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+  display: grid;
+  position: relative;
+  grid-template-columns: 1fr;
+  grid-template-rows: 40px 1fr;
+  
+  overflow: hidden;
+  /* margin-bottom: 10px; */
+}
+.result-page-container .left-container .measure-item-containerC{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin-top: 5vh;
+  overflow: scroll;
+  scrollbar-width: none;
+}
+.result-page-container .left-container .measure-item-containerC::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera*/
+}
+.measure-item-containerC .measure-item{
+  width: 100%;
+  height: min(5vh,35px);
+  display: grid;
+  /* grid-template-columns: % 40%; */
+  text-align: left;
+  cursor: pointer;
+}
+.measure-item-containerC .measure-item:hover{
+  background: #eee;
+}
+.measure-item-containerC .measure-item div:first-child{
+  width: 100%;
+  display: flex;
+  /* padding: 0 1vh; */
+  align-items:end;
+  justify-content:left;
+  font-size: min(3vh, .9rem);
+  color: #111;
+}
+.measure-item-containerC .measure-item .measure-item-date{
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  font-size: min(2.2vh, .6rem);
+}
+.measure-item-containerC .measure-item-right-chevron{
+  /* font-size: min(2vh, 1rem); */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+.result-page-container .left-container .measure-date-container{
+  height: 6vh;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  position: relative;
+  justify-content: space-between;
+}
+.result-page-container .left-container .measure-date-container .measure-selected-date-container{
+  height: 100%;
+}
+.result-page-container .left-container .measure-date-container .measure-selected-date-container>div:nth-child(1){
+  font-weight: bold;
+}
+
+.measure-selected-dateC{
+  display: flex;
+}
+.measure-selected-dateC div{
+  font-size: min(1.2vw, 13px);
+  margin-right: .5vh;
+  color: #aaa;
+}
+.measure-select-date-btn-container{
+  /* position: absolute; */
+  right: 0;
+  width: fit-content;
+  font-size: min(1.2vw, 13px);
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+  text-align: right;
+  cursor: pointer;
+  display: flex;
+}
+.measure-select-date-btn-container:active{
+  opacity: .3;
+}
+.measure-select-date-btn-container .calenderIcon{
+  margin-right: .7vh;
+  cursor: pointer;
+}
+
+
+
+
+.result-page-container .left-container .patient-info-containerC{
+  width: 100%;
+  height: -webkit-fill-available;
+  /* background: #ccc; */
+  padding: 5%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+  margin-top: 10px;
+  /* position: absolute; */
+  /* overflow: scroll; */
+}
+.result-page-container .left-container .patient-info-containerC>span{
+  display: block;
+  color: rgb(75, 117, 214);
+  font-size: 2.2vh;
+  font-weight: bold;
+  padding-bottom: 1vh; 
+  /* border-bottom: 1px #ccc solid; */
+}
+
+.patient-infoC{
+  /* position: absolute; */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* margin-top: 10px; */
+}
+.patient-infoC .title{
+  font-size: 2vh;
+  margin-bottom: 10px;
+  font-weight: bold;
+  
+}
+.patient-infoC .content{
+  font-size: min(2vh,20px);
+  margin-bottom: 1vh; 
+  /* font-weight: 500;  */
+}
+
+/* ------------------------ */
 
 .result-page-container .left-container .patient-info-container{
   width: 100%;
@@ -114,7 +265,7 @@
   padding: 5%;
   border-radius: 5px;
   border: #ccc 1px solid;
-  position: absolute;
+  /* position: absolute; */
   overflow: scroll;
 }
 .result-page-container .left-container .patient-info-container>span{
@@ -126,7 +277,7 @@
   border-bottom: 1px #ccc solid;
 }
 .patient-info{
-  position: absolute;
+  /* position: absolute; */
   margin-top: 10px;
 }
 .patient-info .title{
@@ -161,6 +312,7 @@
 }
 .result-page-container .right-container{
   width: 100%;
+  height: 100%;
   display: grid;
   grid-template-rows: 40px 10fr 8fr;
 }
@@ -279,6 +431,7 @@
   overflow: hidden;
   align-items: center;
   padding: 0 10px;
+  /* height: 80%; */
 }
 .history-container .slider{
   display:flex;
@@ -1257,7 +1410,225 @@
   text-overflow:ellipsis;
 }
 
+/* ---------------------------------------------------- */
 
+.memberList-page-containerC{
+  width: 100%;
+  height : 100%;
+  display: grid;
+  /* grid-template-columns: 1fr 1fr; */
+  grid-template-rows: 40px 1fr;
+  grid-column-gap: 10px;
+}
+.memberList-page-navC{
+  grid-column: 1/-1;
+  width: 100%;
+  height: 40px;
+  align-items: center;
+  position: relative;
+}
+.memberList-page-navC p{
+  display: block;
+  text-align: center;
+  margin: 0;
+  font-size: 1.1rem;
+}
+.memberList-page-navC .setting-btn-containerC{
+  position: absolute;
+  right: 0;
+  top: 2px;
+  cursor: pointer;
+  /* height: 40px; */
+  /* transform: translate(0,-1vh); */
+  display: flex;align-items: center;justify-content: center;
+  color: rgb(44, 192, 202);
+}
+.memberList-page-navC .setting-btnC{
+  all:unset;
+  font-size: .8rem;
+  margin-left: 3px;
+  font-weight: bold;
+}
+.memberList-page-navC .cogIconC{
+  font-size: .7rem;
+  color: rgb(44, 192, 202);
+}
+.memberList-page-left-containerC{
+  position: relative;
+}
+.patient-list-containerC{
+  width: 100%;
+  height: 100%;
+  padding: 2%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+
+}
+.patient-list-containerC .add-patient-btn-containerC{
+  position: relative;
+  height: 5vh;
+  margin-bottom: 2vh;
+}
+.patient-list-containerC .add-patient-btnC{
+  position: absolute;
+  right: 0;
+  width: fit-content;
+  font-size: min(2.3vh, 1rem);
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+  text-align: right;
+  cursor: pointer;
+}
+.patient-list-containerC .add-patient-btnC:active{
+  opacity: .3;
+}
+
+.patient-list-containerC .search-patient-containerC{
+  width: 100%;
+  height: 6vh;
+  border: 1px solid rgb(75, 117, 214);
+  border-radius: 5px;
+  display: grid;
+  grid-template-columns: 0.3fr 9fr;
+  align-items: center;
+  grid-gap: 10px;
+}
+.patient-list-containerC .search-patient-containerC .searchIconC{
+  margin-left: 2vh;
+  cursor: pointer;
+}
+.patient-list-containerC .search-patient-containerC .searchIconC:active{
+  opacity: .3;
+}
+.patient-list-containerC .search-patient-containerC input{
+  all: unset;
+  display: block;
+  width: 100%;
+  /* padding-left: 2vh; */
+}
+.patient-list-containerC .search-patient-containerC input::placeholder{
+  color: #ccc;
+  font-size: min(2.4vh, 1rem);
+}
+.patient-listC{
+  width: 100%;
+  margin-top: 2%;
+  height: 80%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+  display: grid;
+  position: relative;
+  grid-template-columns: 1fr;
+  grid-template-rows: 5vh 1fr;
+  overflow: hidden;
+}
+.patient-listC .patient-list-columnC{
+  border-bottom: .5px solid #333;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+.patient-list-column-nameC{
+  font-size: min(2vh,0.9rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgb(75, 117, 214);
+  font-weight: bold;
+}
+.patient-listC .patient-item-containerC{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin-top: 5vh;
+  overflow: scroll;
+  scrollbar-width: none;
+}
+.patient-listC .patient-item-containerC::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera*/
+}
+.patient-itemC{
+  width: 100%;
+  height: 11.5%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  cursor: pointer;
+}
+.patient-itemC .btn{
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.patient-itemC .btn label{
+  position: absolute;
+  width: 100%;
+  /* max-width: 72px; */
+  text-align: center;
+  cursor: pointer;
+  font-size: min(1.4vw,0.9rem);
+}
+
+.patient-itemC .btn input{
+  all: unset;
+  appearance: none;
+  display: block;
+  width: 100%;
+  /* max-width: 72px; */
+  height: 70%;
+  border-radius: 100vh;
+  background: #fff;
+  cursor: pointer;
+}
+.patient-itemC .btn:active{
+  opacity: 0.3;
+}
+.patient-itemC .btn input{
+  border: 1px solid rgb(75, 117, 214);
+}
+.patient-itemC .btn input+label{
+  color: rgb(75, 117, 214);
+}
+.patient-itemC .btn input:checked{
+  border: 1px solid #ccc;
+  background: #ccc;
+}
+.patient-itemC .btn input:checked + label{
+  color: #aaa;
+  font-weight: bold;
+}
+
+
+
+.patient-loadingC{
+  width: 100%;
+  height: 5vh;
+  transform: translate(0,-10%);
+  text-align: center;
+  font-size: 1rem;
+}
+.patient-itemC:hover{
+  background: #eee;
+}
+.patient-itemC div{
+  display: inline-block;
+  width: 100%;
+  display: flex;
+  padding: 0 1vh;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  white-space:nowrap;
+}
+.patient-itemC div p{
+  font-size: min(2.1vh,0.9rem);
+  overflow: hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+}
+
+
+
+/* ------------------------------------------------------- */
 
 
 .memberList-page-right-container{
@@ -1560,6 +1931,48 @@
   font-size: 1rem;
   font-weight: bold;
 }
+
+/* //---------------------------------------- */
+
+.add-patient-page-containerC{
+  width: 100%;
+  height : 100%;
+  display: grid;
+  grid-template-rows: 35px 1fr 4fr 0.3fr;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 10px;
+}
+.add-patient-page-containerC .inner{
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  border: #ccc 1px solid;
+}
+.add-complete-btnC{
+  width: 200%;
+  height: 100%;
+  border: 1px solid rgb(77, 174, 226);
+  color: rgb(77, 174, 226);
+  /* position: absolute; */
+  top: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2vw;
+  opacity: 1;
+  background: #fff;
+  cursor: pointer;
+}
+.add-complete-btnC:disabled{
+  opacity: 0.2;
+}
+.add-complete-btnC p{
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* -------------------------------------- */
 
 
 .add-patient-backBtn{

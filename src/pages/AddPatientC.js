@@ -6,7 +6,7 @@ import { Routes, Route, Link, useNavigate,useLocation } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronDown } from '@fortawesome/free-solid-svg-icons'
-const AddPatient = ()=>{
+const AddPatientCopy = ()=>{
 
   const [examinee,setExaminee] = useState({
     chartNumber: "",
@@ -42,7 +42,10 @@ const AddPatient = ()=>{
     // }
     
   });
-  const submitAddP = ()=>{
+    // useNavigate
+    const navigator = useNavigate();
+  const [patch,setPatch] = useState(false);
+  const submitAddP = async()=>{
     console.log("GH")
     let temp = {...examinee};
     
@@ -61,26 +64,28 @@ const AddPatient = ()=>{
     }
     console.log(temp);
     // PATCH 부분
-    if(location.state.update){
-      axios.patch('/subjects',temp,{withCredentials : true})
-      .then((res)=>{
-        console.log(res);
-      })
-      .catch((error)=>{
-        console.log(error);alert("ERROR");
-      })
+    if(location.state.update && patch){
+      console.log(patch)
+      // axios.patch('/subjects',temp,{withCredentials : true})
+      // .then((res)=>{
+      //   console.log(res);
+      // })
+      // .catch((error)=>{
+      //   console.log(error);alert("ERROR");
+      // })
     }
     // POST 부분
-    else{
-      axios.post('/subjects',temp,{withCredentials : true})
-      .then((res)=>{
-        console.log(res);
-      })
-      .catch((error)=>{
-        console.log(error);alert("ERROR₩₩₩₩");
-      })
+    else if(!location.state.update){
+      console.log(patch);
+      // axios.post('/subjects',temp,{withCredentials : true})
+      // .then((res)=>{
+      //   console.log(res);
+      // })
+      // .catch((error)=>{
+      //   console.log(error);alert("ERROR₩₩₩₩");
+      // })
     }
-    navigator(-1);
+    navigator("/memberList/measureInfo", {state: {chartNumber : examinee.chartNumber}});
   }
   const location = useLocation();
   const cookies = new Cookies();
@@ -142,6 +147,7 @@ const AddPatient = ()=>{
   const stopAgeRef = useRef();
   const maleRef = useRef();
   const femaleRef = useRef();
+  const chartNumberRef = useRef();
 
   // smoke 상황별 버튼 활성화
   useEffect(()=>{
@@ -258,19 +264,15 @@ const AddPatient = ()=>{
     }
   },[addBtnStatus])
 
-  // useNavigate
-  const navigator = useNavigate();
+
 
   //환자 정보 수정하기
   const [addUpdate,setAddUpdate] = useState(false);
 
   useEffect(()=>{
     console.log(location.state)
-    if(location.state){
-      // setExaminee({...examinee,
-        
-      // })
-      
+    if(location.state.chartNumber){
+      console.log(chartNumberRef)
       axios.get(`/subjects/${location.state.chartNumber}`,{
         headers: {
           Authorization: `Bearer ${cookies.get('accessToken')}`
@@ -322,27 +324,25 @@ const AddPatient = ()=>{
     }
   },[])
 
+  useEffect(()=>{
+    console.log(patch)
+  },[patch])
   return(
     <>
-      <div className="add-patient-page-container">
+      <div className="add-patient-page-containerC">
         
         <div className="add-patient-page-nav">
           <div className='add-patient-backBtn' onClick={()=>{navigator(-1)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
           </div>
-          <p onClick={()=>{console.log(examinee)}}>환자 정보 수정</p>
-          <button ref={addBtnRef} className="add-complete-btn"
-          onClick={(e)=>{
-            e.preventDefault();
-            console.log(examinee);
-            submitAddP();
-          }}><p>{addUpdate === true ? "수정 완료" : "추가 완료"}</p></button>
+          <p onClick={()=>{console.log(examinee)}}>환자 정보 입력</p>
+
         </div>
         <div className="add-patient-page-top-container">
           <div className="inner">
             <div className="chartNumInput-container input-container">
               <label htmlFor="">차트넘버</label>
-              <input type="number" value={examinee.chartNumber}
+              <input type="number" value={examinee.chartNumber} ref={chartNumberRef} readOnly={location.state.update ? true : false}
               onChange={(e)=>{
                 let copy = examinee.chartNumber;
                 copy = e.target.value;
@@ -359,6 +359,8 @@ const AddPatient = ()=>{
               onChange={(e)=>{
                 let copy = examinee.clinicianId;
                 copy = e.target.value;
+                setPatch(true);
+
                 setExaminee({...examinee, clinicianId: copy});
               }}>
                 <option value="">담당자명</option>
@@ -383,6 +385,8 @@ const AddPatient = ()=>{
               onChange={(e)=>{
                 let copy = examinee.name;
                 copy = e.target.value;
+                setPatch(true);
+
                 setExaminee({...examinee, name: copy})
               }}/>
             </div>
@@ -390,11 +394,11 @@ const AddPatient = ()=>{
               <label htmlFor="">성별</label>
               <div className="radio-container">
                 <div className='radioBtn' >
-                  <input ref={maleRef} onChange={genderChange} value="m" type="radio" name="gender" id="man"/>
+                  <input ref={maleRef} onChange={(e)=>{genderChange(e);setPatch(true)}} value="m" type="radio" name="gender" id="man"/>
                   <label htmlFor="man">남</label>
                 </div>
                 <div className='radioBtn'>
-                  <input ref={femaleRef} onChange={genderChange} value="f" type="radio" name="gender" id="woman" />
+                  <input ref={femaleRef} onChange={(e)=>{genderChange(e);setPatch(true)}} value="f" type="radio" name="gender" id="woman" />
                   <label htmlFor="woman">여</label>
                 </div>
               </div>
@@ -406,6 +410,7 @@ const AddPatient = ()=>{
               onChange={(e)=>{
                 let copy = examinee.subjectDetails;
                 copy.height = e.target.value;
+                setPatch(true);
                 setExaminee({...examinee, subjectDetails: copy})
               }}/>
               <div className='inputMeasure'><p>cm</p></div>
@@ -417,6 +422,7 @@ const AddPatient = ()=>{
               onChange={(e)=>{
                 let copy = examinee.subjectDetails;
                 copy.weight = e.target.value;
+                setPatch(true);
                 setExaminee({...examinee, subjectDetails: copy})
               }}/>  
               <div className='inputMeasure'><p>Kg</p></div>
@@ -428,6 +434,7 @@ const AddPatient = ()=>{
               onChange={(e)=>{
                 let copy = examinee.birthday;
                 copy = e.target.value;
+                setPatch(true);
                 setExaminee({...examinee, birthday: copy})
               }}/>
             </div>
@@ -442,11 +449,11 @@ const AddPatient = ()=>{
               <label htmlFor="">흡연경험</label>
               <div className="radio-container">
                 <div className='radioBtn' >
-                  <input ref={expTrueRef} onChange={(e)=>{smokeChange(e,"smokingExperience")}} value="true" type="radio" name="smokingExperience" id="expTrue"/>
+                  <input ref={expTrueRef} onChange={(e)=>{smokeChange(e,"smokingExperience");setPatch(true)}} value="true" type="radio" name="smokingExperience" id="expTrue"/>
                   <label htmlFor="expTrue">있음</label>
                 </div>
                 <div className='radioBtn'>
-                  <input ref={expFalseRef} onChange={(e)=>{smokeChange(e,"smokingExperience")}} value="false" type="radio" name="smokingExperience" id="expFalse" />
+                  <input ref={expFalseRef} onChange={(e)=>{smokeChange(e,"smokingExperience");setPatch(true)}} value="false" type="radio" name="smokingExperience" id="expFalse" />
                   <label htmlFor="expFalse">없음</label>
                 </div>
               </div>
@@ -455,11 +462,11 @@ const AddPatient = ()=>{
               <label htmlFor="">현재 흡연 여부</label>
               <div className="radio-container">
                 <div className='radioBtn' >
-                  <input ref={smokingTrueRef} onChange={(e)=>{smokeChange(e,"smoking")}} value="true" type="radio" name="smoking" id="smokingTrue"/>
+                  <input ref={smokingTrueRef} onChange={(e)=>{smokeChange(e,"smoking");setPatch(true)}} value="true" type="radio" name="smoking" id="smokingTrue"/>
                   <label htmlFor="smokingTrue">흡연</label>
                 </div>
                 <div className='radioBtn'>
-                  <input ref={smokingFalseRef} onChange={(e)=>{smokeChange(e,"smoking")}} value="false" type="radio" name="smoking" id="smokingFalse" />
+                  <input ref={smokingFalseRef} onChange={(e)=>{smokeChange(e,"smoking");setPatch(true)}} value="false" type="radio" name="smoking" id="smokingFalse" />
                   <label htmlFor="smokingFalse">금연</label>
                 </div>
               </div>
@@ -471,6 +478,7 @@ const AddPatient = ()=>{
               onChange={(e)=>{
                 let copy = examinee.subjectDetails;
                 copy.smokingStartAge = e.target.value;
+                setPatch(true);
                 setExaminee({...examinee, subjectDetails: copy})
               }}/>  
             </div>
@@ -481,6 +489,7 @@ const AddPatient = ()=>{
               onChange={(e)=>{
                 let copy = examinee.subjectDetails;
                 copy.smokingPackYear = e.target.value;
+                setPatch(true);
                 setExaminee({...examinee, subjectDetails: copy})
               }}/>  
             </div>
@@ -491,13 +500,20 @@ const AddPatient = ()=>{
               onChange={(e)=>{
                 let copy = examinee.subjectDetails;
                 copy.smokingStopAge = e.target.value;
+                setPatch(true);
                 setExaminee({...examinee, subjectDetails: copy})
               }}/>  
             </div>
           </div>
         </div>
-      </div>
+        <button ref={addBtnRef} className="add-complete-btnC"
+          onClick={(e)=>{
+            e.preventDefault();
+            console.log(examinee);
+            submitAddP();
+          }}><p>검사하기</p></button></div>
+      
     </>
   )
 }
-export default AddPatient;
+export default AddPatientCopy;

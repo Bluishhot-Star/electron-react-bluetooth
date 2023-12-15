@@ -427,7 +427,7 @@ const VerificationPage = () =>{
  },[alNotifyDone])
 
  useEffect(()=>{ 
-  console.log(dataList)
+  // console.log(dataList)
    if(dataList[0] == '2'){
      setNotifyDone(true);
    }
@@ -1114,8 +1114,16 @@ const [calivration,setCalivration] = useState({
     "thirdP":false,
     "thirdM":false
   });
-  const [verify,setVerify] = useState([])
+  const [verify,setVerify] = useState([]);
   const [apply,setApply] = useState(false);
+  const getGainVolume = (graph,flow) =>{
+    
+    return graph.find((element) => {
+      if(element.y.toFixed(3) === flow)  {
+        console.log(flow+",,,,"+element.y.toFixed(3))
+        return true;
+      }}).x.toFixed(3);
+  }
   const verification = ()=>{
     let rDataList = [];
     rawDataList.map((num)=>rDataList.push(String(num).padStart(9, "0"))) 
@@ -1132,6 +1140,8 @@ const [calivration,setCalivration] = useState({
       // setCalivration(res.data.response);
       // setVolumeFlowList(res.data.response.volumeFlow);
       // let passList = new Object();
+      console.log(volumeFlowList);
+      let veri = [];
       res.data.response.verify.map((value,index)=>{
         
         if(value.strength === 'LOW'){
@@ -1139,37 +1149,82 @@ const [calivration,setCalivration] = useState({
           if(Math.sign(value.flow) === -1){
             console.log('low')
             pass["firstM"] = value.pass;
-            console.log('volume',volumeFlowList.find((element) => {
-              if(element.x === `${value.flow}`)  {
-                return true;
-              }}))
-              console.log(value.flow)
+            console.log(getGainVolume(res.data.response.graph.volumeFlow,value.flow))
+            veri = {
+              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+              flow : value.flow, 
+              error:value.error
+            }
+            verify.push(veri);
           }else{
             console.log('low')
             pass["firstP"] = value.pass;
+            veri = {
+              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+              flow : value.flow, 
+              error:value.error,
+              pass:value.pass
+            }
+            verify.push(veri);
+
           }
         }
         else if(value.strength === 'MID'){
           console.log('mid')
           if(Math.sign(value.flow) === -1){
             pass["secondM"] = value.pass;
+            veri = {
+              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+              flow : value.flow, 
+              error:value.error,
+              pass:value.pass
+            }
+            verify.push(veri);
+
           }else{
             pass["secondP"] = value.pass;
+            veri = {
+              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+              flow : value.flow, 
+              error:value.error,
+              pass:value.pass
+            }
+            verify.push(veri);
+
+
           }
         }else if(value.strength === 'HIGH'){
           console.log('high')
           if(Math.sign(value.flow) === -1){
             pass["thirdM"] = value.pass;
+            veri = {
+              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+              flow : value.flow, 
+              error:value.error,
+              pass:value.pass
+            }
+            console.log(veri)
+            verify.push(veri);
+
+
           }else{
             pass["thirdP"] = value.pass;
+            veri = {
+              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+              flow : value.flow, 
+              error:value.error,
+              pass:value.pass
+            }
+            verify.push(veri);
+
           }
         }
       })
 
       setPass(pass);
-      setVerify(res.data.response.verify);
       setApply(true);
       console.log(pass);
+      setVerify(verify);
       
     })
     .catch((err)=>{
@@ -1211,10 +1266,10 @@ const [calivration,setCalivration] = useState({
             <div ref={firstBtnRef} onClick={()=>{
                 
                 if(!(firstBtnRef.current.classList.contains("disabled"))){
+                  resetChart()
                   setBlowF(true);
                   setMeaStart(true); 
                   secondBtnRef.current.classList.remove("disabled");
-                
                   firstBtnRef.current.classList += " disabled";
                   thirdBtnRef.current.classList.remove("disabled");
                 }
@@ -1230,9 +1285,10 @@ const [calivration,setCalivration] = useState({
             <div ref={thirdBtnRef} onClick={()=>{
               if(!thirdBtnRef.current.classList.contains("disabled")){
                 verification()
+                firstBtnRef.current.classList.remove("disabled");
+                thirdBtnRef.current.classList += " disabled";
+                secondBtnRef.current.classList += " disabled";
               }
-              // secondBtnRef.current.classList += " disabled";
-              // thirdBtnRef.current.classList += " disabled";
             }}>분석</div>
           </div>
 
@@ -1282,14 +1338,13 @@ const [calivration,setCalivration] = useState({
               
                 {!apply ? "":
                   verify.map((value)=>{
-                    if(value.pass){
                     return(
                       <div>
-                        <p>Inhale</p>
+                        <p>{value.volume}</p>
                         <p>{value.flow}</p>
                         <p>{value.error}</p>
                       </div>
-                    )}
+                    )
                   })
                   
                 }
