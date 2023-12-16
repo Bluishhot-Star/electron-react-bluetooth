@@ -21,8 +21,10 @@ import Timer from "../components/Timer.js"
 
 
 const MeasurementPage = () =>{
+  const location = useLocation();
   let deviceInfo = useSelector((state) => state.deviceInfo ) 
   let measureInfo = useSelector((state)=>state.info);
+  let measureSetInfo = location.state;
   const cookies = new Cookies();
   const [setCookie] = useCookies();
   let navigatorR = useNavigate();
@@ -36,7 +38,7 @@ const MeasurementPage = () =>{
   let breathCount = 3;
   let strongTime = 6;
   let stopTime = 15;
-
+  
   
   const [measureDone, setMeasureDone] = useState(false);
 
@@ -99,7 +101,7 @@ const MeasurementPage = () =>{
     if(inF !== -1){
       if(inF && timerReady===false){//흡기 선
         setGaugeContent({r11:"1", r12:breathCount, r2:"IN"})
-        setSessionVol(breathCount*2);
+        setSessionVol(breathCount*2); //====================================고쳐야 하는 부분..
       }
       else if(!inF && timerReady===false){//호기 선
         setGaugeContent({r11:"1", r12:breathCount, r2:"OUT"})
@@ -494,9 +496,10 @@ const MeasurementPage = () =>{
   // 시작 확인 시 flag 세우기 -> 처리할 데이터 슬라이싱
   useEffect(()=>{
     if(meaStart){
-
+      let temp = dataList.length;
       let time = setTimeout(() => {
-        setFlag({idx: dataList.length, rIdx: 1}); // idx : dataList에서의 인덱스, rIdx : realData에서의 인덱스
+        setFlag({idx: temp, rIdx: 1}); // idx : dataList에서의 인덱스, rIdx : realData에서의 인덱스
+        setFlagTo({...flagTo, from: 1});
       }, 1000);
     }
   },[meaStart])
@@ -504,6 +507,7 @@ const MeasurementPage = () =>{
 //-----------------------------------------------------------------------------------------------
 
   const [rawDataList, setRawDataList] = useState([0]); // raw data 처리 전 (0만 뗀거)
+  const [flagTo, setFlagTo] = useState(0); // rawDataList에서 잘라서 post
   const [calDataList, setCalDataList] = useState([]); // raw data 처리 -> time/volume/lps/exhale
   const [calFlag, setCalFlag] = useState(0); // calDataList에서 그래프 좌표로 처리할 index=>현재 처리된 index
 
@@ -533,9 +537,9 @@ const MeasurementPage = () =>{
       // 호 <-> 흡 바뀔 때 0 넣기 주석
       // let currItemR = data[data.length-1]; //방금 들어온 raw 데이터
       // let currItem = dataCalculateStrategyE.convert(currItemR); // 데이터 전처리 후
-      if(dataCalculateStrategyE.isExhale(preItem) !== dataCalculateStrategyE.isExhale(currItem)){
-        TrawDataList.push(dataCalculateStrategyE.getZero(dataCalculateStrategyE.isExhale(currItem)));
-      }
+      // if(dataCalculateStrategyE.isExhale(preItem) !== dataCalculateStrategyE.isExhale(currItem)){
+      //   TrawDataList.push(dataCalculateStrategyE.getZero(dataCalculateStrategyE.isExhale(currItem)));
+      // }
 
       TrawDataList.push(currItem);
       setRawDataList(TrawDataList);
@@ -674,12 +678,18 @@ const MeasurementPage = () =>{
             x = vTemp;
           }
         }
+        if(timerReady && timerStart && volumeFlowList[calFlag]["y"] <= 0 && !measureDone){
+          // setFlagTo({...flagTo, to: flagTo.from+calFlag+1});
+          setFlagTo({...flagTo, to: flag.rIdx-1});
+          setTimerStart(false);
+          setMeasureDone(true);
+          // =========================================================================== -> 데이터 자르기============================================================
+        }
       }
       //호기 시
       else{
         if(!inFDone && meaStart && rawV!==0){ //호기선?
           setInF(false);
-          // console.log("hererer")
           setInFDone(true);
         }
         // if(preXY['y']<=0 && sessionVol !== 0 ){
@@ -687,17 +697,27 @@ const MeasurementPage = () =>{
         //   setSessionCount(tempSesCnt); 
         // }
         x = preXY['x'] + rawV;
+        if(timerReady && timerStart && !measureDone){
+          if(rawF == 0 && runTime!=0){
+            // setFlagTo({...flagTo, to: flagTo.from+calFlag+1});
+            setFlagTo({...flagTo, to: flag.rIdx-1});
+            setTimerStart(false);
+            setMeasureDone(true);  
+            // =========================================================================== -> 데이터 자르기
+          }
+        }
       }
-      
       volumeFlowList.push({x: x, y:rawF});
       console.log(volumeFlowList);
       setVolumeFlowList(volumeFlowList);
-      if(timerReady && timerStart){
-        if(rawF == 0){
-          setTimerStart(false);
-          setMeasureDone(true);
-        }
-      }
+      // if(timerReady && timerStart){
+      //   if(rawF == 0){
+      //     setFlagTo({...flagTo, to: flag.idx});
+      //     setTimerStart(false);
+      //     setMeasureDone(true);  
+      //     // =========================================================================== -> 데이터 자르기
+      //   }
+      // }
       // return {x: x, y:rawF};
     }
     catch(err){
@@ -811,7 +831,6 @@ const MeasurementPage = () =>{
 //-----------------------------------------------------------------------------------------------
   // 그래프 설정
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables);
-  const location = useLocation();
 
   //결과 그래프 목록 요청 FVC
 
@@ -1057,13 +1076,21 @@ const MeasurementPage = () =>{
 
   const chartRef = useRef();
 
-  const measurementEnd = ()=>{
+  const measurementEnd = async()=>{
+    let rDataList = [];
+    rawDataList.slice(flagTo.from,flagTo.to+1).map((num)=>rDataList.push(String(num).padStart(9, "0")))
+    while (rDataList[rDataList.length-1].slice(0,1) == 1) {
+      rDataList.pop()
+    }
+    // console.log(dataList.slice(flagTo.from, flagTo.to+1).toString().replaceAll(","," ")); //---------------------------------------------------------------------------------------------------------
+    console.log(rDataList.join(' '))
     axios.post(`/subjects/1234/types/fvc/measurements`, 
     {
       serialNumber:"970222",
       bronchodilator: "pre",
-      data:"000000000 000000000 126924999 105047761 103838213 103320572 103075786 102943239 102866735 102849851 102870002 102891412 102899555 102918380 102961015 103014671 103070532 103136921 103204506 103263671 103317158 103365782 103415871 103480419 103550957 103626483 103721017 103834866 103984180 104211153 104499493 104904872 105338869 105955816 106746424 107745517 109086141 113451132 119519839 120138454 030052011 004842118 002453991 001980650 001726161 001548197 001424058 001344006 001292535 001256386 001229456 001204358 001182884 001169258 001156269 001149000 001145803 001147655 001156232 001158712 001155712 001154499 001149522 001149780 001164072 001172014 001173465 001175152 001177922 001178485 001174321 001171871 001168485 001171650 001162639 001161795 001164926 001175002 001166350 001172705 001179700 001185469 001180635 001193177 001199091 001198823 001190205 001207255 001221689 001240795 001249712 001246816 001240284 001233813 001231849 001242631 001249665 001250247 001260521 001270026 001266723 001267207 001269873 001270530 001277364 001284371 001306779 001307426 001304650 001307101 001309329 001307473 001325509 001343393 001355753 001358059 001357510 001363585 001358634 001371314 001374710 001376778 001384640 001387011 001386841 001381364 001385161 001387877 001393890 001399288 001414767 001428969 001447796 001462064 001458235 001466061 001473629 001474056 001481474 001496375 001507764 001502277 001509324 001499681 001503103 001506491 001513018 001517993 001516706 001524027 001531436 001530926 001535886 001535572 001541895 001540489 001533595 001542174 001548565 001559930 001558649 001566502 001562860 001559356 001573239 001571072 001579215 001592789 001607743 001620722 001635084 001639286 001644397 001634762 001633607 001632202 001632479 001622104 001626892 001623572 001622531 001618556 001638254 001636676 001628179 001634083 001644276 001644565 001661064 001674290 001688056 001708525 001698041 001711679 001734100 001743333 001740591 001747938 001743753 001730991 001733607 001733342 001747259 001759596 001772005 001761434 001769562 001785885 001788733 001785835 001785187 001787319 001791187 001798476 001800512 001808660 001813525 001826618 001841157 001869921 001864649 001843237 001828476 001812025 001804606 001810500 001798395 001789413 001786484 001790402 001810067 001838073 001846257 001850456 001874823 001871260 001885873 001897203 001909556 001906264 001912781 001923458 001943286 001947394 001948761 001944631 001953137 001956566 001953267 001946480 001953437 001958192 001965968 001956443 001954438 001933395 001915698 001922851 001943698 001932690 001939024 001944745 001968801 001988469 001997283 002015517 002027303 002016538 002025139 002039674 002067500 002091555 002138376 002143663 002147625 002180289 002192757 002213541 002235082 002237870 002236548 002217140 002205874 002213491 002221305 002241636 002281259 002335190 002353488 002368103 002415183 002445377 002510056 002589690 002656087 002711677 002749819 002776846 002832386 002879495 002903907 002932131 002950502 002978106 003003006 003016268 003064441 003156719 003235294 003369913 003516804 003668921 003862248 004069411 004268124 004461844 004749987 005088580 005583262 005925423 006561897 007469709 008681521 011158058 119678463 109415346 106145923 105226592 104758710 104297766 103828540 103533963 103351548 103239957 103188476 103176524 103189304 103214505 103250217 103281722 103298956 103302194 103298053 103306458 103315802 103309779 103304213 103305835 103316418 103331716 103344156 103361401 103387108 103420618 103462411 103506188 103559575 103623438 103692884 103772742 103846546 103911708 103969921 104032268 104091738 104141497 104194800 104242480 104297365 104341412 104367300 104421686 104537831 104699619 104889206 105037510 105179897 105377112 105638661 105860598 105929321 106019935 106216283 106405653 106707794 107353198 108294536 109599354 111725725 019359874 004359485 002497781 001950276 001664349 001526452 001453275 001395829 001376321 001358323 001353099 001353354 001359418 001360377 001371277 001383532 001389380 001399639 001415303 001436559 001460396 001467896 001469713 001461040 001451852 001448634 001453402 001458402 001463401 001459103 001452471 001463265 001468443 001482529 001499094 001510820 001507538 001523650 001538308 001541499 001542563 001548539 001562319 001594301 001627149 001661136 001686072 001691216 001697087 001711944 001720326 001733734 001728265 001726654 001733863 001737238 001742126 001758757 001781143 001796516 001810975 001825429 001851975 001867251 001875293 001873578 001882213 001879337 001882197 001891197 001898154 001910095 001920881 001924127 001923809 001923561 001944942 001971389 001974018 001953800 001945123 001904210 001889073 001879852 001856705 001857500 001860376 001860997 001876172 001898269 001923042 001920974 001908356 001897976 001911789 001926698 001920672 001924575 001932174 001938875 001944836 001937838 001929826 001918058 001919437 001910479 001882600 001865334 001863585 001844355 001831409 001819344 001806216 001816751 001814314 001824161 001825823 001842788 001866585 001863481 001855910 001864057 001866488 001848832 001823207 001813373 001828159 001853332 001862594 001865234 001874990 001890737 001903086 001920481 001925604 001915225 001923159 001925231 001924342 001930475 001932279 001933097 001934618 001920018 001912621 001913869 001922051 001951030 001947556 001958241 001976588 001988733 001981465 001978420 002003137 002036159 002054802 002063250 002072184 002087191 002102580 002120232 002116041 002129529 002144498 002149937 002164574 002187006 002209136 002228575 002243378 002245328 002268165 002304363 002332218 002367896 002431707 002487216 002532181 002570232 002606592 002618235 002665602 002737396 002820356 002876536 002910237 002928823 002950978 003007517 003054832 003085611 003148488 003238850 003298086 003375595 003421994 003470176 003574881 003692479 003877810 004037828 004201675 004377860 004466172 004455592 004463434 004641775 004860501 004959290 004962113 005029409 005050004 004999951 005007312 005059302 005090349 005221328 005271303 005396135 005584131 005720327 006020713 006328612 006633580 007154554 008069330 009280556 010956214 012846188 015098351 020065758 052303707",
-      date:"2023-11-6"
+      // data:dataList.slice(flagTo.from, flagTo.to+1).toString().replaceAll(","," "),
+      data:rDataList.join(' ')+"000000000",
+      date:"2023-12-16"
     },{
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
@@ -1216,6 +1243,32 @@ const MeasurementPage = () =>{
 
 //-----------------------------------------------------------------------------------------------
   
+//   const measurementApply = ()=>{
+//     console.log()
+//     let rDataList = [];
+    
+//     rawDataList.slice(flagTo["from"], flagTo["to"]+1).map((num)=>rDataList.push(String(num).padStart(9, "0"))) 
+//     axios.post(`/devices/000255/calibrations`, 
+//     {
+//       "serialNumber":cookies.get('serialNum'),
+//       "bronchodilator": "pre",
+//       "data":"100000000 ...",
+//       "date": "yyyy-MM-dd"
+//     },{
+//       headers: {
+//         Authorization: `Bearer ${cookies.get('accessToken')}`
+//     }},
+//     {withCredentials : true})
+//     .then((res)=>{
+
+//     })
+//     .catch((err)=>{
+//       console.log(err);
+//     })
+// }
+
+
+
   return(
     <div className="measurement-page-container">
       {confirmStat ? <Confirm content="검사를 시작하시겠습니까?" btn={true} onOff={setConfirmStat} select={confirmFunc}/> : null}
@@ -1226,8 +1279,9 @@ const MeasurementPage = () =>{
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6"}} />
           </div>
           <p onClick={()=>{
-            console.log(txCharRef.current);
-            console.log(location.state.info);
+            // console.log(txCharRef.current);
+            // console.log(location.state.info);
+            measurementEnd()
           }}>검사</p>
           <div ref={blueIconRef} className="device-connect" onClick={()=>{navigatorR("/setting")}}>
               {
@@ -1324,9 +1378,6 @@ const MeasurementPage = () =>{
               </div>
           </div>
           <div className="measure-msg-container">
-            <div>
-              {/* <Timer setRunTime={setRunTime} runTime={runTime} start={timerStart} stop={stopTime}/> */}
-            </div>
             {
             meaPreStart?
               meaStart? 
@@ -1341,6 +1392,7 @@ const MeasurementPage = () =>{
               <p className='measure-msg'>{noneDevice==false?"SpiroKit 연동이 완료되었습니다.\nSpiroKit 동작버튼을 켜주시고, 마우스피스 입구에 살짝 입김을 불어 검사 시작 버튼을 활성화 해주세요.":"SpiroKit 연동이 필요합니다."}</p>
             }
           </div>
+          <div className='measure-msg-picture'><div></div></div>
         </div>
         <div className="measurement-page-right-container">
           <div className="fvc-graph-container">
@@ -1375,19 +1427,20 @@ const MeasurementPage = () =>{
                   setTimerReady(false);
                   setRunTime(0);
                   setMeasureDone(false);
+                  setFlagTo({from:rawDataList.length, to:""})
                 }, 500);
               }
-            }}>재검사</div>
+            }}> <p>재측정</p></div>
             <div ref={secondBtnRef} onClick={()=>{
               if(!(secondBtnRef.current.classList.contains("disabled"))){
                 setBlowF(true);
               }
-            }}>검사시작</div>
+            }}> <p>검사 시작</p></div>
             <div onClick={()=>{
-              console.log(volumeFlowList, timeVolumeList);
-
-              // measurementEnd();
-            }}>버튼3</div>
+              console.log(flagTo);
+              console.log(dataList.slice(flagTo.from, flagTo.to+1).toString().replaceAll(","," "));
+              console.log(measureSetInfo.administration);
+            }}><p>검사 종료</p></div>
           </div>
 
           <div className="history-container">

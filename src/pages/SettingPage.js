@@ -350,7 +350,7 @@ window.api.receive("connectedBLEDevice", (data)=>{
     <div className="setting-page-container">
       {serialSettingStat ? <SerialSetting content="검사를 시작하시겠습니까?" btn={true} onOff={setSerialSettingStat} select={serialFunc} serialNum={serialNum} setSerialNum={setSerialNum} /> : null}
         <div className="setting-page-nav" onClick={()=>{console.log()}}>
-          <div className='setting-page-backBtn' onClick={()=>{navigatorR('/memberList')}}>
+          <div className='setting-page-backBtn' onClick={()=>{navigatorR(-1)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
           </div>
           <p onClick={()=>{
