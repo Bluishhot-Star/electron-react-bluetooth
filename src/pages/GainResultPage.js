@@ -98,6 +98,7 @@ const GainResultPage = () =>{
   // const gainGraph = new ChartJS();
   
   useEffect(()=>{
+    console.log(chartRef.current)
     if(chartRef.current){
       const chart = chartRef.current.scales.y;
       let maxM;
@@ -238,6 +239,9 @@ const GainResultPage = () =>{
         radius: 0,
       },
     },
+    afterDraw: function (chart, easing) {
+      console.log(chart);
+    },
     scales: {
       x: {
         axios: 'x',
@@ -264,7 +268,7 @@ const GainResultPage = () =>{
         axios: 'y',
         tickLength:9,
         start:100,
-
+        
         ticks: {
 
           major: true,
@@ -319,6 +323,7 @@ const GainResultPage = () =>{
     },1000);
     
   },[graphData])
+
 
   return(
     <div className="gain-page-container">

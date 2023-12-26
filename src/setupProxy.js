@@ -50,6 +50,13 @@ module.exports = function(app){
       changeOrigin: true,
     })
   )
+  
+  app.use(
+    createProxyMiddleware('/measurements',{
+      target:'https://spirokitdev.the-researcher.com/v1',
+      changeOrigin: true,
+    })
+  )
 };
 
 
