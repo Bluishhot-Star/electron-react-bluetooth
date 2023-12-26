@@ -53,13 +53,17 @@
   /* width: ; */
   display: flex;
 }
-.nav-left-container .admin{
+.nav-left-container div{
   margin-left: 10px;
   font-size: 0.7rem;
+  font-weight: bold;
 }
-.nav-left-container .admin span:last-child{
+.nav-left-container div span:last-child{
   margin-left: 5px;
   color: rgb(44, 192, 202);
+}
+.nav-left-container .grade span:last-child{
+  color: rgb(255, 0, 0);
 }
 .nav-right-container{
   display: flex;
@@ -133,7 +137,7 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  margin-top: 5vh;
+  margin-top: 6vh;
   overflow: scroll;
   scrollbar-width: none;
 }
@@ -155,7 +159,7 @@
   width: 100%;
   display: flex;
   /* padding: 0 1vh; */
-  align-items:end;
+  align-items:center;
   justify-content:left;
   font-size: min(3vh, .9rem);
   color: #111;
@@ -451,6 +455,12 @@
   grid-template-rows: 1fr 5fr;
   padding: 1vh 0;
   cursor: pointer;
+  position: relative;
+}
+.history-container .slider .simple-result-title-container .deleteIcon{
+  position: absolute;
+  
+  right:2%;
 }
 .history-container .slider .selected:nth-child(10n+1){border: rgb(5,128,190) .4vh solid; }
 .history-container .slider .selected:nth-child(10n+2){border: rgb(158,178,243) .4vh solid; }
@@ -475,17 +485,31 @@
 .history-container .slider .simple-result-container:nth-child(10n+10) .simple-result-title{color: rgb(97,97,97);}
 .simple-result-title-container .simple-result-title{
   font-weight:600;
+text-align: right;
 }
-.simple-result-title-container p{
-  font-size: 2.2vh;
-  margin: 0;
-  display: block;
-  text-align: center;
+.simple-result-title-date{
+  margin-left: 1%;
+  /* width: 100%; */
+  display: grid;
+  grid-template-columns: 25% 75% ;
+  /* align-items: center; */
+
+}
+.simple-result-title-container{
+  
+
+  
+}
+.simple-result-title-date div{
+  font-size: 1.7vh;
+  /* width: 50%; */
+  /* display: inline; */
   text-transform: uppercase;
 }
 .simple-result-title-container .simple-result-date{
-  font-size: 1.8vh;
+  /* font-size: 1.5vh; */
   color: #aaa;
+  text-align: left;
 }
 
 .simple-result-table-container{
