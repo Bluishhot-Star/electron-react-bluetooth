@@ -42,7 +42,7 @@ const GainResultPage = () =>{
   })
 
 
- 
+
 
 
   useEffect(()=>{
@@ -158,7 +158,7 @@ const GainResultPage = () =>{
         });
       }
         
-     
+    
 
     }
   })

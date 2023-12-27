@@ -14,18 +14,17 @@ import {registerables,Chart as ChartJS,RadialLinearScale,LineElement,Tooltip,Leg
 import { Scatter } from 'react-chartjs-2';
 import { useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux"
-import { changeDeviceInfo, reset } from "./../deviceInfo.js"
+import { changeDeviceInfo, reset } from "../deviceInfo.js"
 import { da } from 'date-fns/locale';
 import Gauge from "../components/Gauge.js"
 import Timer from "../components/Timer.js"
 
 
-//FVC 검사 페이지
-const MeasurementPage = () =>{
+const MeasurementSVCPage = () =>{
   const location = useLocation();
   let deviceInfo = useSelector((state) => state.deviceInfo ) 
   let measureInfo = useSelector((state)=>state.info);
-  let data = location.state.data;
+  let measureSetInfo = location.state;
   const cookies = new Cookies();
   const [setCookie] = useCookies();
   let navigatorR = useNavigate();
@@ -33,256 +32,10 @@ const MeasurementPage = () =>{
   let firstBtnRef = useRef();
   let secondBtnRef = useRef();
 
-  const [tvMax, setTvMax] = useState([10]);
-  let colorList = ['rgb(5,128,190)','rgb(158,178,243)','rgb(83, 225, 232)','rgb(67,185,162)','rgb(106,219,182)','rgb(255,189,145)','rgb(255,130,130)','rgb(236,144,236)','rgb(175,175,175)','rgb(97,97,97)'];
-
-  const [graphOnOff, setGraphOnOff] = useState([]);
-  const [allTimeVolumeList, setAllTimeVolumeList] = useState([]);
-  const [allVolumeFlowList, setAllVolumeFlowList] = useState([]);
-
-  const [totalData,setTotalData] = useState(" ");
-  //결과 그래프 목록 요청 FVC
-  const[volumeFlow,setVolumeFlow] = useState([]);
-  const[timeVolume,setTimeVolume] = useState([]);
-  const [trigger, setTrigger] = useState(-1);
-
-  // conta
-  useEffect(()=>{
-    console.log(location.state.data)
-    setTotalData(location.state.data);
-  },[])
-  //fvc 그래프 처리
-  const simpleResultsRef = useRef([]);
-  useEffect(()=>{
-    if(totalData){
-      //fvc의 심플카드
-      let timeVolumeList = [];
-      let volumeFlowList = [];
-      let timeVolumeMaxList = [];
-      let timeVolumeMaxListX = [];
-  
-      if(totalData.trials){
-        console.log(totalData.trials.length);
-        let temp = new Array(totalData.trials.length).fill(0);
-        setGraphOnOff(temp);
-  
-        // 매 결과에서 데이터 추출
-        totalData.trials.forEach((item)=>{
-          timeVolumeList.push(item.graph.timeVolume);
-          volumeFlowList.push(item.graph.volumeFlow);
-  
-          //현 timeVolume에서 최대값 찾기
-          timeVolumeMaxList.push(item.results[3].meas);
-          timeVolumeMaxListX.push(item.graph.timeVolume[item.graph.timeVolume.length-1].x); //최대 x값 찾기
-        })
-        timeVolumeMaxListX.sort((a,b)=>a-b);
-        timeVolumeMaxList.forEach((item, idx)=>{
-          timeVolumeList[idx].push({x : Math.max(Math.ceil(timeVolumeMaxListX[timeVolumeMaxListX.length-1]), 3), y: timeVolumeList[idx][timeVolumeList[idx].length-1].y})
-        })
-        setVolumeFlow(volumeFlowList);
-        setTimeVolume(timeVolumeList);
-        setAllTimeVolumeList(timeVolumeList);
-        setAllVolumeFlowList(volumeFlowList);
-        setTvMax(timeVolumeMaxList);
-        graphOption.scales.x.max = parseInt(Math.max(...timeVolumeMaxList));
-        setTrigger(0);
-      }
-    }
-  },[totalData])
-
-  //그래프 선택
-  const selectGraph=(index)=>{
-    if(meaStart)return;
-    console.log("HE!!!!");
-    let temp;
-    //처음 눌렀을때
-    if(trigger == 0){
-      temp = [...graphOnOff].fill(0); //0으로 바꾸기 (선택효과 끄기)
-    }
-    else{ //처음 아닐때
-      temp = [...graphOnOff];
-    }
-
-    if (temp[index] == 1){
-      temp[index] = 0;
-      setTrigger(trigger-1);
-    }
-    else if(temp[index] == 0){
-      temp[index] = 1;
-      setTrigger(trigger+1);
-    }
-    setGraphOnOff(temp);
-  }
-  useEffect(()=>{
-    /**
-     * allTimeVolumeList -> 전체 리스트
-     * timeVolume -> 보여줄 리스트
-     */
+  const getMeasurement = async(date)=>{
     
-    // 누른거 없을떄 onoff[1,1,1, ...]
-    console.log("Trigger : "+trigger);
-    // if(trigger == 0){
-    //   console.log("ALLLLL : ",allTimeVolumeList);
-    //   let temp = [...graphOnOff].fill(0);
-    //   setGraphOnOff(temp);
-    //   setTimeVolume(allTimeVolumeList);
-    //   setVolumeFlow(allVolumeFlowList);
-    //   return;
-    // }
-    // 누른거 있을때
-    let temp = [...allTimeVolumeList];
-    let temp2 = [...allVolumeFlowList];
-    graphOnOff.forEach((item, index)=>{
-      if(item == 0){
-        temp[index] = [{x: 0, y: 0}];
-        temp2[index] = [{x: 0, y: 0}];
-      }
-      else if(item == 1){
-        temp[index] = allTimeVolumeList[index];
-        temp2[index] = allVolumeFlowList[index];
-      }
-    })
-    setTimeVolume(temp);
-    setVolumeFlow(temp2);
-    console.log(temp);
-
-    /////////////////////////
-  },[trigger])
-
-
-  // 검사 시작 상태
-  const [meaStart, setMeaStart] = useState(false);
-  useEffect(()=>{
-    if(meaStart && totalData){
-      setTrigger(0);
-      simpleResultsRef.current.forEach((item,index)=>{
-        simpleResultsRef.current[index].disabled = true;
-        simpleResultsRef.current[index].classList += "disabled";
-      })
-    }
-    else{
-      simpleResultsRef.current.forEach((item,index)=>{
-        simpleResultsRef.current[index].disabled = false;
-        if(simpleResultsRef.current[index].classList.contains("disabled")){
-          simpleResultsRef.current[index].classList.remove("disabled");
-        }
-      })
-    }
-  })
-  useEffect(()=>{
-    if(totalData){
-      graphOnOff.forEach((item, index)=>{
-        if(item == 1){
-          simpleResultsRef.current[index].classList+=" selected";
-          simpleResultsRef.current[index].style+="";
-        }
-        else{
-          if(simpleResultsRef.current[index].classList.contains("selected")){
-            simpleResultsRef.current[index].classList.remove("selected");
-          }
-        }
-      })
-    }
-  },[graphOnOff])
-// volumeFlow 그리기
-useEffect(()=>
-{
-  console.log("!#!##")
-
-  let time = setTimeout(()=>{
-    console.log("!#!##!@!@")
-    
-    let time2 = setTimeout(() => {
-      let dataset = []
-      volumeFlow.forEach((item,index)=>{
-        dataset.push(
-          {
-            label: "",
-            data: item,
-            borderColor: `${colorList[index%10]}`,
-            borderWidth: 2.5,
-            showLine: true,
-            tension: 0.4
-          }
-        )
-      })
-      let time3 = setTimeout(() => {
-        let data = {
-          labels: '',
-          datasets: dataset,
-        }
-        let time4 = setTimeout(() => {
-          setGraphData(data);
-        }, 50);
-        return()=>{
-          clearTimeout(time4);
-        }
-      }, 50);
-      return()=>{
-        clearTimeout(time3);
-      }
-    }, 50);
-    return()=>{
-      clearTimeout(time2);
-    }
-  },50)
-
-  return()=>{
-    clearTimeout(time);
   }
-},[volumeFlow])
-
-
-
-  // timeVolume 그리기
-  useEffect(()=>
-  {
-    console.log("!#!##")
-
-    let time = setTimeout(()=>{
-      console.log("!#!##!@!@")
-      
-      let time2 = setTimeout(() => {
-        let dataset = []
-        timeVolume.forEach((item,index)=>{
-          dataset.push(
-            {
-              label: "",
-              data: item,
-              borderColor: `${colorList[index%10]}`,
-              borderWidth: 2.5,
-              showLine: true,
-              tension: 0.4
-            }
-          )
-        })
-        let time3 = setTimeout(() => {
-          let data = {
-            labels: "",
-            datasets: dataset,
-          }
-          let time4 = setTimeout(() => {
-            setGraphData2(data);
-          }, 50);
-          return()=>{
-            clearTimeout(time4);
-          }
-        }, 50);
-        return()=>{
-          clearTimeout(time3);
-        }
-      }, 50);
-      return()=>{
-        clearTimeout(time2);
-      }
-    },50)
-
-    return()=>{
-      clearTimeout(time);
-    }
-  },[timeVolume])
-
-
+  
   // 노력성 호기 전 호흡 횟수 등 쿠키에서 받아오기
   let breathCount = 3;
   let strongTime = 6;
@@ -633,7 +386,7 @@ useEffect(()=>
   const [blowF, setBlowF] = useState(false);
 
   // 검사 시작 상태
-  // const [meaStart, setMeaStart] = useState(false);
+  const [meaStart, setMeaStart] = useState(false);
   // 데이터 리스트
   const [dataList, setDataList] = useState([]);
   // real데이터 리스트
@@ -1328,7 +1081,6 @@ useEffect(()=>
   const graphStyle = {width:"0px" ,height:"0px", transition:"none"}
 
   const chartRef = useRef();
-  const chartRef2 = useRef();
 
   const measurementEnd = async()=>{
     let rDataList = [];
@@ -1657,7 +1409,7 @@ useEffect(()=>
             </div>
             <div className="graph">
               {temp?<div className="title-y">Volume(L)</div>:<></>}
-              {temp?<Scatter ref={chartRef2} style={graphStyle} data={graphData2} options={graphOption2}/>:<p className='loadingG'>화면 조정 중..</p>}
+              {temp?<Scatter style={graphStyle} data={graphData2} options={graphOption2}/>:<p className='loadingG'>화면 조정 중..</p>}
               {temp?<div className="title-x">Time(s)</div>:<></>}
             </div>
             <div className='volume-bar'>
@@ -1693,54 +1445,13 @@ useEffect(()=>
             <div onClick={()=>{
               console.log(flagTo);
               console.log(dataList.slice(flagTo.from, flagTo.to+1).toString().replaceAll(","," "));
+              console.log(measureSetInfo.administration);
             }}><p>검사 종료</p></div>
           </div>
 
           <div className="history-container">
-            <div className="slider">
-              {
-              totalData == " " || totalData == "Empty resource" || !totalData ? null :
-                totalData.trials.map((item, index)=>(
-                  <div ref={(el)=>{simpleResultsRef.current[index]=el}} onClick={()=>{console.log(simpleResultsRef.current[index]);console.log(item.measurementId);selectGraph(index)}} key={item.measurementId}  className='simple-result-container'>
-                    <div className='simple-result-title-container'>
-                      <p className='simple-result-title'>{item.bronchodilator}</p>
-                      <p className='simple-result-date'>검사일시({item.date})</p>
-                    </div>
-                    <div className='simple-result-table-container'>
-                      <div className='simple-result-table-column'>
-                        <p></p>
-                        <p>meas</p>
-                        <p>pred</p>
-                        <p>percent</p>
-                      </div>
-                      <div className='simple-result-table-FVC'>
-                        <p>{item.results[0].title}({item.results[0].unit})</p>
-                        <p>{item.results[0].meas?item.results[0].meas:"-"}</p>
-                        <p>{item.results[0].pred?item.results[0].pred:"-"}</p>
-                        <p>{item.results[0].per?item.results[0].per:"-"}</p>
-                      </div>
-                      <div className='simple-result-table-FEV1'>
-                        <p>{item.results[1].title}({item.results[1].unit})</p>
-                        <p>{item.results[1].meas?item.results[1].meas:"-"}</p>
-                        <p>{item.results[1].pred?item.results[1].pred:"-"}</p>
-                        <p>{item.results[1].per?item.results[1].per:"-"}</p>
-                      </div>
-                      <div className='simple-result-table-FEV1per'>
-                        <p>FEV1%</p>
-                        <p>{item.results[2].meas?item.results[2].meas:"-"}</p>
-                        <p>{item.results[2].pred?item.results[2].pred:"-"}</p>
-                        <p>{item.results[2].per?item.results[2].per:"-"}</p>
-                      </div>
-                      <div className='simple-result-table-PEF'>
-                        <p>PEF(L/s)</p>
-                        <p>{item.results[3].meas?item.results[3].meas:"-"}</p>
-                        <p>{item.results[3].pred?item.results[3].pred:"-"}</p>
-                        <p>{item.results[3].per?item.results[3].per:"-"}</p>
-                      </div>
-                    </div>
-                  </div>
-                  ))
-              }
+            <div className="data">
+
             </div>
           </div>
         </div>
@@ -1748,5 +1459,5 @@ useEffect(()=>
   );
 }
 
-export default MeasurementPage;
+export default MeasurementSVCPage;
 

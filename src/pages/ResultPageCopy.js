@@ -14,6 +14,7 @@ import annotationPlugin from 'chartjs-plugin-annotation';
 
 function ResultPageCopy(){
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
+
   const location = useLocation();
   const navigator = useNavigate();
   const state = location.state;
@@ -29,6 +30,9 @@ function ResultPageCopy(){
   })
 
   let diagnosis, trials;
+
+  const chartRef = useRef();
+  const chartRef2 = useRef();
 
   let colorList = ['rgb(5,128,190)','rgb(158,178,243)','rgb(83, 225, 232)','rgb(67,185,162)','rgb(106,219,182)','rgb(255,189,145)','rgb(255,130,130)','rgb(236,144,236)','rgb(175,175,175)','rgb(97,97,97)'];
   
@@ -48,6 +52,7 @@ useEffect(()=>{
     let timeVolumeList = [];
     let volumeFlowList = [];
     let timeVolumeMaxList = [];
+    let timeVolumeMaxListX = [];
 
     if(trials){
       console.log(trials.length);
@@ -61,6 +66,11 @@ useEffect(()=>{
 
         //현 timeVolume에서 최대값 찾기
         timeVolumeMaxList.push(item.results[3].meas);
+        timeVolumeMaxListX.push(item.graph.timeVolume[item.graph.timeVolume.length-1].x); //최대 x값 찾기
+      })
+      timeVolumeMaxListX.sort((a,b)=>a-b);
+      timeVolumeMaxList.forEach((item, idx)=>{
+        timeVolumeList[idx].push({x : Math.max(Math.ceil(timeVolumeMaxListX[timeVolumeMaxListX.length-1]), 3), y: timeVolumeList[idx][timeVolumeList[idx].length-1].y})
       })
       setVolumeFlow(volumeFlowList);
       setTimeVolume(timeVolumeList);
@@ -71,7 +81,8 @@ useEffect(()=>{
       setTrigger(0);
     }
   },[totalData])
-
+// timeVolumeList -> meas 최대값 == y축 마지막값(최대값) / 마지막x값들 중 최대값을 각 데이터셋에 적용
+// dataset.push({x: 마지막x값들 중 최대값, y:tvMax[index]})
 
 
 
@@ -354,9 +365,10 @@ useEffect(()=>{
         min: 0,
         // max: parseInt(Math.max(...tvMax)),
         // suggestedMax: 6.0,
+        // max:5.5,
         ticks:{
           autoSkip: false,
-          // stepSize : 0.1,
+          // stepSize : 0.25,
           // precision : 0.1,
           beginAtZero: false,
           max: 12.0,
@@ -404,8 +416,13 @@ useEffect(()=>{
     },
   }
 
-  const [graphOption2,setGraphOption2]= useState({
+
+  const [graphOption2, setGraphOption2]=useState({
+
     plugins:{
+      afterDraw: function (chart, easing) {
+        console.log(chart);
+      },
       legend: {
           display: false
       },
@@ -416,6 +433,7 @@ useEffect(()=>{
     afterDraw: function (chart, easing) {
       console.log(chart);
     },
+    
     responsive: true,
     animation:{
       duration:0
@@ -562,7 +580,6 @@ useEffect(()=>{
   console.log(chartRef.current);
 },[])
 
-
   // 창 크기 조절에 따른 그래프 크기 조절
   const [first, setFirst] = useState({x:window.innerWidth, y: window.innerHeight})
   const [second, setSecond] = useState({x:window.innerWidth, y: window.innerHeight})
@@ -582,6 +599,7 @@ useEffect(()=>{
 
   useEffect(()=>{
     let time = setTimeout(() => {
+      setGraphOption2({...graphOption2})
       setTemp(true);
     },500);
   },[graphData])
@@ -598,6 +616,7 @@ useEffect(()=>{
         if(chartRef.current){
           console.log("HELLO")
           chartRef.current.resize();
+          chartRef2.current.update();
         };
       }
       else{
@@ -723,7 +742,7 @@ useEffect(()=>{
       clearTimeout(time);
     }
   },[timeVolume])
-  
+
   // svcGraph 그리기
   useEffect(()=>
   {
@@ -912,9 +931,9 @@ console.log(totalData)
 
   return( 
     <div className="result-page-container">
-       {dateSelectorStat ? <DateSelector data={inspectionDate} onOff={setDateSelectorStat} select={dateSelect}/> : null}
+      {dateSelectorStat ? <DateSelector data={inspectionDate} onOff={setDateSelectorStat} select={dateSelect}/> : null}
         <div className="nav">
-          <div className="nav-logo" onClick={()=>{console.log(graphData);}}>
+          <div className="nav-logo" onClick={()=>{console.log(chartRef2.current);}}>
             <h1>The SpiroKit</h1>
           </div>
           <div className="nav-content-container">
@@ -935,7 +954,7 @@ console.log(totalData)
               </div>
             </div>
             <div className="nav-right-container">
-              <div className="select-patient-btn" onClick={()=>{navigator('/memberListCopy')}}>환자 선택</div>
+              <div className="select-patient-btn" onClick={()=>{navigator('/memberList')}}>환자 선택</div>
               <div className='setting-btn-container' onClick={()=>{navigator("/setting")}}>
                 <FontAwesomeIcon className='cogIcon' icon={faGear}/>
                 <p className="setting-btn" >설정</p>
@@ -993,7 +1012,7 @@ console.log(totalData)
 
               {/* // 이부분 api 문제있음 */}
               <div className="title">흡연 기간(연)</div> 
-              <div className="content">{totalData.fvc === '' ? '': totalData.fvc.subject[11].value == '' ? "-" :parseInt(state.subject[12].value) - parseInt(state.subject[11].value)}</div>
+              <div className="content">{totalData.fvc === '' ? '': totalData.fvc.subject[11].value == '' ? "-" :parseInt(totalData.fvc.subject[12].value) - parseInt(totalData.fvc.subject[11].value)}</div>
               
 
               {/* <div className="space"></div> */}

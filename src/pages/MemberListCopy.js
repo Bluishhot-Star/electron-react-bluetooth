@@ -38,26 +38,23 @@ const MemberListCopy = ()=>{
   //     })
   // },[])
 
-  // 클릭한 subject css State
-  const [clicked, setClicked] = useState("");
+  // // 클릭한 subject css State
+  // const [clicked, setClicked] = useState("");
 
-  // 클릭했을때 css 변화
-  useEffect(()=>{
-    if(clicked == false){return}
-    let temp = document.getElementById(clicked);
-    console.log(temp);
-    temp.classList.add("memberList-selected");
-  },[clicked])
+  // // 클릭했을때 css 변화
+  // useEffect(()=>{
+  //   if(clicked == false){return}
+  //   let temp = document.getElementById(clicked);
+  //   console.log(temp);
+  //   temp.classList.add("memberList-selected");
+  // },[clicked])
 
-  const removeCSS=(e)=>{
-    let temp = document.getElementById(clicked);
-    temp.classList.remove("memberList-selected")
-  }
+  // const removeCSS=(e)=>{
+  //   let temp = document.getElementById(clicked);
+  //   temp.classList.remove("memberList-selected")
+  // }
 
   const click = (index,chartNumber, birth) =>{
-    setCurtainStat(false) // 환자 선택 문구 삭제
-    if(clicked !== ""){removeCSS();}//햔재 클릭된 요소css 제거
-    setClicked("memberItem"+index);
     setBirth(birth);
     console.log(birth);
 
@@ -66,8 +63,6 @@ const MemberListCopy = ()=>{
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
     }).then((res)=>{
-      // setDate(res.data.response[0]);
-      // setChartNumber(chartNumber);
       report(res.data.response,chartNumber);
     }).catch((err)=>{
       console.log(err);
@@ -91,7 +86,7 @@ const MemberListCopy = ()=>{
       console.log(err);
     })
     await axios.get(`/subjects/${chartNum}/histories`
-     , {
+    , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
     }}).then((res)=>{
@@ -255,7 +250,7 @@ const MemberListCopy = ()=>{
         <div className="memberList-page-navC">
           <p onClick={()=>{console.log(deviceInfo);
             // testIt()
-            navigator('/memberlistcopy');
+            navigator('/memberList');
           }}>환자 선택</p>
           <div className='setting-btn-containerC' onClick={()=>{navigator("/setting")}}>
             <FontAwesomeIcon className='cogIconC' icon={faGear}/>
@@ -265,7 +260,7 @@ const MemberListCopy = ()=>{
         <div className="memberList-page-left-containerC">
           <div className="patient-list-containerC">
             <div className="add-patient-btn-containerC">
-              <div className="add-patient-btnC" onClick={()=>{navigator("./addPatientCopy", {state: {update:false}})}}>
+              <div className="add-patient-btnC" onClick={()=>{navigator("./addPatient", {state: {update:false}})}}>
                 + 환자 추가
               </div>
             </div>
@@ -294,17 +289,21 @@ const MemberListCopy = ()=>{
                 {
                   examinees.map((item, index)=>{
                     return(
-                    <div id={"memberItem"+index} className="patient-itemC" key={item.chartNumber} onClick={(e)=>{click(index,item.chartNumber,item.birthday);}}>
+                    <div id={"memberItem"+index} className="patient-itemC" key={index}>
                       <div className="patient-item-chartNumberC"><p>{item.chartNumber}</p></div>
                       <div className="patient-item-nameC"><p>{item.name}</p></div>
                       <div className="patient-item-genderC"><p>{item.gender == "m" ? "남자" : "여자"}</p></div>
                       <div className="patient-item-birthdayC"><p>{item.birthday}</p></div>
-                      <div className="btn">
-                        <input type='button' id='measurmentBtn' className='measurmentBtn'onClick={()=>{navigator("./addPatientCopy", {state: {chartNumber:item.chartNumber,update:true}})}}/>
+                      <div className="btn" onClick={(e)=>{e.preventDefault(); navigator("./addPatient", {state: {chartNumber:item.chartNumber,update:true}})}}>
+                        <input type='button' id='measurmentBtn' className='measurmentBtn'/>
                         <label htmlFor='measurmentBtn'>검사하기</label>
                       </div>
-                      <div className="btn">
-                        <input type='button' id='resultBtn' className='resultBtn' onChange={(e)=>{click(index,item.chartNumber,item.birthday);}}/>
+                      <div className="btn" onClick={(e)=>{
+                          e.preventDefault();
+                          console.log(e.target);
+                          console.log(item.chartNumber); 
+                          click(index,item.chartNumber,item.birthday);}}>
+                        <input type='button' id={"resultBtn" + index} className='resultBtn'/>
                         <label htmlFor='resultBtn'>결과보기</label>
                       </div>
                     </div>

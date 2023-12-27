@@ -20,6 +20,7 @@ import MngClncs from './pages/MngClncs.js'
 import SubjectSetting from './pages/SubjectSetting.js'
 import DeviceSetting from './pages/DeviceSetting.js'
 import MeasurementPage from './pages/measurementPage';
+import MeasurementSVCPage from './pages/measurementSVCPage';
 import GainResultPage from './pages/GainResultPage.js';
 import ManagementSetting from './pages/ManagementSetting.js';
 import GainMeasurementPage from './pages/GainMeasurementPage.js';
@@ -37,10 +38,12 @@ function App() {
       <Routes>
         <Route path='/' element={<LoginForm/>}/>
         <Route path='/signUp' element={<SignUpForm/>}/>
-        <Route path='/memberList' element={<MemberList/>}/>
-        <Route path='/memberList/addPatient' element={<AddPatient/>}/>
         <Route path='/memberList/measureInfo' element={<MeasureInfo/>}/>
-        <Route path='/memberList/resultPage' element={<ResultPage/>}/>
+
+        {/* <Route path='/memberList' element={<MemberList/>}/>
+        <Route path='/memberList/addPatient' element={<AddPatient/>}/>
+        <Route path='/memberList/resultPage' element={<ResultPage/>}/> */}
+
         <Route path='/memberList/detailPage' element={<DetailPage/>}/>
         <Route path='/memberList/detailSvcPage' element={<DetailSvcPage/>}/>
         <Route path='/setting' element={<SettingPage/>}/>
@@ -49,13 +52,15 @@ function App() {
         <Route path='/setting/deviceSetting' element={<DeviceSetting/>}/>
         <Route path='/setting/deviceSetting/gainResultPage' element={<GainResultPage/>}/>
         <Route path='/measurement' element={<MeasurementPage/>}/>
+        <Route path='/measurementSVC' element={<MeasurementSVCPage/>}/>
         <Route path='/setting/managementSetting' element={<ManagementSetting/>}/>
         <Route path='/setting/gainPage' element={<GainPage/>}/>
         <Route path='/setting/gainPage/gainMeasurementPage' element={<GainMeasurementPage/>}/>
         <Route path='/setting/verificationPage' element={<VerificationPage/>}/>
-        <Route path='/memberlistcopy' element={<MemberListCopy/>}/>
-        <Route path='/memberlistcopy/addPatientCopy' element={<AddPatientCopy/>}/>
-        <Route path='/memberlistcopy/resultPage' element={<ResultPageCopy/>}/>
+        
+        <Route path='/memberList' element={<MemberListCopy/>}/>
+        <Route path='/memberList/addPatient' element={<AddPatientCopy/>}/>
+        <Route path='/memberList/resultPage' element={<ResultPageCopy/>}/>
       </Routes>
     </div>
   );
