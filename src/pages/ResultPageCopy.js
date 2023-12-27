@@ -4,13 +4,14 @@ import { Cookies, useCookies } from 'react-cookie';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGear,faChevronRight,faCalendar } from '@fortawesome/free-solid-svg-icons'
+import { faGear,faChevronRight,faCalendar, faSquareXmark } from '@fortawesome/free-solid-svg-icons'
 import { debounce } from 'lodash'
 import {registerables,Chart as ChartJS,RadialLinearScale,LineElement,Tooltip,Legend,} from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
 import { useLocation } from 'react-router-dom';
 import DateSelector from './DateSelector.js'
 import annotationPlugin from 'chartjs-plugin-annotation';
+
 function ResultPageCopy(){
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
 
@@ -415,7 +416,9 @@ useEffect(()=>{
     },
   }
 
+
   const [graphOption2, setGraphOption2]=useState({
+
     plugins:{
       afterDraw: function (chart, easing) {
         console.log(chart);
@@ -425,6 +428,10 @@ useEffect(()=>{
       },
       resizeDelay:0,
       datalabels: false,
+      
+    },
+    afterDraw: function (chart, easing) {
+      console.log(chart);
     },
     
     responsive: true,
@@ -438,6 +445,7 @@ useEffect(()=>{
         radius: 0,
       },
     },
+    
     scales: {
       x: {
         axios: 'x',
@@ -510,6 +518,7 @@ useEffect(()=>{
         radius: 0,
       },
     },
+    
     scales: {
       x: {
         axios: 'x',
@@ -567,7 +576,9 @@ useEffect(()=>{
     },
   }
 
-
+useEffect(()=>{
+  console.log(chartRef.current);
+},[])
 
   // 창 크기 조절에 따른 그래프 크기 조절
   const [first, setFirst] = useState({x:window.innerWidth, y: window.innerHeight})
@@ -787,6 +798,8 @@ useEffect(()=>{
 
   const graphStyle = {width:"0px" ,height:"0px", transition:"none"}
 
+  const chartRef = useRef();
+  const chartRef2 = useRef();
 
   const simpleResultsRef = useRef([]);
   const svcSimpleResultsRef = useRef([]);
@@ -798,6 +811,7 @@ useEffect(()=>{
 
   const FVCBtnRef = useRef();
   const SVCBtnRef = useRef();
+
 
   const changeType = (type)=>{
     setFvcSvc(type);
@@ -894,6 +908,27 @@ useEffect(()=>{console.log(state)},[])
     else{}
   },[goTO])
   
+useEffect(()=>{
+console.log(totalData)
+},[totalData])
+  const simpleResult = async(id,date)=>{
+    await axios.delete(`/measurements/${id}` , {
+      headers: {
+        Authorization: `Bearer ${cookies.get('accessToken')}`
+      }
+    }).then((res)=>{
+      console.log(res);
+    }).catch((err)=>{
+      console.log(err);
+    })
+    console.log(date.split(' ')[0]);
+    report(date.split(' ')[0]);
+
+  }
+  useEffect(()=>{
+    console.log(ChartJS.defaults)
+  },[])  
+
   return( 
     <div className="result-page-container">
       {dateSelectorStat ? <DateSelector data={inspectionDate} onOff={setDateSelectorStat} select={dateSelect}/> : null}
@@ -903,9 +938,19 @@ useEffect(()=>{console.log(state)},[])
           </div>
           <div className="nav-content-container">
             <div className="nav-left-container">
-              <div className="admin">
-                <span>담당자</span>
-                {/* <span>{state.subject[7].value}</span> */}
+              <div className='admin'>
+                <span>담당자 </span>
+                
+                <span>{state.fvc.subject[7].value}</span>
+                
+              </div>
+              <div className='error'>
+                <span>Error Code </span>
+                <span>{state.fvc.diagnosis.errorCode}</span>
+              </div>
+              <div className='grade'>
+                <span>Grade </span>
+                <span>{state.fvc.diagnosis.suitability}</span>
               </div>
             </div>
             <div className="nav-right-container">
@@ -1019,8 +1064,12 @@ useEffect(()=>{console.log(state)},[])
               totalData.fvc.trials.map((item, index)=>(
                 <div ref={(el)=>{simpleResultsRef.current[index]=el}} onClick={()=>{console.log(simpleResultsRef.current[index]);console.log(item.measurementId);selectGraph(index)}} key={item.measurementId}  className='simple-result-container'>
                   <div className='simple-result-title-container'>
-                    <p className='simple-result-title'>{item.bronchodilator}</p>
-                    <p className='simple-result-date'>검사일시({item.date})</p>
+                  <FontAwesomeIcon className='deleteIcon' icon={faSquareXmark} style={{color: "#ff0000",}} onClick={()=>simpleResult(item.measurementId, item.date)}/>
+                  <div className='simple-result-title-date'>
+                    <div className='simple-result-title'>{item.bronchodilator}</div>
+                    <div className='simple-result-date'>({item.date})</div>
+                  </div>
+                    
                   </div>
                   <div className='simple-result-table-container'>
                     <div className='simple-result-table-column'>
@@ -1034,6 +1083,12 @@ useEffect(()=>{console.log(state)},[])
                       <p>{item.results[0].meas?item.results[0].meas:"-"}</p>
                       <p>{item.results[0].pred?item.results[0].pred:"-"}</p>
                       <p>{item.results[0].per?item.results[0].per:"-"}</p>
+                    </div>
+                    <div className='simple-result-table-FEV1'>
+                      <p>{item.results[22].title}({item.results[22].unit})</p>
+                      <p>{item.results[22].meas?item.results[22].meas:"-"}</p>
+                      <p>{item.results[22].pred?item.results[22].pred:"-"}</p>
+                      <p>{item.results[22].per?item.results[22].per:"-"}</p>
                     </div>
                     <div className='simple-result-table-FEV1'>
                       <p>{item.results[1].title}({item.results[1].unit})</p>

@@ -215,7 +215,9 @@ function ResultPage(){
     
   }
 
-
+  useEffect(()=>{
+    console.log(chartRef)
+  },[])
 
 
   useEffect(()=>{
@@ -343,6 +345,7 @@ function ResultPage(){
         radius: 0,
       },
     },
+    
     scales: {
       x: {
         axios: 'x',
@@ -417,6 +420,9 @@ function ResultPage(){
       point: {
         radius: 0,
       },
+    },
+    afterDraw: function (chart, easing) {
+      console.log(chart);
     },
     scales: {
       x: {
