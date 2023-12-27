@@ -79,9 +79,10 @@ const MemberListCopy = ()=>{
       }
     }).then((res)=>{
       console.log(res);
-      setData1(res.data.response);
-      console.log(data1);
-      
+      if(res.data.subCode === 2004){
+        setData1(res.data.message);
+      }
+      else setData1(res.data.response);
     }).catch((err)=>{
       console.log(err);
     })

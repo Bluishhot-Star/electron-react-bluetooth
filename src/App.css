@@ -459,8 +459,10 @@
 }
 .history-container .slider .simple-result-title-container .deleteIcon{
   position: absolute;
-  
   right:2%;
+}
+.history-container .slider .simple-result-title-container .deleteIcon:hover{
+  opacity: .3;
 }
 .history-container .slider .simple-result-container.disabled{
   cursor: default;

@@ -23,7 +23,7 @@ function ResultPageCopy(){
   const [info, setInfo] = useState();
   const [tvMax, setTvMax] = useState([10]);
   const [totalData,setTotalData] = useState({
-    fvc:"",
+    fvc:"Empty resource",
     svc:"Empty resource",
     date:"",
     birth:""
@@ -798,9 +798,6 @@ useEffect(()=>{
 
   const graphStyle = {width:"0px" ,height:"0px", transition:"none"}
 
-  const chartRef = useRef();
-  const chartRef2 = useRef();
-
   const simpleResultsRef = useRef([]);
   const svcSimpleResultsRef = useRef([]);
   const addSimpleResultsRef = (el) => {simpleResultsRef.current.push(el)};
@@ -842,8 +839,8 @@ useEffect(()=>{console.log(state)},[])
   });
   const [date, setDate] = useState([]);
   useEffect(()=>{
-    if(state.chartNumber !== ""){
-      axios.get(`/subjects/${state.fvc.subject[0].value}/histories?from=${inspectionDate.start === "" ? "2000-01-01" : inspectionDate.start}&to=${inspectionDate.end === "" ? "2099-01-01" : inspectionDate.end}` , {
+    if(totalData.chartNumber !== "" && totalData.fvc !== "" && totalData.fvc!=="Empty resource"){
+      axios.get(`/subjects/${totalData.fvc.subject[0].value}/histories?from=${inspectionDate.start === "" ? "2000-01-01" : inspectionDate.start}&to=${inspectionDate.end === "" ? "2099-01-01" : inspectionDate.end}` , {
         headers: {
           Authorization: `Bearer ${cookies.get('accessToken')}`
         }}).then((res)=>{
@@ -941,16 +938,16 @@ console.log(totalData)
               <div className='admin'>
                 <span>담당자 </span>
                 
-                <span>{state.fvc.subject[7].value}</span>
+                <span>{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[7].value}</span>
                 
               </div>
               <div className='error'>
                 <span>Error Code </span>
-                <span>{state.fvc.diagnosis.errorCode}</span>
+                <span>{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '-': totalData.fvc.diagnosis.errorCode}</span>
               </div>
               <div className='grade'>
                 <span>Grade </span>
-                <span>{state.fvc.diagnosis.suitability}</span>
+                <span>{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '-': totalData.fvc.diagnosis.suitability}</span> 
               </div>
             </div>
             <div className="nav-right-container">
@@ -982,7 +979,7 @@ console.log(totalData)
           </div>
             <div className="measure-item-containerC">
               { state.date ? 
-              date.map((item, index)=>(
+              state.date.map((item, index)=>(
                     // <Link key={item} to={`/ss/${examinee}/${item}`}>
                 <div key={item} className="measure-item" onClick={()=>{report(item);}}>
                   <div className='measure-item-date'>{item}</div>
@@ -995,24 +992,24 @@ console.log(totalData)
             <span>환자 정보</span>
             <div className="patient-infoC">
               <div className="title">이름</div>
-              <div className="content">{totalData.fvc === '' ? '': totalData.fvc.subject[1].value}</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[1].value}</div>
               <div className="title">성별</div>
-              <div className="content">{totalData.fvc === '' ? '': totalData.fvc.subject[3].value=="m"?"남자":"여자"}</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[3].value=="m"?"남자":"여자"}</div>
               <div className="title">신장</div>
-              <div className="content">{totalData.fvc === '' ? '': totalData.fvc.subject[4].value}cm</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[4].value}cm</div>
               <div className="title">몸무게</div>
-              <div className="content">{totalData.fvc === '' ? '': totalData.fvc.subject[5].value}kg</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[5].value}kg</div>
               <div className="title">생년월일</div>
-              <div className="content">{totalData.fvc === '' ? '': totalData.birth}</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.birth}</div>
               <div className="title">연간 흡연량</div>
-              <div className="content">{totalData.fvc === '' ? '': totalData.fvc.subject[13].value == '' ? "-":state.fvc.subject[13].value}</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[13].value == '' ? "-":state.fvc.subject[13].value}</div>
               <div className="title">흡연 여부</div>
-              <div className="content">{totalData.fvc === '' ? '': totalData.fvc.subject[9].value === "false"||state.fvc.subject[9].value === false ? "아니오" : "예"}</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[9].value === "false"||state.fvc.subject[9].value === false ? "아니오" : "예"}</div>
 
 
               {/* // 이부분 api 문제있음 */}
               <div className="title">흡연 기간(연)</div> 
-              <div className="content">{totalData.fvc === '' ? '': totalData.fvc.subject[11].value == '' ? "-" :parseInt(totalData.fvc.subject[12].value) - parseInt(totalData.fvc.subject[11].value)}</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[11].value == '' ? "-" :parseInt(totalData.fvc.subject[12].value) - parseInt(totalData.fvc.subject[11].value)}</div>
               
 
               {/* <div className="space"></div> */}
@@ -1060,11 +1057,11 @@ console.log(totalData)
             <div className="slider">
             {
               FvcSvc == "fvc" ?
-              totalData.fvc === ''? '' :
+              totalData.fvc === '' || totalData.fvc === 'Empty resource'? '' :
               totalData.fvc.trials.map((item, index)=>(
                 <div ref={(el)=>{simpleResultsRef.current[index]=el}} onClick={()=>{console.log(simpleResultsRef.current[index]);console.log(item.measurementId);selectGraph(index)}} key={item.measurementId}  className='simple-result-container'>
                   <div className='simple-result-title-container'>
-                  <FontAwesomeIcon className='deleteIcon' icon={faSquareXmark} style={{color: "#ff0000",}} onClick={()=>simpleResult(item.measurementId, item.date)}/>
+                  <FontAwesomeIcon className='deleteIcon' icon={faSquareXmark} style={{color: "#ff0000",}} onClick={(e)=>{e.stopPropagation(); simpleResult(item.measurementId, item.date)}}/>
                   <div className='simple-result-title-date'>
                     <div className='simple-result-title'>{item.bronchodilator}</div>
                     <div className='simple-result-date'>({item.date})</div>

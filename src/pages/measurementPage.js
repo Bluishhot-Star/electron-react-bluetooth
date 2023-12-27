@@ -5,7 +5,7 @@ import Alert from "../components/Alerts.js"
 import Confirm from "../components/Confirm.js"
 import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon} from '@fortawesome/react-fontawesome'
-import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+import { faChevronLeft, faSquareXmark } from '@fortawesome/free-solid-svg-icons'
 import { FaBluetoothB } from "react-icons/fa6";
 import {} from "@fortawesome/fontawesome-svg-core"
 import styled from 'styled-components';
@@ -51,6 +51,33 @@ const MeasurementPage = () =>{
     console.log(location.state.data)
     setTotalData(location.state.data);
   },[])
+  const simpleResult = async(id,date)=>{
+    await axios.delete(`/measurements/${id}` , {
+      headers: {
+        Authorization: `Bearer ${cookies.get('accessToken')}`
+      }
+    }).then((res)=>{
+      console.log(res);
+    }).catch((err)=>{
+      console.log(err);
+    })
+    getMeasureData(date);
+  }
+  const getMeasureData = async(date)=>{
+    await axios.get(`/subjects/${totalData.chartNumber}/types/fvc/results/${date}` , {
+      headers: {
+        Authorization: `Bearer ${cookies.get('accessToken')}`
+      }
+    }).then((res)=>{
+      console.log(res);
+      if(res.data.subCode === 2004){
+        setTotalData(res.data.message);
+      }
+      else setTotalData(res.data.response);
+    }).catch((err)=>{
+      console.log(err);
+    })
+  }
   //fvc 그래프 처리
   const simpleResultsRef = useRef([]);
   useEffect(()=>{
@@ -92,7 +119,7 @@ const MeasurementPage = () =>{
 
   //그래프 선택
   const selectGraph=(index)=>{
-    if(meaStart)return;
+    if(meaStart){return;}
     console.log("HE!!!!");
     let temp;
     //처음 눌렀을때
@@ -153,20 +180,22 @@ const MeasurementPage = () =>{
   // 검사 시작 상태
   const [meaStart, setMeaStart] = useState(false);
   useEffect(()=>{
-    if(meaStart && totalData){
-      setTrigger(0);
-      simpleResultsRef.current.forEach((item,index)=>{
-        simpleResultsRef.current[index].disabled = true;
-        simpleResultsRef.current[index].classList += "disabled";
-      })
-    }
-    else{
-      simpleResultsRef.current.forEach((item,index)=>{
-        simpleResultsRef.current[index].disabled = false;
-        if(simpleResultsRef.current[index].classList.contains("disabled")){
-          simpleResultsRef.current[index].classList.remove("disabled");
-        }
-      })
+    if(totalData !== " " && totalData !== "Empty resource"){
+      if(meaStart){
+        setTrigger(0);
+        simpleResultsRef.current.forEach((item,index)=>{
+          simpleResultsRef.current[index].disabled = true;
+          simpleResultsRef.current[index].classList += "disabled";
+        })
+      }
+      else{
+        simpleResultsRef.current.forEach((item,index)=>{
+          simpleResultsRef.current[index].disabled = false;
+          if(simpleResultsRef.current[index].classList.contains("disabled")){
+            simpleResultsRef.current[index].classList.remove("disabled");
+          }
+        })
+      }
     }
   })
   useEffect(()=>{
@@ -1702,43 +1731,53 @@ useEffect(()=>
               totalData == " " || totalData == "Empty resource" || !totalData ? null :
                 totalData.trials.map((item, index)=>(
                   <div ref={(el)=>{simpleResultsRef.current[index]=el}} onClick={()=>{console.log(simpleResultsRef.current[index]);console.log(item.measurementId);selectGraph(index)}} key={item.measurementId}  className='simple-result-container'>
-                    <div className='simple-result-title-container'>
-                      <p className='simple-result-title'>{item.bronchodilator}</p>
-                      <p className='simple-result-date'>검사일시({item.date})</p>
+                  <div className='simple-result-title-container'>
+                  <FontAwesomeIcon className='deleteIcon' icon={faSquareXmark} style={{color: "#ff0000",}} onClick={(e)=>{e.stopPropagation(); simpleResult(item.measurementId, item.date);}}/>
+                  <div className='simple-result-title-date'>
+                    <div className='simple-result-title'>{item.bronchodilator}</div>
+                    <div className='simple-result-date'>({item.date})</div>
+                  </div>
+                    
+                  </div>
+                  <div className='simple-result-table-container'>
+                    <div className='simple-result-table-column'>
+                      <p></p>
+                      <p>meas</p>
+                      <p>pred</p>
+                      <p>percent</p>
                     </div>
-                    <div className='simple-result-table-container'>
-                      <div className='simple-result-table-column'>
-                        <p></p>
-                        <p>meas</p>
-                        <p>pred</p>
-                        <p>percent</p>
-                      </div>
-                      <div className='simple-result-table-FVC'>
-                        <p>{item.results[0].title}({item.results[0].unit})</p>
-                        <p>{item.results[0].meas?item.results[0].meas:"-"}</p>
-                        <p>{item.results[0].pred?item.results[0].pred:"-"}</p>
-                        <p>{item.results[0].per?item.results[0].per:"-"}</p>
-                      </div>
-                      <div className='simple-result-table-FEV1'>
-                        <p>{item.results[1].title}({item.results[1].unit})</p>
-                        <p>{item.results[1].meas?item.results[1].meas:"-"}</p>
-                        <p>{item.results[1].pred?item.results[1].pred:"-"}</p>
-                        <p>{item.results[1].per?item.results[1].per:"-"}</p>
-                      </div>
-                      <div className='simple-result-table-FEV1per'>
-                        <p>FEV1%</p>
-                        <p>{item.results[2].meas?item.results[2].meas:"-"}</p>
-                        <p>{item.results[2].pred?item.results[2].pred:"-"}</p>
-                        <p>{item.results[2].per?item.results[2].per:"-"}</p>
-                      </div>
-                      <div className='simple-result-table-PEF'>
-                        <p>PEF(L/s)</p>
-                        <p>{item.results[3].meas?item.results[3].meas:"-"}</p>
-                        <p>{item.results[3].pred?item.results[3].pred:"-"}</p>
-                        <p>{item.results[3].per?item.results[3].per:"-"}</p>
-                      </div>
+                    <div className='simple-result-table-FVC'>
+                      <p>{item.results[0].title}({item.results[0].unit})</p>
+                      <p>{item.results[0].meas?item.results[0].meas:"-"}</p>
+                      <p>{item.results[0].pred?item.results[0].pred:"-"}</p>
+                      <p>{item.results[0].per?item.results[0].per:"-"}</p>
+                    </div>
+                    <div className='simple-result-table-FEV1'>
+                      <p>{item.results[22].title}({item.results[22].unit})</p>
+                      <p>{item.results[22].meas?item.results[22].meas:"-"}</p>
+                      <p>{item.results[22].pred?item.results[22].pred:"-"}</p>
+                      <p>{item.results[22].per?item.results[22].per:"-"}</p>
+                    </div>
+                    <div className='simple-result-table-FEV1'>
+                      <p>{item.results[1].title}({item.results[1].unit})</p>
+                      <p>{item.results[1].meas?item.results[1].meas:"-"}</p>
+                      <p>{item.results[1].pred?item.results[1].pred:"-"}</p>
+                      <p>{item.results[1].per?item.results[1].per:"-"}</p>
+                    </div>
+                    <div className='simple-result-table-FEV1per'>
+                      <p>FEV1%</p>
+                      <p>{item.results[2].meas?item.results[2].meas:"-"}</p>
+                      <p>{item.results[2].pred?item.results[2].pred:"-"}</p>
+                      <p>{item.results[2].per?item.results[2].per:"-"}</p>
+                    </div>
+                    <div className='simple-result-table-PEF'>
+                      <p>PEF(L/s)</p>
+                      <p>{item.results[3].meas?item.results[3].meas:"-"}</p>
+                      <p>{item.results[3].pred?item.results[3].pred:"-"}</p>
+                      <p>{item.results[3].per?item.results[3].per:"-"}</p>
                     </div>
                   </div>
+                </div>
                   ))
               }
             </div>
