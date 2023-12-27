@@ -36,6 +36,10 @@ const MeasureInfo = ()=>{
   const navigatorR = useNavigate();
   const location = useLocation();
   const state = location.state;
+  useEffect(()=>{
+    console.log("HERE");
+    console.log(state);
+  })
 
   const administration = (value) =>{
     setInfo({...info, administration: value});
@@ -54,6 +58,71 @@ const MeasureInfo = ()=>{
       console.log(addBtnRef.current.classList)
     }
   },[info]);
+
+
+
+
+  const [date, setDate] = useState();
+  useEffect(()=>{
+    let today = new Date();   
+    let year = today.getFullYear(); // 년도
+    let month = (today.getMonth() + 1).toString().padStart(2,'0');  // 월
+    let day = today.getDate().toString().padStart(2,'0');  // 일
+    let tDate = year+"-"+month+"-"+day;
+    console.log(tDate);
+    setDate(tDate);
+  })
+
+  const [goTO, setGoTO] = useState(false)
+  // let data1, data2;
+  const [data1, setData1] = useState([]); //FVC 데이터
+  const [data2, setData2] = useState([]); //SVC 데이터
+
+  const getMeasureData = async()=>{
+    if(info.type == "FVC"){
+      await axios.get(`/subjects/${state.chartNumber}/types/fvc/results/${date}` , {
+        headers: {
+          Authorization: `Bearer ${cookies.get('accessToken')}`
+        }
+      }).then((res)=>{
+        console.log(res);
+        if(res.data.subCode === 2004){
+          setData1(res.data.message);
+        }
+        else setData1(res.data.response);
+      }).catch((err)=>{
+        console.log(err);
+      })
+    }
+    else if(info.type=="SVC"){
+      await axios.get(`/subjects/${state.chartNumber}/types/svc/results/${date}` , {
+        headers: {
+          Authorization: `Bearer ${cookies.get('accessToken')}`
+        }
+      }).then((res)=>{
+        console.log(res);
+        if(res.data.subCode === 2004){
+          setData2(res.data.message);
+        }
+        else setData2(res.data.response);
+      }).catch((err)=>{
+        console.log(err);
+      })
+    }
+    setGoTO(true);
+  }
+  useEffect(()=>{
+    if(goTO){
+      console.log(data1);
+      console.log(data2);
+      console.log(date);
+      if(info.type == "FVC") navigatorR('/measurement', {state: {data:data1}});
+      else if(info.type == "SVC") navigatorR('/measurementSVC', {state: {data:data2}});
+    }
+    else{}
+  },[goTO])
+
+
 
   return(
     <>
@@ -121,10 +190,8 @@ const MeasureInfo = ()=>{
               </div>
               <div ref={addBtnRef} className="measure-btn" onClick={()=>{
                 if(!addBtnRef.current.classList.contains("disabled")){
-                  navigatorR("/measurement",{state:{info}});
-      
+                  getMeasureData()
                 }
-
                 }}>검사하기</div>
             </form>
           </div>

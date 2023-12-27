@@ -157,7 +157,7 @@ const GainResultPage = () =>{
         });
       }
         
-     
+    
 
     }
   })
@@ -237,6 +237,9 @@ const GainResultPage = () =>{
       point: {
         radius: 0,
       },
+    },
+    afterDraw: function (chart, easing) {
+      console.log(chart);
     },
     scales: {
       x: {

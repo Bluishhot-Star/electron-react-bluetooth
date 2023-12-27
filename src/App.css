@@ -452,6 +452,9 @@
   padding: 1vh 0;
   cursor: pointer;
 }
+.history-container .slider .simple-result-container.disabled{
+  cursor: default;
+}
 .history-container .slider .selected:nth-child(10n+1){border: rgb(5,128,190) .4vh solid; }
 .history-container .slider .selected:nth-child(10n+2){border: rgb(158,178,243) .4vh solid; }
 .history-container .slider .selected:nth-child(10n+3){border: rgb(83, 225, 232) .4vh solid; }
@@ -1606,9 +1609,9 @@
   text-align: center;
   font-size: 1rem;
 }
-.patient-itemC:hover{
+/* .patient-itemC:hover{
   background: #eee;
-}
+} */
 .patient-itemC div{
   display: inline-block;
   width: 100%;
