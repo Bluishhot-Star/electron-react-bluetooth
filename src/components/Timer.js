@@ -10,7 +10,16 @@ function Timer(props){
   const milliSec10Ref = useRef();
   const milliSec1Ref = useRef();
 
-  
+  const formatTime = (time) => {
+    let seconds =  Math.floor((time / 1000) % 60).toString().slice(-2)
+    const temp = Math.floor((time / 10)%100).toString().slice(-2);
+    let millseconds10 = temp[0];
+    let milliseconds1 = temp[1];
+    return { seconds, millseconds10, milliseconds1 };
+  };
+
+  const { seconds, millseconds10, milliseconds1 } = formatTime(time);
+
   useEffect(()=>{
     if(props.start){
       setRun(true);
@@ -22,39 +31,36 @@ function Timer(props){
   },[props.start])
   
   useEffect(()=>{
-    let tempTime = 0;
     if(run){
       intervalRef.current = setInterval(() => {
-        tempTime += 1;
-        timeInterval(tempTime);
-      }, 10);
+        setTime(val=>val+10);
+      },10);
     }
   },[run])
-  let timeInterval = (tempTime)=>{
-
-    if(tempTime == props.stop*100+1){
+  useEffect(()=>{
+    if(time == props.stop*1000+1){
       clearInterval(intervalRef.current)
       setRun(false);
     }
     else{
-      setTime(tempTime)
-      props.setRunTime(tempTime)
+      props.setRunTime(time)
     }
-  }
+  })
 
-  useEffect(()=>{
-    milliSec1Ref.current.innerHTML = time%10; //1의 자리
-    milliSec10Ref.current.innerHTML = parseInt((time/10)%10); //10의 자리
-    secondRef.current.innerHTML = parseInt(time/100);
-  },[time])
+  // useEffect(()=>{
+  //   console.log(time)
+  //   milliSec1Ref.current.innerHTML = ((time % 1000)%100).toString(); //1의 자리 0011
+  //   milliSec10Ref.current.innerHTML = ((time % 1000)/100).toString(); //10의 자리
+  //   secondRef.current.innerHTML = Math.floor((time % 1000)/1000).toString();
+  // },[time])
 
   return(
     <>
       <div className="timer-container">
-        <p ref={secondRef} className="timer-second">0</p>
+        <p ref={secondRef} className="timer-second">{seconds}</p>
         <p>초</p>
-        <p ref={milliSec10Ref} className="timer-millisecond">0</p>
-        <p ref={milliSec1Ref} className="timer-millisecond">0</p>
+        <p ref={milliSec10Ref} className="timer-millisecond">{millseconds10}</p>
+        <p ref={milliSec1Ref} className="timer-millisecond">{milliseconds1}</p>
 
       </div>
     </>

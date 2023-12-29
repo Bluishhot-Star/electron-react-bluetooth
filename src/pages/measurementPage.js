@@ -32,6 +32,7 @@ const MeasurementPage = () =>{
   let dispatch = useDispatch();
   let firstBtnRef = useRef();
   let secondBtnRef = useRef();
+  let thirdBtnRef = useRef();
 
   const [tvMax, setTvMax] = useState([10]);
   let colorList = ['rgb(5,128,190)','rgb(158,178,243)','rgb(83, 225, 232)','rgb(67,185,162)','rgb(106,219,182)','rgb(255,189,145)','rgb(255,130,130)','rgb(236,144,236)','rgb(175,175,175)','rgb(97,97,97)'];
@@ -327,32 +328,32 @@ useEffect(()=>
     switch (strongTime) {
       case 3:
         itemRef.current[30].classList += " endColor";
-        setTimerTick(10.0);
+        setTimerTick(100);
         break;
       
       case 10:
         itemRef.current[30].classList += " endColor";
-        setTimerTick(33.3)
+        setTimerTick(333)
         break;
       
       case 15:
         itemRef.current[36].classList += " endColor";
-        setTimerTick(41.7)
+        setTimerTick(417)
         break;
       
       case 20:
         itemRef.current[40].classList += " endColor";
-        setTimerTick(50.0)
+        setTimerTick(500)
         break;
       
       case 30:
         itemRef.current[30].classList += " endColor";
-        setTimerTick(100.0)
+        setTimerTick(1000)
         break;
       
       default: //default 6
         itemRef.current[24].classList += " endColor";
-        setTimerTick(25.0)
+        setTimerTick(250)
         break;
     }
   }
@@ -738,6 +739,7 @@ useEffect(()=>
     else{
       firstBtnRef.current.classList += " disabled"
       secondBtnRef.current.classList += " disabled";
+      thirdBtnRef.current.classList += " disabled";
     }
   },[meaPreStart])
 
@@ -760,12 +762,12 @@ useEffect(()=>
     if(dataList[0] == '2' && dataList[1] == '2' && dataList[2] == '2'){
       setBlow(true);
     }
-    if(blow==true&&blowF==false){
+    if(blow==true&&blowF==false){ //  입김 불면!
       console.log(dataList[dataList.length-1].slice(0,1))
       if(dataList[dataList.length-1].slice(0,1) == "0"){
         //css 변화로 검사 활성화
         if(secondBtnRef.current.classList.contains("disabled")){
-          firstBtnRef.current.classList.remove("disabled");
+          // firstBtnRef.current.classList.remove("disabled");
           secondBtnRef.current.classList.remove("disabled");
         }
       }
@@ -777,6 +779,8 @@ useEffect(()=>
     if(meaStart){
       let temp = dataList.length;
       let time = setTimeout(() => {
+        if(firstBtnRef.current.classList.contains("disabled"))firstBtnRef.current.classList.remove("disabled"); // 재측정 버튼 활성화
+        secondBtnRef.current.classList += " disabled";
         setFlag({idx: temp, rIdx: 1}); // idx : dataList에서의 인덱스, rIdx : realData에서의 인덱스
         setFlagTo({...flagTo, from: 1});
       }, 1000);
@@ -1520,8 +1524,74 @@ useEffect(()=>
     }
   }, [noneDevice])
   
+//
+  const resetGraph = ()=>{
+    setTimeout(() => {
+      removeTick()
+      setInF(-1);
+      setInFDone(false);
+      setVolumeFlowList([{x:0, y:0}]);
+      setTimeVolumeList([{x:0, y:0}]);
+      setCalDataList([calDataList[0]]);
+      setCalFlagTV(1);
+      setCalFlag(1);
+      setTimerReady(false);
+      setRunTime(0);
+      setMeasureDone(false);
+      setFlagTo({from:rawDataList.length, to:""})
+    }, 500);
+  }
 
+//----------------------------------------------------------------------------------------------- 
 
+  // 저장 알림창
+  const [saveGAlert, setSaveGAlert] = useState(false); //유효한 검사 시 알림
+  const [saveBAlert, setSaveBAlert] = useState(false); //유효하지 않은 검사 시 알림
+  const [saveReady, setSaveReady] = useState(false);
+  useEffect(()=>{
+    if(measureDone){
+      setSaveReady(true);
+    }
+  },[measureDone])
+
+  useEffect(()=>{
+    if(saveReady){
+      if(runTime < parseInt(strongTime*1000)){
+        setSaveBAlert(true);
+      }
+      else{
+        setSaveGAlert(true);
+      }
+    }
+  },[saveReady])
+
+  const measureFin = ()=>{
+    setTimeout(() => {
+      setBlowF(false);
+      removeTick()
+      setInF(-1);
+      setInFDone(false);
+      setVolumeFlowList([{x:0, y:0}]);
+      setTimeVolumeList([{x:0, y:0}]);
+      setCalDataList([calDataList[0]]);
+      setCalFlagTV(1);
+      setCalFlag(1);
+      setTimerReady(false);
+      setRunTime(0);
+      setMeasureDone(false);
+      setFlagTo({from:rawDataList.length, to:""})
+      setMeaStart(false);
+    }, 500);
+  }
+
+  const selectSave = (val)=>{
+    if(val == "select"){
+
+    }
+    else{
+      measureFin()
+    }
+  }
 
 
 //-----------------------------------------------------------------------------------------------
@@ -1554,9 +1624,11 @@ useEffect(()=>
 
   return(
     <div className="measurement-page-container">
+      {saveGAlert ? <Confirm content={"검사를 저장하시려면 확인 버튼을 눌러주세요.\n해당 검사를 취소하고 싶다면 취소 버튼을 눌러주세요."} btn={true} onOff={setSaveGAlert} select={selectSave}/> : null}
+      {saveBAlert ? <Confirm content={`${strongTime}초 이상 강하게 호흡을 불지 않아, 유효하지 않은 검사입니다.\n그대로 검사를 저장하시겠습니까?`} btn={true} onOff={setSaveBAlert} select={selectSave}/> : null}
       {confirmStat ? <Confirm content="검사를 시작하시겠습니까?" btn={true} onOff={setConfirmStat} select={confirmFunc}/> : null}
       {disconnectStat ? <Confirm content={"연결된 Spirokit기기가 없습니다.\n설정 페이지로 이동해서 Spirokit을 연결해주세요."} btn={true} onOff={setDisconnectStat} select={disconnectConfirmFunc}/> : null}
-      {readyAlert ? <Confirm content="준비 중입니다..." btn={false} onOff={setReadyAlert} select={confirmFunc}/> : null}
+      {readyAlert ? <Confirm content={"SpiroKit 동작 준비 중 입니다.\n잠시만 기다려주세요."} btn={false} onOff={setReadyAlert} select={confirmFunc}/> : null}
         <div className="measurement-page-nav" onClick={()=>{console.log()}}>
           <div className='measurement-page-backBtn' onClick={()=>{navigatorR(-1)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6"}} />
@@ -1670,7 +1742,7 @@ useEffect(()=>
             :
               notifyDone?
               // <p className="measure-msg">준비중입니다...</p>
-              null
+              <p>HWLLO!</p>
               :
               <p className='measure-msg'>{noneDevice==false?"SpiroKit 연동이 완료되었습니다.\nSpiroKit 동작버튼을 켜주시고, 마우스피스 입구에 살짝 입김을 불어 검사 시작 버튼을 활성화 해주세요.":"SpiroKit 연동이 필요합니다."}</p>
             }
@@ -1698,28 +1770,20 @@ useEffect(()=>
             <div ref={firstBtnRef} onClick={()=>{
               // console.log({"nonDevice":noneDevice,"notifyStart":notifyStart,"notifyDone":notifyDone,"meaPreStart":meaPreStart, "blow":blow, "blowF":blowF, "meaStart":meaStart})
               if(!(firstBtnRef.current.classList.contains("disabled"))){
-                setTimeout(() => {
-                  removeTick()
-                  setInF(-1);
-                  setInFDone(false);
-                  setVolumeFlowList([{x:0, y:0}]);
-                  setTimeVolumeList([{x:0, y:0}]);
-                  setCalDataList([calDataList[0]]);
-                  setCalFlagTV(1);
-                  setCalFlag(1);
-                  setTimerReady(false);
-                  setRunTime(0);
-                  setMeasureDone(false);
-                  setFlagTo({from:rawDataList.length, to:""})
-                }, 500);
+                resetGraph()
               }
             }}> <p>재측정</p></div>
             <div ref={secondBtnRef} onClick={()=>{
               if(!(secondBtnRef.current.classList.contains("disabled"))){
-                setBlowF(true);
+                if(!meaStart){
+                  setBlowF(true);
+                }
+                else{
+                  //+++++++++++++++++++++++++++++++++++++++++++++++++검사 저장 버튼 눌렀을 떄 -> 알림창!
+                }
               }
-            }}> <p>검사 시작</p></div>
-            <div onClick={()=>{
+            }}> <p>{meaStart ? "검사 시작" : "검사 저장"}</p></div>
+            <div ref={thirdBtnRef} onClick={()=>{
               console.log(flagTo);
               console.log(dataList.slice(flagTo.from, flagTo.to+1).toString().replaceAll(","," "));
             }}><p>검사 종료</p></div>
