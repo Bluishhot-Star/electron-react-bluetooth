@@ -85,7 +85,7 @@ const AddPatientCopy = ()=>{
       //   console.log(error);alert("ERROR₩₩₩₩");
       // })
     }
-    navigator("/memberList/measureInfo", {state: {chartNumber : examinee.chartNumber}});
+    navigator("/memberList/measureInfo", {state: {chartNumber : examinee.chartNumber, name:examinee.name}});
   }
   const location = useLocation();
   const cookies = new Cookies();

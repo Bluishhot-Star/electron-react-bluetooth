@@ -42,7 +42,7 @@ const MeasureInfo = ()=>{
   })
 
   const administration = (value) =>{
-    setInfo({...info, administration: value});
+    setInfo({...info, administration: value=="true"?"post":"pre"});
   };
 
   const type = (value) =>{
@@ -77,7 +77,7 @@ const MeasureInfo = ()=>{
   // let data1, data2;
   const [data1, setData1] = useState([]); //FVC 데이터
   const [data2, setData2] = useState([]); //SVC 데이터
-
+  const [name, setName] = useState();
   const getMeasureData = async()=>{
     if(info.type == "FVC"){
       await axios.get(`/subjects/${state.chartNumber}/types/fvc/results/${date}` , {
@@ -116,8 +116,8 @@ const MeasureInfo = ()=>{
       console.log(data1);
       console.log(data2);
       console.log(date);
-      if(info.type == "FVC") navigatorR('/measurement', {state: {data:data1}});
-      else if(info.type == "SVC") navigatorR('/measurementSVC', {state: {data:data2}});
+      if(info.type == "FVC") navigatorR('/measurement', {state: {data:data1, date:date, name:state.name, chartNumber:state.chartNumber, type:info.administration}});
+      else if(info.type == "SVC") navigatorR('/measurementSVC', {state: {data:data2, date:date, name:state.name, chartNumber:state.chartNumber, type:info.administration}});
     }
     else{}
   },[goTO])

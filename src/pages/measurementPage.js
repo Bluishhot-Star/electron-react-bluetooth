@@ -25,7 +25,13 @@ const MeasurementPage = () =>{
   const location = useLocation();
   let deviceInfo = useSelector((state) => state.deviceInfo ) 
   let measureInfo = useSelector((state)=>state.info);
+
   let data = location.state.data;
+  let date = location.state.date;
+  let name = location.state.name;
+  let type = location.state.type;
+  let chartNumber = location.state.chartNumber;
+
   const cookies = new Cookies();
   const [setCookie] = useCookies();
   let navigatorR = useNavigate();
@@ -49,6 +55,7 @@ const MeasurementPage = () =>{
 
   // conta
   useEffect(()=>{
+    console.log(location.state)
     console.log(location.state.data)
     setTotalData(location.state.data);
   },[])
@@ -65,7 +72,7 @@ const MeasurementPage = () =>{
     getMeasureData(date);
   }
   const getMeasureData = async(date)=>{
-    await axios.get(`/subjects/${totalData.chartNumber}/types/fvc/results/${date}` , {
+    await axios.get(`/subjects/${chartNumber}/types/fvc/results/${date}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
@@ -186,14 +193,16 @@ const MeasurementPage = () =>{
         setTrigger(0);
         simpleResultsRef.current.forEach((item,index)=>{
           simpleResultsRef.current[index].disabled = true;
-          simpleResultsRef.current[index].classList += "disabled";
+          simpleResultsRef.current[index].classList += " disabled";
         })
       }
       else{
         simpleResultsRef.current.forEach((item,index)=>{
-          simpleResultsRef.current[index].disabled = false;
-          if(simpleResultsRef.current[index].classList.contains("disabled")){
-            simpleResultsRef.current[index].classList.remove("disabled");
+          if(simpleResultsRef.current[index]){
+            simpleResultsRef.current[index].disabled = false;
+            if(simpleResultsRef.current[index].classList.contains("disabled")){
+              simpleResultsRef.current[index].classList.remove("disabled");
+            }
           }
         })
       }
@@ -441,7 +450,6 @@ useEffect(()=>
         itemRef.current[i].classList.remove("tickColor");
       }
       else{
-        return;
       }
     }
   }
@@ -782,7 +790,7 @@ useEffect(()=>
         if(firstBtnRef.current.classList.contains("disabled"))firstBtnRef.current.classList.remove("disabled"); // 재측정 버튼 활성화
         secondBtnRef.current.classList += " disabled";
         setFlag({idx: temp, rIdx: 1}); // idx : dataList에서의 인덱스, rIdx : realData에서의 인덱스
-        setFlagTo({...flagTo, from: 1});
+        if(flagTo == 0){setFlagTo({...flagTo, from: 1});}
       }, 1000);
     }
   },[meaStart])
@@ -796,7 +804,7 @@ useEffect(()=>
 
   // 그래프 좌표 생성 시작
   useEffect(()=>{
-    if(calDataList[calFlag]){
+    if(calDataList[calFlag] && meaStart){
       let item = calDataList[calFlag];
       setVFGraphData(item.volume, item.lps);
       setTVGraphData(item.time, item.volume, item.exhale);
@@ -883,17 +891,12 @@ useEffect(()=>
   
 //-----------------------------------------------------------------------------------------------
   // 시작 메세지 띄우기
-  useEffect(()=>{
-    if(blowF){
-      console.log("메세지 띄우려면")
-      setStartMsg(true);
-    }
-  },[blowF])
 
   useEffect(()=>{
     if(startMsg){
       //시작 메세지 띄우기
       console.log("시작 메세지 띄우기")
+      setStartMsg(false);
       setConfirmStat(true);
       // setDataList([])
       // setMeaStart(true);
@@ -1371,13 +1374,15 @@ useEffect(()=>
     }
     // console.log(dataList.slice(flagTo.from, flagTo.to+1).toString().replaceAll(","," ")); //---------------------------------------------------------------------------------------------------------
     console.log(rDataList.join(' '))
-    axios.post(`/subjects/1234/types/fvc/measurements`, 
+    console.log(`${chartNumber}|${type}`)
+
+    axios.post(`/subjects/${chartNumber}/types/fvc/measurements`, 
     {
-      serialNumber:"970222",
-      bronchodilator: "pre",
+      serialNumber:`${chartNumber}`,
+      bronchodilator: `${type}`,
       // data:dataList.slice(flagTo.from, flagTo.to+1).toString().replaceAll(","," "),
       data:rDataList.join(' ')+"000000000",
-      date:"2023-12-16"
+      // date:{date}
     },{
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
@@ -1464,6 +1469,8 @@ useEffect(()=>
   const [confirmStat, setConfirmStat] = useState(false);
   let confirmFunc = (val)=>{
     if(val=="confirm"){
+      setMeaPreStart(true);
+      setBlowF(true);
       setMeaStart(true);
     }
   }
@@ -1562,12 +1569,42 @@ useEffect(()=>
       else{
         setSaveGAlert(true);
       }
+      setSaveReady(false);
     }
   },[saveReady])
 
+  // const measureFin = ()=>{
+  //   setTimeout(() => {
+  //     setMeaStart(false);
+  //     setBlowF(false);
+  //     setInF(-1);
+  //     setInFDone(false);
+  //     setSessionCount(0);
+  //     setVolumeFlowList([]);
+  //     setTimeVolumeList([]);
+  //     setCalDataList([]);
+  //     setCalFlagTV(0);
+  //     setDataList(['000000000']);
+  //     setRawDataList([0]);
+  //     setFlag(0);
+  //     setFlagTo(0)
+  //     setCalFlag(0);
+  //     setCalFlagTV(0);
+  //     if(secondBtnRef.current.classList.contains("disabled")){
+  //       secondBtnRef.current.classList += " disabled";
+  //     }
+  //     firstBtnRef.current.classList += " disabled"
+
+  //     setTimerReady(false);
+  //     setRunTime(0);
+  //     setMeasureDone(false);
+  //     setCTime(0);
+  //     removeTick()
+  //     resetGraph()
+  //   }, 500);
+  // }
   const measureFin = ()=>{
     setTimeout(() => {
-      setBlowF(false);
       removeTick()
       setInF(-1);
       setInFDone(false);
@@ -1579,18 +1616,28 @@ useEffect(()=>
       setTimerReady(false);
       setRunTime(0);
       setMeasureDone(false);
-      setFlagTo({from:rawDataList.length, to:""})
+      setFlagTo({from:rawDataList.length, to:""});
+      setTrigger(-1)
+      firstBtnRef.current.classList+=" disabled";
+      if(secondBtnRef.current.classList.contains("disabled")){
+        secondBtnRef.current.classList.remove("disabled");
+      }
       setMeaStart(false);
+      getMeasureData(date);
     }, 500);
   }
 
-  const selectSave = (val)=>{
-    if(val == "select"){
+  const [saveMsg, setSaveMsg] = useState("");
 
+  const selectSave = (val)=>{
+    if(val == "confirm"){
+      setSaveMsg("검사 저장이 완료되었습니다.\n추가로 검사를 진행하고 싶다면 검사 시작 버튼을 눌러주세요.");
+      measurementEnd()
     }
     else{
-      measureFin()
+      setSaveMsg("검사 저장에 실패했습니다.\n검사를 다시 진행하여 저장해주세요.");
     }
+    measureFin();
   }
 
 
@@ -1619,7 +1666,10 @@ useEffect(()=>
 //       console.log(err);
 //     })
 // }
-
+  const startBtnClicked = ()=>{
+    setStartMsg(true);
+    setGraphOnOff([...graphOnOff].fill(0))
+  }
 
 
   return(
@@ -1637,7 +1687,7 @@ useEffect(()=>
             // console.log(txCharRef.current);
             // console.log(location.state.info);
             measurementEnd()
-          }}>검사</p>
+          }}>{location.state.name}</p>
           <div ref={blueIconRef} className="device-connect" onClick={()=>{navigatorR("/setting")}}>
               {
                 noneDevice ?
@@ -1738,11 +1788,11 @@ useEffect(()=>
               meaStart? 
               <p className='measure-msg'>{"편하게 호흡을 시작해주세요."}</p>
               :
-              <p className='measure-msg'>{"바람을 불어서 활성화해주세요."}</p>
+              saveMsg ? <p className='measure-msg'>{saveMsg}</p> : <p className='measure-msg'>{"바람을 불어서 활성화해주세요."}</p>
             :
               notifyDone?
               // <p className="measure-msg">준비중입니다...</p>
-              <p>HWLLO!</p>
+              <p></p>
               :
               <p className='measure-msg'>{noneDevice==false?"SpiroKit 연동이 완료되었습니다.\nSpiroKit 동작버튼을 켜주시고, 마우스피스 입구에 살짝 입김을 불어 검사 시작 버튼을 활성화 해주세요.":"SpiroKit 연동이 필요합니다."}</p>
             }
@@ -1776,13 +1826,16 @@ useEffect(()=>
             <div ref={secondBtnRef} onClick={()=>{
               if(!(secondBtnRef.current.classList.contains("disabled"))){
                 if(!meaStart){
-                  setBlowF(true);
+                  console.log(1)
+                  startBtnClicked()
                 }
                 else{
+                  console.log(2)
+                  measurementEnd()
                   //+++++++++++++++++++++++++++++++++++++++++++++++++검사 저장 버튼 눌렀을 떄 -> 알림창!
                 }
               }
-            }}> <p>{meaStart ? "검사 시작" : "검사 저장"}</p></div>
+            }}> <p>{meaStart ? "검사 저장" : "검사 시작"}</p></div>
             <div ref={thirdBtnRef} onClick={()=>{
               console.log(flagTo);
               console.log(dataList.slice(flagTo.from, flagTo.to+1).toString().replaceAll(","," "));
@@ -1796,7 +1849,7 @@ useEffect(()=>
                 totalData.trials.map((item, index)=>(
                   <div ref={(el)=>{simpleResultsRef.current[index]=el}} onClick={()=>{console.log(simpleResultsRef.current[index]);console.log(item.measurementId);selectGraph(index)}} key={item.measurementId}  className='simple-result-container'>
                   <div className='simple-result-title-container'>
-                  <FontAwesomeIcon className='deleteIcon' icon={faSquareXmark} style={{color: "#ff0000",}} onClick={(e)=>{e.stopPropagation(); simpleResult(item.measurementId, item.date);}}/>
+                  <FontAwesomeIcon className='deleteIcon' icon={faSquareXmark} style={{color: "#ff0000",}} onClick={(e)=>{e.stopPropagation(); if(!meaStart){simpleResult(item.measurementId, date);}}}/>
                   <div className='simple-result-title-date'>
                     <div className='simple-result-title'>{item.bronchodilator}</div>
                     <div className='simple-result-date'>({item.date})</div>
