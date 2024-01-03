@@ -73,7 +73,7 @@ const MemberListCopy = ()=>{
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
   const report = async(date,chartNum)=>{
-    await axios.get(`/subjects/${chartNum}/types/fvc/results/${date[0]}` , {
+    await axios.get(`/v3/subjects/${chartNum}/types/fvc/results/${date[0]}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
@@ -96,7 +96,7 @@ const MemberListCopy = ()=>{
     }).catch((err)=>{
       console.log(err);
     })
-    await axios.get(`/subjects/${chartNum}/types/svc/results/${date[0]}` , {
+    await axios.get(`/v3/subjects/${chartNum}/types/svc/results/${date[0]}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
