@@ -616,7 +616,7 @@ useEffect(()=>{
         if(chartRef.current){
           console.log("HELLO")
           chartRef.current.resize();
-          chartRef2.current.update();
+          // chartRef2.current.update();
         };
       }
       else{
@@ -859,18 +859,18 @@ useEffect(()=>{console.log(state)},[])
   const [data2, setData2] = useState([]);
   const report = async(date)=>{
     const nDate = [date];
-    await axios.get(`/subjects/${state.fvc.subject[0].value}/types/fvc/results/${date}` , {
+    await axios.get(`/v3/subjects/${state.fvc.subject.chartNumber}/types/fvc/results/${date}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
     }).then((res)=>{
-      console.log(res);
+      console.log(res.data.response);
       setData1(res.data.response);
       // setDate(nDate)
     }).catch((err)=>{
       console.log(err);
     })
-    await axios.get(`/subjects/${state.fvc.subject[0].value}/types/svc/results/${date}` , {
+    await axios.get(`/v3/subjects/${state.fvc.subject.chartNumber}/types/svc/results/${date}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
@@ -883,6 +883,19 @@ useEffect(()=>{console.log(state)},[])
     }).catch((err)=>{
       console.log(err);
     })
+
+
+    axios.get(`/subjects/${state.fvc.subject.chartNumber}/types/fvc/results/${date}/diagnosis` , {
+      headers: {
+        Authorization: `Bearer ${cookies.get('accessToken')}`
+      }
+    }).then((res)=>{
+      console.log(res.data.response);
+      // setDate(nDate)
+    }).catch((err)=>{
+      console.log(err);
+    })
+
     
 
     setGoTO(true);
@@ -904,6 +917,22 @@ useEffect(()=>{console.log(state)},[])
     }
     else{}
   },[goTO])
+
+  // useEffect(()=>{
+  //   if(data1.length != 0){
+  //     axios.get(`/subjects/${state.fvc.subject[0].value}/types/fvc/measurements/${data1.trials[1].measurementId}` , {
+  //       headers: {
+  //         Authorization: `Bearer ${cookies.get('accessToken')}`
+  //       }
+  //     }).then((res)=>{
+  //       console.log(res);
+        
+  //     }).catch((err)=>{
+  //       console.log(err);
+  //     })
+  //   }
+    
+  // },[data1])
   
 useEffect(()=>{
 console.log(totalData)
@@ -938,7 +967,7 @@ console.log(totalData)
               <div className='admin'>
                 <span>담당자 </span>
                 
-                <span>{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[7].value}</span>
+                <span>{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.clinicianName}</span>
                 
               </div>
               <div className='error'>
@@ -992,24 +1021,24 @@ console.log(totalData)
             <span>환자 정보</span>
             <div className="patient-infoC">
               <div className="title">이름</div>
-              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[1].value}</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.name}</div>
               <div className="title">성별</div>
-              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[3].value=="m"?"남자":"여자"}</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.gender=="m"?"남자":"여자"}</div>
               <div className="title">신장</div>
-              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[4].value}cm</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.height}cm</div>
               <div className="title">몸무게</div>
-              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[5].value}kg</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.weight}kg</div>
               <div className="title">생년월일</div>
               <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.birth}</div>
               <div className="title">연간 흡연량</div>
-              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[13].value == '' ? "-":state.fvc.subject[13].value}</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.smokingPackYear == '' ? "-":state.fvc.subject.smokingPackYear}</div>
               <div className="title">흡연 여부</div>
-              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[9].value === "false"||state.fvc.subject[9].value === false ? "아니오" : "예"}</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.smoking === "false"||state.fvc.subject.smoking === false ? "아니오" : "예"}</div>
 
 
               {/* // 이부분 api 문제있음 */}
               <div className="title">흡연 기간(연)</div> 
-              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject[11].value == '' ? "-" :parseInt(totalData.fvc.subject[12].value) - parseInt(totalData.fvc.subject[11].value)}</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.smokingStartAge == '' ? "-" :parseInt(totalData.fvc.subject.smokingStopAge) - parseInt(totalData.fvc.subject.smokingStartAge)}</div>
               
 
               {/* <div className="space"></div> */}
@@ -1061,12 +1090,14 @@ console.log(totalData)
               totalData.fvc.trials.map((item, index)=>(
                 <div ref={(el)=>{simpleResultsRef.current[index]=el}} onClick={()=>{console.log(simpleResultsRef.current[index]);console.log(item.measurementId);selectGraph(index)}} key={item.measurementId}  className='simple-result-container'>
                   <div className='simple-result-title-container'>
-                  <FontAwesomeIcon className='deleteIcon' icon={faSquareXmark} style={{color: "#ff0000",}} onClick={(e)=>{e.stopPropagation(); simpleResult(item.measurementId, item.date)}}/>
-                  <div className='simple-result-title-date'>
-                    <div className='simple-result-title'>{item.bronchodilator}</div>
-                    <div className='simple-result-date'>({item.date})</div>
-                  </div>
-                    
+                    <FontAwesomeIcon className='deleteIcon' icon={faSquareXmark} style={{color: "#ff0000",}} onClick={(e)=>{e.stopPropagation(); simpleResult(item.measurementId, item.date)}}/>
+                    <div className='simple-result-title-date'>
+                      <div className='simple-result-title'>{item.bronchodilator}</div>
+                      <div className='simple-result-date'>({item.date})</div>
+                    </div>
+                    <div className='simple-result-errorcode'>
+                      Error Code : {item.errorCode}
+                    </div>
                   </div>
                   <div className='simple-result-table-container'>
                     <div className='simple-result-table-column'>
@@ -1113,8 +1144,14 @@ console.log(totalData)
               totalData.svc.trials.map((item, index)=>(
                 <div ref={(el)=>{svcSimpleResultsRef.current[index]=el}} onClick={()=>{console.log(svcSimpleResultsRef.current[index]);console.log(item.measurementId);selectSvcGraph(index)}} key={item.measurementId}  className='simple-result-container'>
                   <div className='simple-result-title-container'>
-                    <p className='simple-result-title'>{item.bronchodilator}</p>
-                    <p className='simple-result-date'>검사일시({item.date})</p>
+                    <FontAwesomeIcon className='deleteIcon' icon={faSquareXmark} style={{color: "#ff0000",}} onClick={(e)=>{e.stopPropagation(); simpleResult(item.measurementId, item.date)}}/>
+                    <div className='simple-result-title-date'>
+                      <div className='simple-result-title'>{item.bronchodilator}</div>
+                      <div className='simple-result-date'>({item.date})</div>
+                    </div>
+                    <div className='simple-result-errorcode'>
+                      Error Code : {item.errorCode}
+                    </div>
                   </div>
                   <div className='simple-result-table-container'>
                     <div className='simple-result-table-column'>
@@ -1146,6 +1183,12 @@ console.log(totalData)
                       <p>{item.results[3].meas?item.results[3].meas:"-"}</p>
                       <p>{item.results[3].pred?item.results[3].pred:"-"}</p>
                       <p>{item.results[3].per?item.results[3].per:"-"}</p>
+                    </div>
+                    <div className='simple-result-table-PEF'>
+                      <p>-</p>
+                      <p>-</p>
+                      <p>-</p>
+                      <p>-</p>
                     </div>
                   </div>
                 </div>

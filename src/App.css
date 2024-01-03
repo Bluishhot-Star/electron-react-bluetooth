@@ -461,6 +461,7 @@
   position: absolute;
   right:2%;
 }
+
 .history-container .slider .simple-result-title-container .deleteIcon:hover{
   opacity: .3;
 }
@@ -502,7 +503,7 @@ text-align: right;
 }
 .simple-result-title-container{
   
-
+  display: grid;
   
 }
 .simple-result-title-date div{
@@ -515,6 +516,12 @@ text-align: right;
   /* font-size: 1.5vh; */
   color: #aaa;
   text-align: left;
+}
+.simple-result-title-container .simple-result-errorcode{
+  text-align: center;
+  
+  margin-left: 1%;
+  font-size: 1.7vh;
 }
 
 .simple-result-table-container{

@@ -25,9 +25,16 @@ module.exports = function(app){
       changeOrigin: true,        
     })
   )
+  // app.use(
+  //   createProxyMiddleware('/subjects',{
+  //     target:'https://spirokitdev.the-researcher.com/v3',
+  //     changeOrigin: true,        
+  //   })
+  // )
+
   app.use(
-    createProxyMiddleware('/v2/subjects',{
-      target:'https://spirokitdev.the-researcher.com/v1',
+    createProxyMiddleware('/v3/subjects',{
+      target:'https://spirokitdev.the-researcher.com/',
       changeOrigin: true,        
     })
   )
@@ -57,6 +64,8 @@ module.exports = function(app){
       changeOrigin: true,
     })
   )
+
+  
 };
 
 
