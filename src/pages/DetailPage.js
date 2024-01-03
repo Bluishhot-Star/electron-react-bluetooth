@@ -1204,7 +1204,7 @@ function DetailPage(){
           <div className="nav-left-container">
             <div className="admin">
               <span>담당자</span>
-              <span>{state.subject[7].value}</span>
+              <span>{state.subject.clinicianName}</span>
             </div>
           </div>
           {/* <div className="nav-right-container">
