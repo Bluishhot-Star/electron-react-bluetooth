@@ -18,7 +18,7 @@ import { changeDeviceInfo, reset } from "./../deviceInfo.js"
 import { da } from 'date-fns/locale';
 import Gauge from "../components/Gauge.js"
 import Timer from "../components/Timer.js"
-
+import { useWorker } from "@koale/useworker";
 
 //FVC 검사 페이지
 const MeasurementPage = () =>{

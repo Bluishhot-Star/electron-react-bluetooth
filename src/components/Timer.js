@@ -47,12 +47,6 @@ function Timer(props){
     }
   })
 
-  // useEffect(()=>{
-  //   console.log(time)
-  //   milliSec1Ref.current.innerHTML = ((time % 1000)%100).toString(); //1의 자리 0011
-  //   milliSec10Ref.current.innerHTML = ((time % 1000)/100).toString(); //10의 자리
-  //   secondRef.current.innerHTML = Math.floor((time % 1000)/1000).toString();
-  // },[time])
 
   return(
     <>
