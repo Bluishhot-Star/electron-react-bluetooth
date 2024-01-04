@@ -59,6 +59,9 @@ const MeasurementPage = () =>{
     console.log(location.state.data)
     setTotalData(location.state.data);
   },[])
+  useEffect(()=>{
+    getMeasureData(date)
+  },[])
   const simpleResult = async(id,date)=>{
     await axios.delete(`/measurements/${id}` , {
       headers: {
@@ -85,6 +88,7 @@ const MeasurementPage = () =>{
     }).catch((err)=>{
       console.log(err);
     })
+    setGraphOnOff([...graphOnOff].fill(0))
   }
   //fvc 그래프 처리
   const simpleResultsRef = useRef([]);
@@ -211,13 +215,15 @@ const MeasurementPage = () =>{
   useEffect(()=>{
     if(totalData){
       graphOnOff.forEach((item, index)=>{
-        if(item == 1){
-          simpleResultsRef.current[index].classList+=" selected";
-          simpleResultsRef.current[index].style+="";
-        }
-        else{
-          if(simpleResultsRef.current[index].classList.contains("selected")){
-            simpleResultsRef.current[index].classList.remove("selected");
+        if(simpleResultsRef.current[index]){
+          if(item == 1){
+            simpleResultsRef.current[index].classList+=" selected";
+            simpleResultsRef.current[index].style+="";
+          }
+          else{
+            if(simpleResultsRef.current[index].classList.contains("selected")){
+              simpleResultsRef.current[index].classList.remove("selected");
+            }
           }
         }
       })
@@ -917,7 +923,8 @@ useEffect(()=>
         preXY = {x:0, y:0}
       }
       else{
-        preXY = volumeFlowList[calFlag-1]
+        // preXY = volumeFlowList[calFlag-1]
+        preXY = volumeFlowList[volumeFlowList.length-1]
       }
   
       // 흡기 시
@@ -934,7 +941,7 @@ useEffect(()=>
 
         //x값 처리
         // x값 최저
-        if (preXY['x'] == 0){
+        if (preXY['x'] == 0 || preXY['x'] < 0){
           // 현재 x값 오른쪽 밀기
           // TvolumeFlowList.forEach((item, idx) =>{
           //     let itemTemp = {...item};
@@ -966,7 +973,7 @@ useEffect(()=>
         }
         if(timerReady && timerStart && volumeFlowList[calFlag]["y"] <= 0 && !measureDone){
           // setFlagTo({...flagTo, to: flagTo.from+calFlag+1});
-          setFlagTo({...flagTo, to: flag.rIdx-1});
+          setFlagTo({...flagTo, to: flagTo.from+flag.rIdx-1});
           setTimerStart(false);
           setMeasureDone(true);
           // =========================================================================== -> 데이터 자르기============================================================
@@ -986,7 +993,7 @@ useEffect(()=>
         if(timerReady && timerStart && !measureDone){
           if(rawF == 0 && runTime!=0){
             // setFlagTo({...flagTo, to: flagTo.from+calFlag+1});
-            setFlagTo({...flagTo, to: flag.rIdx-1});
+            setFlagTo({...flagTo, to: flagTo.from+flag.rIdx-1});
             setTimerStart(false);
             setMeasureDone(true);
             // =========================================================================== -> 데이터 자르기
@@ -1832,6 +1839,7 @@ useEffect(()=>
                 else{
                   console.log(2)
                   measurementEnd()
+                  getMeasureData()
                   //+++++++++++++++++++++++++++++++++++++++++++++++++검사 저장 버튼 눌렀을 떄 -> 알림창!
                 }
               }
