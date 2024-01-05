@@ -441,13 +441,17 @@ useEffect(()=>
   
   const [timerTick, setTimerTick] = useState(250); //default 250 (6/15)
   const [timerRunStat, setTimerRunStat] = useState(false);
+  const intervalRef = useRef();
   useEffect(()=>{
     if(timerRunStat){
       let i =1;
-      setInterval(() => {
+      intervalRef.current = setInterval(() => {
         if(i>60)return;
         itemRef.current[i++].classList += " tickColor";
       }, timerTick);
+    }
+    else{
+      clearInterval(intervalRef.current);
     }
   },[timerRunStat])
   let removeTick = ()=>{
@@ -744,6 +748,9 @@ useEffect(()=>
       let time = setTimeout(() => {
         setMeaPreStart(true);
       }, 1000);
+      return ()=>{
+        clearTimeout(time)
+      }
     }
   },[notifyDone])
   useEffect(()=>{
@@ -798,6 +805,9 @@ useEffect(()=>
         setFlag({idx: temp, rIdx: 1}); // idx : dataList에서의 인덱스, rIdx : realData에서의 인덱스
         if(flagTo == 0){setFlagTo({...flagTo, from: 1});}
       }, 1000);
+      return ()=>{
+        clearTimeout(time)
+      }
     }
   },[meaStart])
   
@@ -1328,6 +1338,9 @@ useEffect(()=>
     let time = setTimeout(() => {
       setTemp(true);
     },500);
+    return ()=>{
+      clearTimeout(time)
+    }
   },[graphData])
 
   useEffect(()=>{
@@ -1442,6 +1455,9 @@ useEffect(()=>
       setTemp(true);
     },1000);
     console.log(graphData)
+    return ()=>{
+      clearTimeout(time)
+    }
   },[graphData])
 
 
@@ -1468,6 +1484,9 @@ useEffect(()=>
       setTemp(true);
     },1000);
     console.log(graphData2)
+    return ()=>{
+      clearTimeout(time)
+    }
   },[graphData2])
 
 
@@ -1508,8 +1527,9 @@ useEffect(()=>
   
   // 런타임 중 틱 인덱스 설정
   useEffect(()=>{
-    if(runTime%timerTick == 0 && runTime != 0){
-      setTickColorIdx(tickColorIdx+1);
+    console.log(parseInt(runTime/timerTick));
+    if(runTime != 0){
+      setTickColorIdx(parseInt(runTime/timerTick));
     }
   },[runTime])
 
@@ -1540,7 +1560,7 @@ useEffect(()=>
   
 //
   const resetGraph = ()=>{
-    setTimeout(() => {
+    let time = setTimeout(() => {
       removeTick()
       setInF(-1);
       setInFDone(false);
@@ -1554,6 +1574,9 @@ useEffect(()=>
       setMeasureDone(false);
       setFlagTo({from:rawDataList.length, to:""})
     }, 500);
+    return ()=>{
+      clearTimeout(time)
+    }
   }
 
 //----------------------------------------------------------------------------------------------- 
@@ -1611,7 +1634,7 @@ useEffect(()=>
   //   }, 500);
   // }
   const measureFin = ()=>{
-    setTimeout(() => {
+    let time = setTimeout(() => {
       removeTick()
       setInF(-1);
       setInFDone(false);
@@ -1632,6 +1655,9 @@ useEffect(()=>
       setMeaStart(false);
       getMeasureData(date);
     }, 500);
+    return ()=>{
+      clearTimeout(time)
+    }
   }
 
   const [saveMsg, setSaveMsg] = useState("");
