@@ -475,7 +475,7 @@ const GainMeasurementPage = () =>{
 
   // 그래프 좌표 생성 시작
   useEffect(()=>{
-    if(calDataList[calFlag]){
+    if(calDataList[calFlag] && meaStart){
       let item = calDataList[calFlag];
       setVFGraphData(item.volume, item.lps);
       //  setTVGraphData(item.time, item.volume, item.exhale);
@@ -1302,6 +1302,7 @@ const [calivration,setCalivration] = useState({
           <div ref={thirdBtnRef} onClick={()=>{
             if(!thirdBtnRef.current.classList.contains("disabled")){
               calivrationApply()
+              setMeaStart(false);
               fourTBtnRef.current.classList.remove("disabled");
               secondBtnRef.current.classList += " disabled";
               thirdBtnRef.current.classList += " disabled";
