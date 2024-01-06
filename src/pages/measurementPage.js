@@ -18,6 +18,7 @@ import { changeDeviceInfo, reset } from "./../deviceInfo.js"
 import { da } from 'date-fns/locale';
 import Gauge from "../components/Gauge.js"
 import Timer from "../components/Timer.js"
+import VolumeBar from "../components/VolumeBar.js"
 import { useWorker } from "@koale/useworker";
 
 //FVC 검사 페이지
@@ -1603,36 +1604,6 @@ useEffect(()=>
     }
   },[saveReady])
 
-  // const measureFin = ()=>{
-  //   setTimeout(() => {
-  //     setMeaStart(false);
-  //     setBlowF(false);
-  //     setInF(-1);
-  //     setInFDone(false);
-  //     setSessionCount(0);
-  //     setVolumeFlowList([]);
-  //     setTimeVolumeList([]);
-  //     setCalDataList([]);
-  //     setCalFlagTV(0);
-  //     setDataList(['000000000']);
-  //     setRawDataList([0]);
-  //     setFlag(0);
-  //     setFlagTo(0)
-  //     setCalFlag(0);
-  //     setCalFlagTV(0);
-  //     if(secondBtnRef.current.classList.contains("disabled")){
-  //       secondBtnRef.current.classList += " disabled";
-  //     }
-  //     firstBtnRef.current.classList += " disabled"
-
-  //     setTimerReady(false);
-  //     setRunTime(0);
-  //     setMeasureDone(false);
-  //     setCTime(0);
-  //     removeTick()
-  //     resetGraph()
-  //   }, 500);
-  // }
   const measureFin = ()=>{
     let time = setTimeout(() => {
       removeTick()
@@ -1845,7 +1816,9 @@ useEffect(()=>
               {temp?<div className="title-x">Time(s)</div>:<></>}
             </div>
             <div className='volume-bar'>
-              <div></div>
+              <div>
+                {calibratedLps ? <VolumeBar width={calibratedLps/3*100}/> : <VolumeBar width={0}/>}
+              </div>
             </div>
           </div>
 

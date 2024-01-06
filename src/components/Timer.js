@@ -13,19 +13,20 @@ function Timer(props){
   const startTimeRef = useRef(null);
   const stopTimeRef = useRef(null);
 
-  const formatTime = (time) => {
-    let seconds =  Math.floor((time / 1000) % 60).toString().slice(-2)
-    const temp = Math.floor((time / 10)%100).toString().slice(-2);
-    let millseconds10 = temp[0];
-    let milliseconds1 = temp[1];
-    return { seconds, millseconds10, milliseconds1 };
-  };
+  // const formatTime = (time) => {
+  //   let seconds =  Math.floor((time / 1000) % 60).toString().slice(-2)
+  //   const temp = Math.floor((time / 10)%100).toString().slice(-2);
+  //   let millseconds10 = temp[0];
+  //   let milliseconds1 = temp[1];
+  //   return { seconds, millseconds10, milliseconds1 };
+  // };
 
   // const { seconds, millseconds10, milliseconds1 } = formatTime(time);
 
   const [seconds, setSeconds] = useState(0);
   const [millseconds10, setMillseconds10] = useState(0);
   const [milliseconds1, setMilliseconds1] = useState(0);
+  
   useEffect(()=>{
     if(props.start){
       setRun(true);
