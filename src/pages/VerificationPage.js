@@ -474,7 +474,7 @@ const VerificationPage = () =>{
 
  // 그래프 좌표 생성 시작
  useEffect(()=>{
-   if(calDataList[calFlag]){
+   if(calDataList[calFlag] && meaStart){
      let item = calDataList[calFlag];
      setVFGraphData(item.volume, item.lps);
     //  setTVGraphData(item.time, item.volume, item.exhale);
@@ -1231,6 +1231,18 @@ const [calivration,setCalivration] = useState({
       console.log(err);
     })
   }
+  //-------------------------------------------
+  const deleteee = () => {
+    axios.delete(`/calibrations/{calibrationId}` , {
+      headers: {
+        Authorization: `Bearer ${cookie.get('accessToken')}`
+      }
+    }).then((res)=>{
+      console.log(res);
+    }).catch((err)=>{
+      console.log(err);
+    })
+  }
   
   //----------------------------------------------
   useEffect(()=>{
@@ -1251,9 +1263,9 @@ const [calivration,setCalivration] = useState({
         </div>
         <p onClick={()=>{
 
-          console.log(deviceInfo);
+          deleteee()
 
-        }}>보정 결과</p>
+        }}>보정 검증</p>
       </div>
       <div className='verify-measurement-m-page-container'>
         <div className="verify-measurement-page-left-container" ref={graphConRef}>
@@ -1285,6 +1297,7 @@ const [calivration,setCalivration] = useState({
             <div ref={thirdBtnRef} onClick={()=>{
               if(!thirdBtnRef.current.classList.contains("disabled")){
                 verification()
+                setMeaStart(false); 
                 firstBtnRef.current.classList.remove("disabled");
                 thirdBtnRef.current.classList += " disabled";
                 secondBtnRef.current.classList += " disabled";
