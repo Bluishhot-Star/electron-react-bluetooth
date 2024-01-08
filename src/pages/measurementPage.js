@@ -54,7 +54,7 @@ const MeasurementPage = () =>{
   const[timeVolume,setTimeVolume] = useState([]);
   const [trigger, setTrigger] = useState(-1);
 
-  // conta
+  // 첫 페이지 렌더링 시
   useEffect(()=>{
     console.log(location.state)
     console.log(location.state.data)
@@ -186,7 +186,6 @@ const MeasurementPage = () =>{
     setVolumeFlow(temp2);
     console.log(temp);
 
-    /////////////////////////
   },[trigger])
 
 
@@ -422,16 +421,28 @@ useEffect(()=>
 
   // 호<->흡 바뀌면서 컨텐츠 바꾸기
   let sessionFlip = () => {
+    
     if(sessionCount > sessionVol){
       setTimerReady(true);
       return;
     }
-    if(sessionCount !== 0 && sessionCount%2 == 0){ //짝수면 카운트업
-      let tgC = parseInt(gaugeContent.r11) + 1
-      setGaugeContent({r11:tgC, r12: breathCount, r2: inOutFlip(gaugeContent.r2)});
+    if(inF){ // 흡기 선
+      if(sessionCount !== 0 && sessionCount%2 == 1){ //홀수면 카운트업
+        let tgC = parseInt(gaugeContent.r11) + 1
+        setGaugeContent({r11:tgC, r12: breathCount, r2: inOutFlip(gaugeContent.r2)});
+      }
+      else{
+        setGaugeContent({...gaugeContent, r2: inOutFlip(gaugeContent.r2)});
+      }
     }
-    else{
-      setGaugeContent({...gaugeContent, r2: inOutFlip(gaugeContent.r2)});
+    else{ //호기 선
+      if(sessionCount !== 0 && sessionCount%2 == 0){ //짝수면 카운트업
+        let tgC = parseInt(gaugeContent.r11) + 1
+        setGaugeContent({r11:tgC, r12: breathCount, r2: inOutFlip(gaugeContent.r2)});
+      }
+      else{
+        setGaugeContent({...gaugeContent, r2: inOutFlip(gaugeContent.r2)});
+      }
     }
   }
   useEffect(()=>{
@@ -443,6 +454,7 @@ useEffect(()=>
   const [timerTick, setTimerTick] = useState(250); //default 250 (6/15)
   const [timerRunStat, setTimerRunStat] = useState(false);
   const intervalRef = useRef();
+
   useEffect(()=>{
     if(timerRunStat){
       let i =1;
@@ -466,7 +478,7 @@ useEffect(()=>
   }
 
 
-  class DataCalculateStrategyE {
+  class DataCalculateStrategyE {j
     constructor() {
       this.FREQUENCY = 80_000_000; // 80MHz
       this.LIMIT_DATA = 100_000_000;
