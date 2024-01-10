@@ -29,6 +29,7 @@ import VerificationPage from './pages/VerificationPage.js';
 import MemberListCopy from './pages/MemberListCopy.js';
 import AddPatientCopy from './pages/AddPatientC.js';
 import ResultPageCopy from './pages/ResultPageCopy.js';
+import Pdf from './pages/Pdf.js';
 // Variable & State
 const author = "KASSID&HAI";
 
@@ -39,7 +40,7 @@ function App() {
         <Route path='/' element={<LoginForm/>}/>
         <Route path='/signUp' element={<SignUpForm/>}/>
         <Route path='/memberList/measureInfo' element={<MeasureInfo/>}/>
-
+        
         {/* <Route path='/memberList' element={<MemberList/>}/>
         <Route path='/memberList/addPatient' element={<AddPatient/>}/>
         <Route path='/memberList/resultPage' element={<ResultPage/>}/> */}
@@ -61,6 +62,8 @@ function App() {
         <Route path='/memberList' element={<MemberListCopy/>}/>
         <Route path='/memberList/addPatient' element={<AddPatientCopy/>}/>
         <Route path='/memberList/resultPage' element={<ResultPageCopy/>}/>
+        <Route path='/memberList/resultPage/pdfView' element={<Pdf/>}/>
+        
       </Routes>
     </div>
   );

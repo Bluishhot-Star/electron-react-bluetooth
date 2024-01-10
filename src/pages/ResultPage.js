@@ -806,7 +806,7 @@ useEffect(()=>{console.log(state)},[])
   return(
     <div className="result-page-container">
         <div className="nav">
-          <div className="nav-logo" onClick={()=>{console.log(graphData);}}>
+          <div className="nav-logo" onClick={()=>{}}>
             <h1>The SpiroKit</h1>
           </div>
           <div className="nav-content-container">

@@ -11,6 +11,9 @@ import { Scatter } from 'react-chartjs-2';
 import { useLocation } from 'react-router-dom';
 import DateSelector from './DateSelector.js'
 import annotationPlugin from 'chartjs-plugin-annotation';
+import PdfView from "../components/PdfView.js";
+import { PDFViewer } from '@react-pdf/renderer';
+
 
 function ResultPageCopy(){
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
@@ -957,16 +960,25 @@ console.log(totalData)
   useEffect(()=>{
     console.log(ChartJS.defaults)
   },[])  
-
+  const [viewer,setViewer] = useState(false);
   return( 
     <div className="result-page-container">
       {dateSelectorStat ? <DateSelector data={inspectionDate} onOff={setDateSelectorStat} select={dateSelect}/> : null}
+      {viewer ?
+      <PDFViewer style={{width:1000, height:500, opacity:1}}>
+        <PdfView />
+      </PDFViewer>  : null}
         <div className="nav">
-          <div className="nav-logo" onClick={()=>{console.log(chartRef2.current);}}>
+          <div className="nav-logo" onClick={()=>{
+            navigator('./pdfView')
+            // setViewer(!viewer)
+
+            }}>
             <h1>The SpiroKit</h1>
           </div>
           <div className="nav-content-container">
             <div className="nav-left-container">
+
               <div className='admin'>
                 <span>담당자 </span>
                 
