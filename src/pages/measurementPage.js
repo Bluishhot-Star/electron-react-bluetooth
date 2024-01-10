@@ -119,8 +119,8 @@ const MeasurementPage = () =>{
         timeVolumeMaxList.forEach((item, idx)=>{
           timeVolumeList[idx].push({x : Math.max(Math.ceil(timeVolumeMaxListX[timeVolumeMaxListX.length-1]), 3), y: timeVolumeList[idx][timeVolumeList[idx].length-1].y})
         })
-        setVolumeFlow(volumeFlowList);
-        setTimeVolume(timeVolumeList);
+        setVolumeFlow([]);
+        setTimeVolume([]);
         setAllTimeVolumeList(timeVolumeList);
         setAllVolumeFlowList(volumeFlowList);
         setTvMax(timeVolumeMaxList);
@@ -161,14 +161,14 @@ const MeasurementPage = () =>{
     
     // 누른거 없을떄 onoff[1,1,1, ...]
     console.log("Trigger : "+trigger);
-    // if(trigger == 0){
-    //   console.log("ALLLLL : ",allTimeVolumeList);
-    //   let temp = [...graphOnOff].fill(0);
-    //   setGraphOnOff(temp);
-    //   setTimeVolume(allTimeVolumeList);
-    //   setVolumeFlow(allVolumeFlowList);
-    //   return;
-    // }
+    if(trigger == 0){
+      console.log("ALLLLL : ",allTimeVolumeList);
+      let temp = [...graphOnOff].fill(0);
+      setGraphOnOff(temp);
+      setTimeVolume([]);
+      setVolumeFlow([]);
+      return;
+    }
     // 누른거 있을때
     let temp = [...allTimeVolumeList];
     let temp2 = [...allVolumeFlowList];
