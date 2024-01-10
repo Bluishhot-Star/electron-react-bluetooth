@@ -108,6 +108,10 @@ useEffect(()=>{
 
   const [trigger, setTrigger] = useState(-1);
 
+
+
+
+  
   //svc그래프
   const[svcGraph,setSvcGraph] = useState([]);
   const[allSvcGraph,setAllSvcGraph] = useState([]);
@@ -199,7 +203,6 @@ useEffect(()=>{
     setVolumeFlow(temp2);
     console.log(temp);
 
-    /////////////////////////
   },[trigger])
   
   useEffect(()=>{
