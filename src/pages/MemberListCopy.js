@@ -23,21 +23,6 @@ const MemberListCopy = ()=>{
   let location = useLocation();
   let navigator = useNavigate();
 
-  
-
-
-  //페이지 스크롤시 /subjects?page=1&size=10에서 page가 변경되어야 함
-  // useEffect(()=>{
-  //   axios.get("/subjects?page=1&size=10" , {
-  //     headers: {
-  //       Authorization: `Bearer ${cookies.get('accessToken')}`
-  //     }}).then((res)=>{
-  //       setExaminees(res.data.response.subjects);
-  //       console.log(res.data.response)
-  //     }).catch((err)=>{
-  //       console.log(err);
-  //     })
-  // },[])
 
   // // 클릭한 subject css State
   // const [clicked, setClicked] = useState("");
