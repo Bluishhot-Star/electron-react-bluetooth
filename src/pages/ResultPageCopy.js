@@ -968,11 +968,11 @@ console.log(totalData)
       {dateSelectorStat ? <DateSelector data={inspectionDate} onOff={setDateSelectorStat} select={dateSelect}/> : null}
       {viewer ?
       <PDFViewer style={{width:1000, height:500, opacity:1}}>
-        <PdfView />
+        <PdfView data={totalData}/>
       </PDFViewer>  : null}
         <div className="nav">
           <div className="nav-logo" onClick={()=>{
-            navigator('./pdfView')
+            navigator('./pdfView',{state:totalData})
             // setViewer(!viewer)
 
             }}>
