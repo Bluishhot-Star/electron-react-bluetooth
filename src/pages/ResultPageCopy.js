@@ -13,7 +13,9 @@ import DateSelector from './DateSelector.js'
 import annotationPlugin from 'chartjs-plugin-annotation';
 import PdfView from "../components/PdfView.js";
 import { PDFViewer } from '@react-pdf/renderer';
-
+import { RiCalendarEventLine } from "react-icons/ri";
+import { HiOutlineCog } from "react-icons/hi";
+import { BiSolidFileJpg } from "react-icons/bi";
 
 function ResultPageCopy(){
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
@@ -997,7 +999,7 @@ console.log(totalData)
             <div className="nav-right-container">
               <div className="select-patient-btn" onClick={()=>{navigator('/memberList')}}>환자 선택</div>
               <div className='setting-btn-container' onClick={()=>{navigator("/setting")}}>
-                <FontAwesomeIcon className='cogIcon' icon={faGear}/>
+                <HiOutlineCog className='cogIcon'/>
                 <p className="setting-btn" >설정</p>
               </div>
             </div>
@@ -1008,7 +1010,7 @@ console.log(totalData)
           <div className="patient-measure-list">
           <div className="measure-date-container">
             <div className="measure-selected-date-container">
-              <div>검사 이력</div>
+              <div className='measure-selected-date-title'>검사 이력</div>
               <div className='measure-selected-dateC'>
                 <div className="measure-selected-date-start">{inspectionDate.start ? inspectionDate.start : "0000-00-00"}</div>
                 <div>~</div>
@@ -1018,7 +1020,7 @@ console.log(totalData)
             <div className="measure-select-date-btn-container" onClick={()=>{
                 setDateSelectorStat(!dateSelectorStat)
               }}>
-            <FontAwesomeIcon className='calenderIcon' icon={faCalendar} style={{color: "#4b75d6",}} />
+            <RiCalendarEventLine className='calenderIcon' style={{color: "#4b75d6",}} />
             </div>
           </div>
             <div className="measure-item-containerC">

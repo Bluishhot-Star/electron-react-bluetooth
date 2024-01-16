@@ -11,6 +11,7 @@ import DateSelector from './DateSelector.js'
 import { useInView } from 'react-intersection-observer';
 import { useDispatch, useSelector } from "react-redux"
 import { changeDeviceInfo } from "../deviceInfo.js"
+import { HiOutlineCog } from "react-icons/hi";
 const MemberListCopy = ()=>{
   let deviceInfo = useSelector((state) => state.deviceInfo ) 
   const [examinees, setExaminees] = useState([]);
@@ -252,9 +253,9 @@ const MemberListCopy = ()=>{
           <p onClick={()=>{console.log(deviceInfo);
             // testIt()
             navigator('/memberList');
-          }}>환자 선택</p>
+          }}>환자 목록</p>
           <div className='setting-btn-containerC' onClick={()=>{navigator("/setting")}}>
-            <FontAwesomeIcon className='cogIconC' icon={faGear}/>
+            <HiOutlineCog className='cogIconC'/>
             <p className="setting-btnC" >설정</p>
           </div>
         </div>
@@ -266,7 +267,7 @@ const MemberListCopy = ()=>{
               </div>
             </div>
             <div className="search-patient-containerC">
-              <FontAwesomeIcon className='searchIconC' icon={faSearch} style={{color: "#4b75d6",}} />
+              <FontAwesomeIcon className='searchIconC' icon={faSearch} style={{color: "#387fb9",}} />
               <form 
                 onSubmit={(e)=>{
                 e.preventDefault(); // 전체 리렌더링 방지
