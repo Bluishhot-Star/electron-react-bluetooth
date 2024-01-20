@@ -5,7 +5,7 @@ import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGear,faChevronRight,faCalendar, faSquareXmark } from '@fortawesome/free-solid-svg-icons'
-import { debounce } from 'lodash'
+import { conforms, debounce } from 'lodash'
 import {registerables,Chart as ChartJS,RadialLinearScale,LineElement,Tooltip,Legend,} from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
 import { useLocation } from 'react-router-dom';
@@ -848,12 +848,13 @@ useEffect(()=>{console.log(state)},[])
   const [date, setDate] = useState([]);
   useEffect(()=>{
     if(totalData.chartNumber !== "" && totalData.fvc !== "" && totalData.fvc!=="Empty resource"){
-      axios.get(`/subjects/${totalData.fvc.subject[0].value}/histories?from=${inspectionDate.start === "" ? "2000-01-01" : inspectionDate.start}&to=${inspectionDate.end === "" ? "2099-01-01" : inspectionDate.end}` , {
+      axios.get(`/subjects/${totalData.fvc.subject['chartNumber']}/histories?from=${inspectionDate.start === "" ? "2000-01-01" : inspectionDate.start}&to=${inspectionDate.end === "" ? "2099-01-01" : inspectionDate.end}` , {
         headers: {
           Authorization: `Bearer ${cookies.get('accessToken')}`
         }}).then((res)=>{
           console.log(inspectionDate);
           setDate(res.data.response);
+          report(res.data.response)
         }).catch((err)=>{
           console.log(err);
         })
@@ -866,8 +867,9 @@ useEffect(()=>{console.log(state)},[])
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
   const report = async(date)=>{
+    console.log(date)
     const nDate = [date];
-    await axios.get(`/v3/subjects/${state.fvc.subject.chartNumber}/types/fvc/results/${date}` , {
+    await axios.get(`/v3/subjects/${state.fvc.subject.chartNumber}/types/fvc/results/${date[0]}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
@@ -878,7 +880,7 @@ useEffect(()=>{console.log(state)},[])
     }).catch((err)=>{
       console.log(err);
     })
-    await axios.get(`/v3/subjects/${state.fvc.subject.chartNumber}/types/svc/results/${date}` , {
+    await axios.get(`/v3/subjects/${state.fvc.subject.chartNumber}/types/svc/results/${date[0]}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
@@ -893,7 +895,7 @@ useEffect(()=>{console.log(state)},[])
     })
 
 
-    axios.get(`/subjects/${state.fvc.subject.chartNumber}/types/fvc/results/${date}/diagnosis` , {
+    axios.get(`/subjects/${state.fvc.subject.chartNumber}/types/fvc/results/${date[0]}/diagnosis` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
@@ -913,6 +915,7 @@ useEffect(()=>{console.log(state)},[])
   }
   useEffect(()=>{
     console.log("adfas")
+    console.log(date)
     if(goTO){
       // navigator('/memberListCopy/resultPage',{replace:true}, {state: {fvc:data1, svc:data2, date:date, birth:state.birth}});
       setTotalData({
@@ -1024,10 +1027,10 @@ console.log(totalData)
             </div>
           </div>
             <div className="measure-item-containerC">
-              { state.date ? 
-              state.date.map((item, index)=>(
+              { totalData.date ? 
+              totalData.date.map((item, index)=>(
                     // <Link key={item} to={`/ss/${examinee}/${item}`}>
-                <div key={item} className="measure-item" onClick={()=>{report(item);}}>
+                <div key={item} className="measure-item" onClick={()=>{report([item]);}}>
                   <div className='measure-item-date'>{item}</div>
 
                 </div>
