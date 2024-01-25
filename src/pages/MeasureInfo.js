@@ -7,7 +7,7 @@ import { Routes, Route, Link, useNavigate,useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 const MeasureInfo = ()=>{
-
+  
   const cookies = new Cookies();
 
   //검사 정보
@@ -21,7 +21,6 @@ const MeasureInfo = ()=>{
     target.value = target.value.replace(/[^0.0-9.0]/g, '');
   };
   // 각종 useRef
-  // const mangerIdRef = useRef();
   const FVCTypeRef = useRef();
   const SVCTypeRef = useRef();
   const mediTrueRef = useRef();
@@ -72,7 +71,26 @@ const MeasureInfo = ()=>{
     console.log(tDate);
     setDate(tDate);
   })
-
+  useEffect(()=>{
+    if(date){
+      axios.get(`/subjects/${location.state.chartNumber}/histories/?from=${date}`,{
+        headers: {
+          Authorization: `Bearer ${cookies.get('accessToken')}`
+          }
+        })
+        .then((res)=>{
+          if(res.data.response.length == 0){
+            mediTrueRef.current.disabled = true;
+          }
+        })
+    }
+  },[date])
+  useEffect(()=>{
+    setTimeout(()=>{
+      FVCTypeRef.current.click()
+      mediFalseRef.current.click()
+    },100)
+  },[])
   const [goTO, setGoTO] = useState(false)
   // let data1, data2;
   const [data1, setData1] = useState([]); //FVC 데이터

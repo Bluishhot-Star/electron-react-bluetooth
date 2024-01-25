@@ -23,24 +23,8 @@ const MemberListCopy = ()=>{
   let location = useLocation();
   let navigator = useNavigate();
 
-
-  // // 클릭한 subject css State
-  // const [clicked, setClicked] = useState("");
-
-  // // 클릭했을때 css 변화
-  // useEffect(()=>{
-  //   if(clicked == false){return}
-  //   let temp = document.getElementById(clicked);
-  //   console.log(temp);
-  //   temp.classList.add("memberList-selected");
-  // },[clicked])
-
-  // const removeCSS=(e)=>{
-  //   let temp = document.getElementById(clicked);
-  //   temp.classList.remove("memberList-selected")
-  // }
-
   const click = (index,chartNumber, birth) =>{
+    setChartNumber(chartNumber);
     setBirth(birth);
     console.log(birth);
 
@@ -49,16 +33,28 @@ const MemberListCopy = ()=>{
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
     }).then((res)=>{
-      report(res.data.response,chartNumber);
+      report(res.data.response, chartNumber);
     }).catch((err)=>{
       console.log(err);
     })
   }
   const [goTO, setGoTO] = useState(false)
-  // let data1, data2;
+  const [data0, setData0] = useState([]);
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
   const report = async(date,chartNum)=>{
+    await axios.get(`/subjects/${chartNum}`,{
+      headers: {
+        Authorization: `Bearer ${cookies.get('accessToken')}`
+      }
+    }).then((res)=>{
+      console.log(res);
+      if(res.data.subCode === 2004){
+        setData0(res.data.message);
+      }
+      else setData0(res.data.response);
+    })
+
     await axios.get(`/v3/subjects/${chartNum}/types/fvc/results/${date[0]}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
@@ -95,46 +91,26 @@ const MemberListCopy = ()=>{
     }).catch((err)=>{
       console.log(err);
     })
-    
-
     setGoTO(true);
-    // let time = setTimeout(()=>{
-    //   setGoTO(true);
-    // },1000)
   }
   useEffect(()=>{
     if(goTO){
+      console.log(chartNumber);
+      console.log(data0);
       console.log(data1);
       console.log(data2);
-      console.log(date)
-      navigator('./resultPage', {state: {fvc:data1, svc:data2, date:date, birth:birth}});
+      console.log(date);
+      navigator('./resultPage', {state: {info:data0, fvc:data1, svc:data2, date:date, birth:birth, chartNumber:chartNumber}});
     }
     else{}
   },[goTO])
-
-  const [curtainStat, setCurtainStat] = useState(true);
-
-  // 검색 기능
-
-  // const searchName = ()=>{
-  //   axios.get(`/subjects?page=1&size=10&name=${searchVal}` , {
-  //     headers: {
-  //       Authorization: `Bearer ${cookies.get('accessToken')}`
-  //     }})
-  //     .then((res)=>{
-  //       setExaminees(res.data.response.subjects);
-  //     }).catch((err)=>{
-  //       console.log(err);
-  //     })
-  // }
-  
 
   //기간 설정 기능
   const [inspectionDate, setInspectionDate] = useState({
     start : "",
     end : ""
   });
-//수정
+  //수정
   useEffect(()=>{
     if(chartNumber !== ""){
       axios.get(`/subjects/${chartNumber}/histories?from=${inspectionDate.start === "" ? "2000-01-01" : inspectionDate.start}&end=${inspectionDate.end === "" ? "2099-01-01" : inspectionDate.end}` , {
@@ -147,16 +123,14 @@ const MemberListCopy = ()=>{
           console.log(err);
         })
     }
-      
-    
   },[inspectionDate])
 
   useEffect(()=>{
     console.log(date)
   },[])
   const dateSelect = (select) =>{
-      console.log(select);
-      setInspectionDate(select);
+    console.log(select);
+    setInspectionDate(select);
   }
 
 
@@ -165,42 +139,8 @@ const MemberListCopy = ()=>{
   const [ref, inView] = useInView();
   const [page, setPage] = useState(1); // 현재 페이지 번호 (페이지네이션)
 
-  // 무한 스크롤
-  // 지정한 타겟 div가 화면에 보일 때 마다 서버에 요청을 보냄
-  // const productFetch = () => {
-  //   axios.get(`/subjects?page=${page}&size=10` , {
-  //     headers: {
-  //       Authorization: `Bearer ${cookies.get('accessToken')}`
-  //     }}).then((res)=>{
-  //       if(res.data.message !== "OK"){return;}
-  //       setExaminees([...examinees, ...res.data.response.subjects]);
-  //       console.log(res.data.response)
-  //       setPage((page) => page + 1)
-  //     }).catch((err)=>{
-  //       console.log(err);
-  //     })
-  // };
-  // useEffect(()=>{
-  //   console.log(page);
-  // },[examinees])
-
-  // useEffect(() => {
-  //   // inView가 true 일때만 실행(마지막 요소 보이면 true)
-  //   if (inView) {
-  //     console.log(inView, '무한 스크롤 요청')
-  //     let time = setTimeout(()=>{
-  //       productFetch();
-  //     },10)
-  //     return()=>{
-  //       clearTimeout(time);
-  //     }
-  //   }
-  //   else{
-  //     console.log(inView);
-  //   }
-  // },);
   const [searchVal, setSearchVal] = useState("")
-  // useEffect(()=>{console.log(searchVal)},[searchVal])
+
   const MemberListCopy = useCallback(async () => {
     setLoading(true)
     axios.get(`/subjects?page=${page}&size=10&name=${searchVal}`,{
@@ -220,16 +160,6 @@ const MemberListCopy = ()=>{
   useEffect(()=>{
     MemberListCopy()
   },[examinees])
-
-  // useEffect(() => {
-  //   // 사용자가 마지막 요소를 보고 있고, 로딩 중이 아니라면
-  //   if (inView && !loading) {
-  //     console.log(page);
-      
-  //     setPage((page) => page + 1);
-  //   }
-  // }, [inView,loading])
-
 
   return (
       <div className="memberList-page-containerC">

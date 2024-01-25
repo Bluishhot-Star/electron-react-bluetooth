@@ -2,19 +2,9 @@ import { useEffect, useState, useRef} from "react";
 import axios from "axios";
 import { Cookies, useCookies } from 'react-cookie';
 import { useLocation,useNavigate } from 'react-router-dom';
-import {
-    Chart as ChartJS,
-    LinearScale,
-    PointElement,
-    LineElement,
-    BarElement,
-    Tooltip,
-    Legend,
-    plugins,
-    CategoryScale,
-  } from 'chart.js';
+import { Chart as ChartJS,LinearScale,PointElement,LineElement,BarElement,Tooltip,Legend,plugins,CategoryScale} from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
-import 'chartjs-adapter-date-fns';
+
 import { debounce } from 'lodash'
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { parse } from "date-fns";

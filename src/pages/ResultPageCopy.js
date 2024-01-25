@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Cookies, useCookies } from 'react-cookie';
-import { Routes, Route, Link, useNavigate } from 'react-router-dom'
+import { Cookies } from 'react-cookie';
+import { useNavigate } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faGear,faChevronRight,faCalendar, faSquareXmark } from '@fortawesome/free-solid-svg-icons'
-import { conforms, debounce } from 'lodash'
-import {registerables,Chart as ChartJS,RadialLinearScale,LineElement,Tooltip,Legend,} from 'chart.js';
+import { faSquareXmark } from '@fortawesome/free-solid-svg-icons'
+import { debounce } from 'lodash'
+import { registerables,Chart as ChartJS,RadialLinearScale,LineElement,Tooltip,Legend} from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
 import { useLocation } from 'react-router-dom';
 import DateSelector from './DateSelector.js'
@@ -28,13 +28,15 @@ function ResultPageCopy(){
   const [info, setInfo] = useState();
   const [tvMax, setTvMax] = useState([10]);
   const [totalData,setTotalData] = useState({
+    info:"Empty resource",
     fvc:"Empty resource",
     svc:"Empty resource",
     date:"",
-    birth:""
+    birth:"",
+    chartNumber:"",
   })
 
-  let diagnosis, trials;
+  let trials;
 
   const chartRef = useRef();
   const chartRef2 = useRef();
@@ -49,9 +51,6 @@ useEffect(()=>{
 },[])
   //fvc 그래프 처리
   useEffect(()=>{
-    console.log(location.state);
-    console.log(123123123);
-    diagnosis = location.state.diagnosis;
     //fvc의 심플카드
     trials = totalData.fvc.trials;
     let timeVolumeList = [];
@@ -86,11 +85,6 @@ useEffect(()=>{
       setTrigger(0);
     }
   },[totalData])
-// timeVolumeList -> meas 최대값 == y축 마지막값(최대값) / 마지막x값들 중 최대값을 각 데이터셋에 적용
-// dataset.push({x: 마지막x값들 중 최대값, y:tvMax[index]})
-
-
-
 
   const click = ()=>{
     console.log(location.state);
@@ -107,13 +101,8 @@ useEffect(()=>{
   //결과 그래프 목록 요청 FVC
   const[volumeFlow,setVolumeFlow] = useState([]);
   const[timeVolume,setTimeVolume] = useState([]);
-
   const [trigger, setTrigger] = useState(-1);
 
-
-
-
-  
   //svc그래프
   const[svcGraph,setSvcGraph] = useState([]);
   const[allSvcGraph,setAllSvcGraph] = useState([]);
@@ -128,7 +117,6 @@ useEffect(()=>{
 
   //그래프 선택
   const selectGraph=(index)=>{
-    console.log("HE!!!!");
     let temp;
     //처음 눌렀을때
     if(trigger == 0){
@@ -151,7 +139,6 @@ useEffect(()=>{
 
   //svc 그래프 선택
   const selectSvcGraph=(index)=>{
-    console.log("SVC!!!!");
     let temp;
     //처음 눌렀을때
     if(svcTrigger == 0){
@@ -181,7 +168,6 @@ useEffect(()=>{
     // 누른거 없을떄 onoff[1,1,1, ...]
     console.log("Trigger : "+trigger);
     if(trigger == 0){
-      console.log("ALLLLL : ",allTimeVolumeList);
       let temp = [...graphOnOff].fill(0);
       setGraphOnOff(temp);
       setTimeVolume(allTimeVolumeList);
@@ -209,14 +195,12 @@ useEffect(()=>{
   
   useEffect(()=>{
     /**
-     * allTimeVolumeList -> 전체 리스트
-     * timeVolume -> 보여줄 리스트
+     * allSvcGraph -> 전체 리스트
+     * svcGraph -> 보여줄 리스트
      */
     
     // 누른거 없을떄 onoff[1,1,1, ...]
-    console.log("SVCTrigger : "+svcTrigger);
     if(svcTrigger == 0){
-      console.log("SVCALLLLL : ",allSvcGraph);
       let temp = [...svcGraphOnOff].fill(0);
       setSvcGraphOnOff(temp);
       setSvcGraph(allSvcGraph);
@@ -234,29 +218,19 @@ useEffect(()=>{
     })
     setSvcGraph(temp);
     console.log(temp);
-
-    /////////////////////////
   },[svcTrigger])
 
-
-
-
-
   useEffect(()=>{
-  //   console.log(location.state);
-    console.log(123123123);
     //svc의 심플카드
-    trials = location.state.svc.trials;
+    let svcTrials = totalData.svc.trials;
     let svcGraphList = [];
     let svcMaxList = [];
 
-    if(trials){
-      console.log(trials.length);
-      let temp = new Array(trials.length).fill(0);
+    if(svcTrials){
+      let temp = new Array(svcTrials.length).fill(0);
       setSvcGraphOnOff(temp);
-// 
       // 매 결과에서 데이터 추출
-      trials.forEach((item)=>{
+      svcTrials.forEach((item)=>{
         svcGraphList.push(item.graph.timeVolume);
 
         //현 svc 최대값 찾기
@@ -267,7 +241,7 @@ useEffect(()=>{
       setSvcMax(svcMaxList);
       setSvcTrigger(0);
     }
-  },[])
+  },[totalData])
 
   useEffect(()=>{
     if(FvcSvc=="fvc"){
@@ -305,10 +279,7 @@ useEffect(()=>{
     labels: ['FVC'],
     datasets: [{
       label: "",
-      data: [
-        {x: 0.030999999999999996, y: 0.23858681948280723},
-        {x: 0.030999999999999996, y: 0.23858681948280724},
-        {x: 0.030999999999999996, y: 0.23858681948280724}],
+      data: [{x: 0, y: 0}],
       borderColor: 'rgb(255,255,255)',
       showLine: true,
       tension: 0.4
@@ -318,10 +289,7 @@ useEffect(()=>{
     labels: ['FVC'],
     datasets: [{
       label: "",
-      data: [
-        {x: 0.030999999999999996, y: 0.23858681948280723},
-        {x: 0.030999999999999996, y: 0.23858681948280724},
-        {x: 0.030999999999999996, y: 0.23858681948280724}],
+      data: [{x: 0, y: 0}],
       borderColor: 'rgb(255,255,255)',
       showLine: true,
       tension: 0.4
@@ -332,21 +300,12 @@ useEffect(()=>{
     datasets: [{
       label: "",
       data: [
-        {x: 0.030999999999999996, y: 0.23858681948280723},
-        {x: 0.030999999999999996, y: 0.23858681948280724},
-        {x: 0.030999999999999996, y: 0.23858681948280724}],
+        {x: 0, y: 0}],
       borderColor: 'rgb(255,255,255)',
       showLine: true,
       tension: 0.4
     },]
   })
-
-  // window.addEventListener('beforeprint', () => {
-  //   chartRef.current.resize(600, 600);
-  // });
-  // window.addEventListener('afterprint', () => {
-  //   chartRef.current.resize();
-  // });
 
   const graphOption={
     plugins:{
@@ -367,17 +326,13 @@ useEffect(()=>{
         radius: 0,
       },
     },
-    scales: {
+    scales: { 
       x: {
         axios: 'x',
         min: 0,
         // max: parseInt(Math.max(...tvMax)),
-        // suggestedMax: 6.0,
-        // max:5.5,
         ticks:{
           autoSkip: false,
-          // stepSize : 0.25,
-          // precision : 0.1,
           beginAtZero: false,
           max: 12.0,
         },
@@ -429,7 +384,6 @@ useEffect(()=>{
 
     plugins:{
       afterDraw: function (chart, easing) {
-        console.log(chart);
       },
       legend: {
           display: false
@@ -459,7 +413,6 @@ useEffect(()=>{
         axios: 'x',
         min: 0,
         suggestedMax: 3,
-        // suggestedMax: 6.0,
         ticks:{
           stepSize : .5,
           beginAtZero: false,
@@ -516,9 +469,6 @@ useEffect(()=>{
       datalabels: false,
     },
     responsive: true,
-    animation:{
-      // duration:0
-    },
     maintainAspectRatio: false,
     interaction: false, 
     elements: {
@@ -584,10 +534,6 @@ useEffect(()=>{
     },
   }
 
-useEffect(()=>{
-  console.log(chartRef.current);
-},[])
-
   // 창 크기 조절에 따른 그래프 크기 조절
   const [first, setFirst] = useState({x:window.innerWidth, y: window.innerHeight})
   const [second, setSecond] = useState({x:window.innerWidth, y: window.innerHeight})
@@ -619,17 +565,13 @@ useEffect(()=>{
   useEffect(()=>{
     let time = setTimeout(() => {
       if (first["x"]===second["x"] && first["y"]==second["y"]){
-        console.log("OOOOOOHHH")
         setTemp(true);
         if(chartRef.current){
-          console.log("HELLO")
           chartRef.current.resize();
-          // chartRef2.current.update();
         };
       }
       else{
         setTemp(false)
-        console.log("HEllt")
       };
     },300);
     return()=>{clearTimeout(time)}
@@ -650,17 +592,10 @@ useEffect(()=>{
     }
   },[])
   
-
-
-
   // volumeFlow 그리기
   useEffect(()=>
   {
-    console.log("!#!##")
-
     let time = setTimeout(()=>{
-      console.log("!#!##!@!@")
-      
       let time2 = setTimeout(() => {
         let dataset = []
         volumeFlow.forEach((item,index)=>{
@@ -706,11 +641,7 @@ useEffect(()=>{
   // timeVolume 그리기
   useEffect(()=>
   {
-    console.log("!#!##")
-
     let time = setTimeout(()=>{
-      console.log("!#!##!@!@")
-      
       let time2 = setTimeout(() => {
         let dataset = []
         timeVolume.forEach((item,index)=>{
@@ -754,11 +685,7 @@ useEffect(()=>{
   // svcGraph 그리기
   useEffect(()=>
   {
-    console.log("!#!##")
-
     let time = setTimeout(()=>{
-      console.log("!#!##!@!@")
-      
       let time2 = setTimeout(() => {
         let dataset = []
         svcGraph.forEach((item,index)=>{
@@ -798,11 +725,6 @@ useEffect(()=>{
       clearTimeout(time);
     }
   },[svcGraph])
-  // useEffect(()=>[
-  //   console.log(state)
-  // ],[])
-
-
 
   const graphStyle = {width:"0px" ,height:"0px", transition:"none"}
 
@@ -810,13 +732,12 @@ useEffect(()=>{
   const svcSimpleResultsRef = useRef([]);
   const addSimpleResultsRef = (el) => {simpleResultsRef.current.push(el)};
   const detailPage = () => {
-    if(FvcSvc == "fvc") navigator('/memberList/detailPage', {state: state.fvc});
-    else navigator('/memberList/detailSvcPage', {state: state.svc});
+    if(FvcSvc == "fvc") navigator('/memberList/detailPage', {state: totalData.fvc});
+    else navigator('/memberList/detailSvcPage', {state: totalData.svc});
   }
 
   const FVCBtnRef = useRef();
   const SVCBtnRef = useRef();
-
 
   const changeType = (type)=>{
     setFvcSvc(type);
@@ -839,48 +760,80 @@ useEffect(()=>{
   const dateSelect = (select) =>{
     console.log(select);
     setInspectionDate(select);
-}
-useEffect(()=>{console.log(state)},[])
+    setDateSelectIdx(null);
+  }
   const [inspectionDate, setInspectionDate] = useState({
     start : "",
     end : ""
   });
-  const [date, setDate] = useState([]);
+  const [date, setDate] = useState(location.state.date);
   useEffect(()=>{
-    if(totalData.chartNumber !== "" && totalData.fvc !== "" && totalData.fvc!=="Empty resource"){
-      axios.get(`/subjects/${totalData.fvc.subject['chartNumber']}/histories?from=${inspectionDate.start === "" ? "2000-01-01" : inspectionDate.start}&to=${inspectionDate.end === "" ? "2099-01-01" : inspectionDate.end}` , {
+    if(totalData.chartNumber){
+      axios.get(`/subjects/${totalData.chartNumber}/histories?from=${inspectionDate.start === "" ? "2000-01-01" : inspectionDate.start}&to=${inspectionDate.end === "" ? "2099-01-01" : inspectionDate.end}` , {
         headers: {
           Authorization: `Bearer ${cookies.get('accessToken')}`
         }}).then((res)=>{
+          console.log(res)
           console.log(inspectionDate);
-          setDate(res.data.response);
-          report(res.data.response)
+          if(res.data.response.length !== 0){
+            setDate(res.data.response);
+            report(res.data.response);
+          }
+          else{
+            setTotalData({
+              info: totalData.info,
+              fvc:'Empty resource',
+              svc:'Empty resource',
+              date:"",
+              birth: totalData.birth,
+              chartNumber: totalData.chartNumber,
+            })
+            
+            setDate([]);
+          }
         }).catch((err)=>{
           console.log(err);
+          
         })
     }
   },[inspectionDate])
 
   const [dateSelectorStat, setDateSelectorStat] = useState(false);
   const [goTO, setGoTO] = useState(false)
-  // let data1, data2;
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
-  const report = async(date)=>{
-    console.log(date)
-    const nDate = [date];
-    await axios.get(`/v3/subjects/${state.fvc.subject.chartNumber}/types/fvc/results/${date[0]}` , {
+  const dateSelectorRef = useRef([]);
+  const [dateSelectIdx, setDateSelectIdx] = useState(0);
+  const [gray, setGray] = useState("");
+  useEffect(()=>{
+    setTimeout(()=>{
+      if(dateSelectorRef.current[0] && dateSelectIdx !== null){
+        dateSelectorRef.current[dateSelectIdx].classList+= " selected";
+        dateSelectorRef.current.map((a,i)=>{
+          if(dateSelectorRef.current[i] && dateSelectorRef.current[i].classList.contains("selected")){
+            if(dateSelectIdx!==i)dateSelectorRef.current[i].classList.remove("selected");
+          }
+        })
+      }
+    },100)
+  },[dateSelectIdx])
+  
+  const report = async(tDate)=>{
+    console.log(tDate)
+    await axios.get(`/v3/subjects/${totalData.chartNumber}/types/fvc/results/${tDate[0]}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
     }).then((res)=>{
       console.log(res.data.response);
-      setData1(res.data.response);
-      // setDate(nDate)
+      if(res.data.subCode === 2004){
+        setData1(res.data.message);
+      }
+      else setData1(res.data.response);
     }).catch((err)=>{
       console.log(err);
     })
-    await axios.get(`/v3/subjects/${state.fvc.subject.chartNumber}/types/svc/results/${date[0]}` , {
+    await axios.get(`/v3/subjects/${totalData.chartNumber}/types/svc/results/${tDate[0]}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
       }
@@ -893,61 +846,26 @@ useEffect(()=>{console.log(state)},[])
     }).catch((err)=>{
       console.log(err);
     })
-
-
-    axios.get(`/subjects/${state.fvc.subject.chartNumber}/types/fvc/results/${date[0]}/diagnosis` , {
-      headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
-      }
-    }).then((res)=>{
-      console.log(res.data.response);
-      // setDate(nDate)
-    }).catch((err)=>{
-      console.log(err);
-    })
-
-    
-
     setGoTO(true);
-    // let time = setTimeout(()=>{
-    //   setGoTO(true);
-    // },1000)
   }
+
+
   useEffect(()=>{
     console.log("adfas")
     console.log(date)
     if(goTO){
-      // navigator('/memberListCopy/resultPage',{replace:true}, {state: {fvc:data1, svc:data2, date:date, birth:state.birth}});
       setTotalData({
+        info : state.info,
         fvc : data1,
         svc : data2,
         date : date,
-        birth : state.birth
+        birth : state.birth,
+        chartNumber: state.chartNumber,
       })
       setGoTO(false);
     }
-    else{}
   },[goTO])
 
-  // useEffect(()=>{
-  //   if(data1.length != 0){
-  //     axios.get(`/subjects/${state.fvc.subject[0].value}/types/fvc/measurements/${data1.trials[1].measurementId}` , {
-  //       headers: {
-  //         Authorization: `Bearer ${cookies.get('accessToken')}`
-  //       }
-  //     }).then((res)=>{
-  //       console.log(res);
-        
-  //     }).catch((err)=>{
-  //       console.log(err);
-  //     })
-  //   }
-    
-  // },[data1])
-  
-useEffect(()=>{
-console.log(totalData)
-},[totalData])
   const simpleResult = async(id,date)=>{
     await axios.delete(`/measurements/${id}` , {
       headers: {
@@ -962,10 +880,19 @@ console.log(totalData)
     report(date.split(' ')[0]);
 
   }
-  useEffect(()=>{
-    console.log(ChartJS.defaults)
-  },[])  
   const [viewer,setViewer] = useState(false);
+  const [sliderBg, setSliderBg] = useState("");
+  useEffect(()=>{
+    if(FvcSvc == "fvc"){
+      if(totalData.fvc === '' || totalData.fvc === 'Empty resource')setSliderBg("empty");
+      else setSliderBg("");
+    }
+    else{
+      if(totalData.svc === '' || totalData.svc === 'Empty resource')setSliderBg("empty");
+      else setSliderBg("");
+    }
+    return(()=>{setSliderBg("")})
+  },[totalData, FvcSvc])
   return( 
     <div className="result-page-container">
       {dateSelectorStat ? <DateSelector data={inspectionDate} onOff={setDateSelectorStat} select={dateSelect}/> : null}
@@ -976,10 +903,8 @@ console.log(totalData)
         <div className="nav">
           <div className="nav-logo" onClick={()=>{
             navigator('./pdfView',{state:totalData})
-            // setViewer(!viewer)
-
             }}>
-            <h1>The SpiroKit</h1>
+            <img src={process.env.PUBLIC_URL + '/spriokit.svg'} />
           </div>
           <div className="nav-content-container">
             <div className="nav-left-container">
@@ -987,16 +912,27 @@ console.log(totalData)
               <div className='admin'>
                 <span>담당자 </span>
                 
-                <span>{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.clinicianName}</span>
+                <span>{totalData.info === '' || totalData.info === 'Empty resource' ? '': totalData.info.clinicianName}</span>
                 
               </div>
               <div className='error'>
                 <span>Error Code </span>
-                <span>{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '-': totalData.fvc.diagnosis.errorCode}</span>
+                {
+                  FvcSvc == "fvc"?
+                    <span>{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '-': totalData.fvc.diagnosis.errorCode}</span>
+                  :
+                    <span>{totalData.svc === '' || totalData.svc === 'Empty resource' ? '-': totalData.svc.diagnosis.errorCode}</span>
+                }
               </div>
               <div className='grade'>
                 <span>Grade </span>
-                <span>{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '-': totalData.fvc.diagnosis.suitability}</span> 
+                {
+                  FvcSvc == "fvc"?
+                    <span>{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '-': totalData.fvc.diagnosis.suitability}</span>
+                  :
+                    <span>{totalData.svc === '' || totalData.svc === 'Empty resource' ? '-': totalData.svc.diagnosis.suitability}</span> 
+                }
+                
               </div>
             </div>
             <div className="nav-right-container">
@@ -1029,8 +965,7 @@ console.log(totalData)
             <div className="measure-item-containerC">
               { totalData.date ? 
               totalData.date.map((item, index)=>(
-                    // <Link key={item} to={`/ss/${examinee}/${item}`}>
-                <div key={item} className="measure-item" onClick={()=>{report([item]);}}>
+                <div ref={(el)=>{dateSelectorRef.current[index]=el}} key={item} className={"measure-item "} onClick={()=>{report([item]); setDateSelectIdx(index)}}>
                   <div className='measure-item-date'>{item}</div>
 
                 </div>
@@ -1041,30 +976,22 @@ console.log(totalData)
             <span>환자 정보</span>
             <div className="patient-infoC">
               <div className="title">이름</div>
-              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.name}</div>
+              <div className="content">{totalData.info === '' || totalData.info === 'Empty resource' ? '': totalData.info.name}</div>
               <div className="title">성별</div>
-              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.gender=="m"?"남자":"여자"}</div>
+              <div className="content">{totalData.info === '' || totalData.info === 'Empty resource' ? '': totalData.info.gender=="m"?"남자":"여자"}</div>
               <div className="title">신장</div>
-              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.height}cm</div>
+              <div className="content">{totalData.info === '' || totalData.info === 'Empty resource' ? '': totalData.info.height}cm</div>
               <div className="title">몸무게</div>
-              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.weight}kg</div>
+              <div className="content">{totalData.info === '' || totalData.info === 'Empty resource' ? '': totalData.info.weight}kg</div>
               <div className="title">생년월일</div>
-              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.birth}</div>
+              <div className="content">{totalData.info === '' || totalData.info === 'Empty resource' ? '': totalData.birth}</div>
               <div className="title">연간 흡연량</div>
-              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.smokingPackYear == '' ? "-":state.fvc.subject.smokingPackYear}</div>
+              <div className="content">{totalData.info === '' || totalData.info === 'Empty resource' ? '': totalData.info.subjectDetails.smokingPackYear == '' ? "-":totalData.info.subjectDetails.smokingPackYear}</div>
               <div className="title">흡연 여부</div>
-              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.smoking === "false"||state.fvc.subject.smoking === false ? "아니오" : "예"}</div>
-
-
-              {/* // 이부분 api 문제있음 */}
+              <div className="content">{totalData.info === '' || totalData.info === 'Empty resource' ? '': totalData.info.subjectDetails.smoking === "false"||totalData.info.subjectDetails.smoking === false ? "아니오" : "예"}</div>
               <div className="title">흡연 기간(연)</div> 
-              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? '': totalData.fvc.subject.smokingStartAge == '' ? "-" :parseInt(totalData.fvc.subject.smokingStopAge) - parseInt(totalData.fvc.subject.smokingStartAge)}</div>
-              
-
-              {/* <div className="space"></div> */}
+              <div className="content">{totalData.info === '' || totalData.info === 'Empty resource' ? '': totalData.info.subjectDetails.smokingStartAge == '' ? "-" :parseInt(totalData.info.subjectDetails.smokingStopAge) - parseInt(totalData.info.subjectDetails.smokingStartAge)}</div>
             </div>
-            {/* <button onClick={updateData}>환자정보 수정</button> */}
-             {/* <div className="button-container"></div> */}
           </div>
         </div>
         <div className="right-container">
@@ -1073,40 +1000,54 @@ console.log(totalData)
               <button ref={FVCBtnRef} onClick={()=>{changeType("fvc")}} id="clickme" className="FVC-btn">FVC</button>
               <button ref={SVCBtnRef} onClick={()=>{changeType("svc")}} className="SVC-btn">SVC</button>
             </div>
-            <button className="detail-btn" onClick={()=>{detailPage()}}>결과 상세보기</button>
+            {
+              FvcSvc == 'fvc' ?
+                totalData.fvc === '' || totalData.fvc === 'Empty resource'?
+                  ""
+                :
+                <button className="detail-btn" onClick={()=>{detailPage()}}>결과 상세보기</button>
+              :
+                totalData.svc === '' || totalData.svc === 'Empty resource'?
+                  ""
+                :
+                <button className="detail-btn" onClick={()=>{detailPage()}}>결과 상세보기</button>
+            }
           </div>
           {
             FvcSvc == "fvc" ? 
-            <div className="fvc-graph-container">
-              <div className="graph">
-                {temp?<div className="title-y">Flow(l/s)</div>:<></>}
-                {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingG'>화면 조정 중..</p>}
-                {temp?<div className="title-x">Volume(L)</div>:<></>}
+            totalData.fvc === '' || totalData.fvc === 'Empty resource'? 
+              <div className="empty-graph-container">검사 결과 데이터가 없습니다.</div>
+            :
+              <div className="fvc-graph-container">
+                <div className="graph">
+                  {temp?<div className="title-y">Flow(l/s)</div>:<></>}
+                  {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingBG'>화면 조정 중..</p>}
+                  {temp?<div className="title-x">Volume(L)</div>:<></>}
+                </div>
+                <div className="graph">
+                  {temp?<div className="title-y">Volume(L)</div>:<></>}
+                  {temp?<Scatter ref={chartRef2} style={graphStyle} data={graphData2} options={graphOption2}/>:<p className='loadingG'>화면 조정 중..</p>}
+                  {temp?<div className="title-x">Time(s)</div>:<></>}
+                </div>
               </div>
-              <div className="graph">
-                {temp?<div className="title-y">Volume(L)</div>:<></>}
-                {temp?<Scatter ref={chartRef2} style={graphStyle} data={graphData2} options={graphOption2}/>:<p className='loadingG'>화면 조정 중..</p>}
-                {temp?<div className="title-x">Time(s)</div>:<></>}
-              </div>
-            </div>
           :
-            <div className='svc-graph-container'>
-              <div className="graph">
-                {temp?<div className="title-y">Volume(L)</div>:<></>}
-                {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData3} options={graphOption3}/>:<p className='loadingG'>화면 조정 중..</p>}
-                {temp?<div className="title-x">Time(s)</div>:<></>}
+            totalData.svc === '' || totalData.svc === 'Empty resource'? 
+              <div className='empty-graph-container'>검사 내역 없음</div>
+            :
+              <div className='svc-graph-container'>
+                <div className="graph">
+                  {temp?<div className="title-y">Volume(L)</div>:<></>}
+                  {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData3} options={graphOption3}/>:<p className='loadingG'>화면 조정 중..</p>}
+                  {temp?<div className="title-x">Time(s)</div>:<></>}
+                </div>
               </div>
-            </div>
           }
-          {/* <div className="fvc-graph-container">
-          </div> */}
 
-
-          <div className="history-container">
-            <div className="slider">
+          <div className={"history-container "+sliderBg}>
+            <div className={"slider"}>
             {
               FvcSvc == "fvc" ?
-              totalData.fvc === '' || totalData.fvc === 'Empty resource'? '' :
+              totalData.fvc === '' || totalData.fvc === 'Empty resource'? <div className='empty-simple-container'></div> :
               totalData.fvc.trials.map((item, index)=>(
                 <div ref={(el)=>{simpleResultsRef.current[index]=el}} onClick={()=>{console.log(simpleResultsRef.current[index]);console.log(item.measurementId);selectGraph(index)}} key={item.measurementId}  className='simple-result-container'>
                   <div className='simple-result-title-container'>
