@@ -30,6 +30,7 @@ import MemberListCopy from './pages/MemberListCopy.js';
 import AddPatientCopy from './pages/AddPatientC.js';
 import ResultPageCopy from './pages/ResultPageCopy.js';
 import Pdf from './pages/Pdf.js';
+import Report from './pages/Report.js';
 // Variable & State
 const author = "KASSID&HAI";
 
@@ -62,7 +63,7 @@ function App() {
         <Route path='/memberList' element={<MemberListCopy/>}/>
         <Route path='/memberList/addPatient' element={<AddPatientCopy/>}/>
         <Route path='/memberList/resultPage' element={<ResultPageCopy/>}/>
-        <Route path='/memberList/resultPage/pdfView' element={<Pdf/>}/>
+        <Route path='/memberList/resultPage/report' element={<Report/>}/>
         
       </Routes>
     </div>

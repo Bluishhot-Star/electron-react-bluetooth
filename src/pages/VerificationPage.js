@@ -14,6 +14,7 @@ import annotationPlugin from 'chartjs-plugin-annotation';
 import { changeDeviceInfo, reset } from "../deviceInfo.js"
 import { useDispatch, useSelector } from "react-redux"
 import { useInView } from 'react-intersection-observer';
+import html2canvas from "html2canvas";
 const VerificationPage = () =>{
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
   const cookie = new Cookies();
@@ -1252,9 +1253,39 @@ const [calivration,setCalivration] = useState({
       verify.map((value)=>{console.log(value)})
     }
   },[verify])
+//capture
+const onCapture = () =>{
+  console.log("onCapture");
+  html2canvas(document.getElementsByClassName('App')).then((canvas)=>{
+    let now = new Date();
+    const month = now.getMonth()+1 < 10 ? "0"+(now.getMonth()+1) : now.getMonth()+1;
+    const date = now.getDate() < 10 ? "0"+now.getDate() : now.getDate();
+    const YMD = now.getFullYear()+""+month+""+date;
+    const hour = now.getHours() < 10 ? "0"+now.getHours() : now.getHours();
+    const minutes= now.getMinutes() < 10 ? "0"+now.getMinutes() : now.getMinutes();
+    const seconds = now.getSeconds() < 10 ? "0"+now.getSeconds() : now.getSeconds();
+    const time = hour+""+minutes+""+seconds;
+    console.log(month)
+    console.log(date+"_"+time)
+    onSaveAs(canvas.toDataURL('image/jpeg'),`car_verify_${YMD}_${time}.jpeg`);
+      
+  });
+  
+};
+const onSaveAs = (uri,filename)=>{
+  console.log("onSaveAs");
+  var link = document.createElement('a');
+  document.body.appendChild(link);
+  link.href = uri;
+  link.download = filename;
+  link.click();
+  document.body.removeChild(link);
 
+};
+const rootRef = useRef(null);
   return(
-    <div className="verify-measurement-page-container">
+    <>
+    <div ref={rootRef} className="verify-measurement-page-container">
       {disconnectStat&&confirm ? <Confirm content={"연결된 Spirokit기기가 없습니다.\n설정 페이지로 이동해서 Spirokit을 연결해주세요."} btn={true} onOff={setDisconnectStat} select={disconnectConfirmFunc}/> : null}
       {readyAlert ? <Confirm content="준비 중입니다..." btn={false} onOff={setReadyAlert} select={confirmFunc}/> : null}
       <div className="verify-measurement-page-nav">
@@ -1267,6 +1298,7 @@ const [calivration,setCalivration] = useState({
 
         }}>보정 검증</p>
       </div>
+      <div onClick={onCapture}>스크린샷</div>
       <div className='verify-measurement-m-page-container'>
         <div className="verify-measurement-page-left-container" ref={graphConRef}>
           <div className='verify-measure-graph'>
@@ -1377,6 +1409,7 @@ const [calivration,setCalivration] = useState({
       
       
     </div>
+    </>
   );
 }
 
