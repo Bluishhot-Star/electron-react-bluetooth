@@ -4,15 +4,15 @@ import './App.css';
 import { useState, useEffect, useRef } from 'react';
 import LoginForm from './pages/LoginForm.js'
 import SignUpForm from './pages/SignUpForm.js'
-import MemberList from './pages/MemberList'
-import AddPatient from './pages/AddPatient';
+// import MemberList from './pages/MemberList'
+// import AddPatient from './pages/AddPatient';
 import axios from 'axios';
 import { Cookies, useCookies } from 'react-cookie';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import MeasureInfo from './pages/MeasureInfo.js';
-import ResultPage from './pages/ResultPage.js'
+// import ResultPage from './pages/ResultPage.js'
 import DetailPage from './pages/DetailPage.js'
 import DetailSvcPage from './pages/DetailSvcPage.js'
 import SettingPage from './pages/SettingPage.js'

@@ -5,6 +5,7 @@ import Alert from "../components/Alerts.js"
 import Confirm from "../components/Confirm.js"
 import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import { RiLungsLine } from "react-icons/ri";
 import { faChevronLeft, faSquareXmark } from '@fortawesome/free-solid-svg-icons'
 import { FaBluetoothB } from "react-icons/fa6";
 import {} from "@fortawesome/fontawesome-svg-core"
@@ -396,7 +397,7 @@ useEffect(()=>
     if(inF !== -1){
       if(inF && timerReady===false){//흡기 선
         setGaugeContent({r11:"1", r12:breathCount, r2:"IN"})
-        setSessionVol(breathCount*2); //====================================고쳐야 하는 부분..
+        setSessionVol(breathCount*2);
       }
       else if(!inF && timerReady===false){//호기 선
         setGaugeContent({r11:"1", r12:breathCount, r2:"OUT"})
@@ -940,13 +941,11 @@ useEffect(()=>
       let x, y;
       let preXY; //이전값
       // preXY 값 할당
-      // let TvolumeFlowList = [...volumeFlowList];
       //초기값 세팅
       if(volumeFlowList.length == 0){
         preXY = {x:0, y:0}
       }
       else{
-        // preXY = volumeFlowList[calFlag-1]
         preXY = volumeFlowList[volumeFlowList.length-1]
       }
   
@@ -956,21 +955,11 @@ useEffect(()=>
           setInF(true);
           setInFDone(true);
         }
-        
-        // if(preXY['y']<=0 && sessionVol !== 0 ){
-        //   let tempSesCnt = sessionCount + 1
-        //   setSessionCount(tempSesCnt); 
-        // }
 
         //x값 처리
         // x값 최저
         if (preXY['x'] == 0 || preXY['x'] < 0){
           // 현재 x값 오른쪽 밀기
-          // TvolumeFlowList.forEach((item, idx) =>{
-          //     let itemTemp = {...item};
-          //     itemTemp['x'] += rawV;
-          //     TvolumeFlowList[idx] = itemTemp; //setState로 변경사항 setState(temp);
-          // })
           setVolumeFlowList(volumeFlowList.map((item)=>{
             item['x'] += rawV;
           }))
@@ -980,11 +969,6 @@ useEffect(()=>
           let vTemp = preXY['x']-rawV;
           if(vTemp<0){
               // 현재 x값 오른쪽 밀기
-              // TvolumeFlowList.forEach(item =>{
-              //     let itemTemp = {...item};
-              //     itemTemp['x'] += Math.abs(vTemp);
-              //     item = itemTemp; //setState로 변경사항 setState(temp);
-              // })
               setVolumeFlowList(volumeFlowList.map((item)=>{
                 item['x'] += Math.abs(vTemp);
               }))
@@ -995,11 +979,9 @@ useEffect(()=>
           }
         }
         if(timerReady && timerStart && volumeFlowList[calFlag]["y"] <= 0 && !measureDone){
-          // setFlagTo({...flagTo, to: flagTo.from+calFlag+1});
           setFlagTo({...flagTo, to: flagTo.from+flag.rIdx-1});
           setTimerStart(false);
           setMeasureDone(true);
-          // =========================================================================== -> 데이터 자르기============================================================
         }
       }
       //호기 시
@@ -1008,33 +990,18 @@ useEffect(()=>
           setInF(false);
           setInFDone(true);
         }
-        // if(preXY['y']<=0 && sessionVol !== 0 ){
-        //   let tempSesCnt = sessionCount + 1
-        //   setSessionCount(tempSesCnt); 
-        // }
         x = preXY['x'] + rawV;
         if(timerReady && timerStart && !measureDone){
           if(rawF == 0 && runTime!=0){
-            // setFlagTo({...flagTo, to: flagTo.from+calFlag+1});
             setFlagTo({...flagTo, to: flagTo.from+flag.rIdx-1});
             setTimerStart(false);
             setMeasureDone(true);
-            // =========================================================================== -> 데이터 자르기
           }
         }
       }
       volumeFlowList.push({x: x, y:rawF});
       console.log(volumeFlowList);
       setVolumeFlowList(volumeFlowList);
-      // if(timerReady && timerStart){
-      //   if(rawF == 0){
-      //     setFlagTo({...flagTo, to: flag.idx});
-      //     setTimerStart(false);
-      //     setMeasureDone(true);  
-      //     // =========================================================================== -> 데이터 자르기
-      //   }
-      // }
-      // return {x: x, y:rawF};
     }
     catch(err){
       console.log(err)
@@ -1088,12 +1055,10 @@ useEffect(()=>
       const rxCharacteristic = await service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
       
       // 송신 특성 가져오기
-      // const txCharacteristic = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
       txCharRef.current = await service.getCharacteristic('6e400003-b5a3-f393-e0a9-e50e24dcca9e');
 
       // 검사하기 버튼 누르고 쓸 부분
       // Notify(구독) 활성화
-      // await txCharacteristic.startNotifications();
       await txCharRef.current.startNotifications();
       if(txCharRef.current.properties['notify'] === true){
         setAlNotifyDone(true);
@@ -1105,12 +1070,9 @@ useEffect(()=>
     }
     catch(error){
       console.log(error);
-      //     console.error('Failed to select device:', error);
-      //     console.log('Failed to select device. Please try again.');
     }
   }
   function onDisconnected(event) {
-    // Object event.target is Bluetooth Device getting disconnected.
     console.log('> Bluetooth Device disconnected');
   }
   
@@ -1836,11 +1798,10 @@ useEffect(()=>
 
           <div className="three-btn-container">
             <div ref={firstBtnRef} onClick={()=>{
-              // console.log({"nonDevice":noneDevice,"notifyStart":notifyStart,"notifyDone":notifyDone,"meaPreStart":meaPreStart, "blow":blow, "blowF":blowF, "meaStart":meaStart})
               if(!(firstBtnRef.current.classList.contains("disabled"))){
                 resetGraph()
               }
-            }}> <p>재측정</p></div>
+            }}> <RiLungsLine className='lungIcon'/><p>재측정</p></div>
             <div ref={secondBtnRef} onClick={()=>{
               if(!(secondBtnRef.current.classList.contains("disabled"))){
                 if(!meaStart){
@@ -1854,7 +1815,7 @@ useEffect(()=>
                   //+++++++++++++++++++++++++++++++++++++++++++++++++검사 저장 버튼 눌렀을 떄 -> 알림창!
                 }
               }
-            }}> <p>{meaStart ? "검사 저장" : "검사 시작"}</p></div>
+            }}> <RiLungsLine className='lungIcon'/><p>{meaStart ? "검사 저장" : "검사 시작"}</p></div>
             <div ref={thirdBtnRef} onClick={()=>{
               console.log(flagTo);
               console.log(dataList.slice(flagTo.from, flagTo.to+1).toString().replaceAll(","," "));
