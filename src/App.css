@@ -5070,6 +5070,107 @@ text-align: right;
   border: 1px solid #018abe;
 }
 
+/* report */
+.report-container{
+  width: 950px;
+  height: 1400px;
+  /* overflow-x: auto;
+  overflow-y: auto; */
+  display: grid;
+  grid-template-rows: 9.3% 5% 2.5% 3.3% 2.7% 18.5% 2.4% 20% 26.7% 2.25% 2.4%;
+}
+.report{
+  width: 950px;
+  height: 1400px;
+  /* visibility: hidden; */
+
+}
+.report-title-container{
+
+}
+.top-chart{
+  display: grid;
+  grid-template-rows: 33% 33% 33%;
+  margin-left: 3%;
+  margin-right: 3%;
+}
+.top-chart .row-line{
+  margin-bottom: 0.6%;
+  display: grid;
+  margin-top: 0.3%;
+  grid-template-columns: 17% 16% 17% 16% 17.5% 16%;
+
+}
+.value{
+  background-color: white;
+  font-size : 12.5px;
+  font-weight:700;
+}
+
+.second-chart{
+  display: grid;
+  grid-template-rows: 50% 50%;
+
+  margin-left: 3%;
+  margin-right: 3%;
+}
+.second-chart .row-line{
+  margin-bottom: 0.4%;
+  display: grid;
+  margin-top: 0.4%;
+  grid-template-columns: 17.2% 16% 17% 16% 17.5% 16%;
+
+}
+.third-chart{
+  display: grid;
+  grid-template-columns: 54.3% 45.7%;
+  margin-left: 3%;
+  margin-right: 3%;
+}
+.third-chart-left{
+  display: grid;
+  grid-template-rows: 16% 8.3% 8.4% 8.4% 8.3% 8.4% 8.2% 8.2% 8.2% 8.2% 8%
+}
+
+.third-chart .row-line{
+  /* margin-bottom: 0.%; */
+  display: grid;
+  /* margin-top: 0.8%; */
+  height: 100%;
+  grid-template-columns: 17.2% 7% 12% 19.5% 16% 14% 17%;
+
+}
+
+.third-chart .row-line div{
+  text-align: center;
+  /* padding-top: 9.5%; */
+  /* border-top: 10%; */
+  /* height: 85%; */
+  /* margin-left: 10%; */
+
+}
+.third-chart .row-line:nth-last-child(1){
+  /* text-align: center; */
+  /* height: 60%; */
+  /* margin-left: 10%; */
+
+}
+.fourth-chart{
+  margin-left: 3%;
+  margin-right: 3%;
+  display: grid;
+  grid-template-columns: 13% 7% 10% 10% 10% 10% 10% 10% 10% 10%;
+}
+.fourth-chart .column-line{
+  display: grid;
+  grid-template-rows: 11.5% 8% 8% 8% 8% 8% 8% 8% 8% 8% 8% 8%;
+}
+.fourth-chart .column-line .value{
+  text-align: center;
+}
+
+
+
 
 .loadingBG {
   background: linear-gradient(335deg, #8d8d8d, #ababab, #737373, #737373);

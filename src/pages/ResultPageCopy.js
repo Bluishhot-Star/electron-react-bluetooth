@@ -16,6 +16,7 @@ import { PDFViewer } from '@react-pdf/renderer';
 import { RiCalendarEventLine } from "react-icons/ri";
 import { HiOutlineCog } from "react-icons/hi";
 import { BiSolidFileJpg } from "react-icons/bi";
+import Report from './Report.js';
 
 function ResultPageCopy(){
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
@@ -35,6 +36,11 @@ function ResultPageCopy(){
     birth:"",
     chartNumber:"",
   })
+  const[rep,setRep] = useState({
+    data : "Empty resource",
+    date:"",
+    birth:""
+  });
 
   let trials;
 
@@ -47,6 +53,7 @@ function ResultPageCopy(){
   const [allTimeVolumeList, setAllTimeVolumeList] = useState([]);
   const [allVolumeFlowList, setAllVolumeFlowList] = useState([]);
 useEffect(()=>{
+
   setTotalData(state);
 },[])
   //fvc 그래프 처리
@@ -755,6 +762,21 @@ useEffect(()=>{
       }
       SVCBtnRef.current.classList += " clickedType"
     }
+    console.log(state)
+    if(FvcSvc === 'fvc'){
+      console.log(FvcSvc)
+      setRep({
+        fvcSvc : state.fvc,
+        date: measDate !== '' ? measDate : state.date[0],
+        birth : state.birth
+      })
+    }else{
+      setRep({
+        fvcSvc : state.svc,
+        date: measDate !== '' ? measDate : state.date[0],
+        birth : state.birth
+      })
+    }
   },[FvcSvc])
 
   const dateSelect = (select) =>{
@@ -880,6 +902,14 @@ useEffect(()=>{
     report(date.split(' ')[0]);
 
   }
+  const [measDate,setMeasDate] = useState('');
+  useEffect(()=>{
+    if(viewer===true){
+      setTimeout(()=>{
+        setViewer(false);
+      },100)
+    }
+  })  
   const [viewer,setViewer] = useState(false);
   const [sliderBg, setSliderBg] = useState("");
   useEffect(()=>{
@@ -894,18 +924,15 @@ useEffect(()=>{
     return(()=>{setSliderBg("")})
   },[totalData, FvcSvc])
   return( 
+    
     <div className="result-page-container">
+
       {dateSelectorStat ? <DateSelector data={inspectionDate} onOff={setDateSelectorStat} select={dateSelect}/> : null}
-      {viewer ?
-      <PDFViewer style={{width:1000, height:500, opacity:1}}>
-        <PdfView data={totalData}/>
-      </PDFViewer>  : null}
         <div className="nav">
-          <div className="nav-logo" onClick={()=>{
-            navigator('./pdfView',{state:totalData})
-            }}>
+          <div className="nav-logo">
             <img src={process.env.PUBLIC_URL + '/spriokit.svg'} />
           </div>
+          
           <div className="nav-content-container">
             <div className="nav-left-container">
 
@@ -945,7 +972,6 @@ useEffect(()=>{
           </div>
         </div>
         <div className="left-container">
-          
           <div className="patient-measure-list">
           <div className="measure-date-container">
             <div className="measure-selected-date-container">
@@ -997,6 +1023,11 @@ useEffect(()=>{
         <div className="right-container">
           <div className="button-container">
             <div className="two-btn-container">
+            <div onClick={()=>{
+            // navigator('./report',{state:{data:rep}})
+            setViewer(!viewer)
+            
+            }}>다운로드</div>
               <button ref={FVCBtnRef} onClick={()=>{changeType("fvc")}} id="clickme" className="FVC-btn">FVC</button>
               <button ref={SVCBtnRef} onClick={()=>{changeType("svc")}} className="SVC-btn">SVC</button>
             </div>
@@ -1160,7 +1191,12 @@ useEffect(()=>{
             </div> 
           </div>
         </div>
+        {viewer ?
+        <Report data={rep} style={{zIndex: -1 }}/>  : null}
       </div>
+      
+      
+      
   );
 }
 export default ResultPageCopy;

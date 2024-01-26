@@ -10,6 +10,7 @@ import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
 import {registerables,Chart as ChartJS,RadialLinearScale,LineElement,Tooltip,Legend,} from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
 import annotationPlugin from 'chartjs-plugin-annotation';
+import html2canvas from "html2canvas";
 const GainResultPage = () =>{
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
   const cookie = new Cookies();
@@ -324,14 +325,47 @@ const GainResultPage = () =>{
     
   },[graphData])
 
+  //capture
+  const onCapture = () =>{
+    console.log("onCapture");
 
+    html2canvas(document.body).then((canvas)=>{
+      let now = new Date();
+      const month = now.getMonth()+1 < 10 ? "0"+(now.getMonth()+1) : now.getMonth()+1;
+      const date = now.getDate() < 10 ? "0"+now.getDate() : now.getDate();
+      const YMD = now.getFullYear()+""+month+""+date;
+      const hour = now.getHours() < 10 ? "0"+now.getHours() : now.getHours();
+      const minutes= now.getMinutes() < 10 ? "0"+now.getMinutes() : now.getMinutes();
+      const seconds = now.getSeconds() < 10 ? "0"+now.getSeconds() : now.getSeconds();
+      const time = hour+""+minutes+""+seconds;
+      console.log(month)
+      console.log(date+"_"+time)
+      onSaveAs(canvas.toDataURL('image/jpeg'),`car_result_${YMD}_${time}.jpeg`);
+        
+    });
+
+    
+  };
+  const onSaveAs = (uri,filename)=>{
+    console.log("onSaveAs");
+    var link = document.createElement('a');
+    document.body.appendChild(link);
+    link.href = uri;
+    link.download = filename;
+    link.click();
+    document.body.removeChild(link);
+
+  };
+  const rootRef = useRef(null);
+  
   return(
-    <div className="gain-page-container">
+    <div ref={rootRef} className="gain-page-container">
       <div className="gain-page-nav">
         <div className='gain-page-backBtn' onClick={()=>{navigatorR(-1)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
         </div>
         <p>보정 결과</p>
+        <div onClick={onCapture}>스크린샷</div>
       </div>
       <div className='gain-page-left-right-container'>
         <div className="gain-page-left-container" ref={graphConRef}>
