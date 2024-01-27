@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useMemo, useCallback} from 'react';
 import axios from 'axios';
 import { Cookies, useCookies } from 'react-cookie';
-import Alert from "../components/Alerts.js"
 import Confirm from "../components/Confirm.js"
 import { useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon} from '@fortawesome/react-fontawesome'
@@ -9,18 +8,14 @@ import { RiLungsLine } from "react-icons/ri";
 import { faChevronLeft, faSquareXmark } from '@fortawesome/free-solid-svg-icons'
 import { FaBluetoothB } from "react-icons/fa6";
 import {} from "@fortawesome/fontawesome-svg-core"
-import styled from 'styled-components';
 import { debounce } from 'lodash'
 import {registerables,Chart as ChartJS,RadialLinearScale,LineElement,Tooltip,Legend,} from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
 import { useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux"
-import { changeDeviceInfo, reset } from "./../deviceInfo.js"
-import { da } from 'date-fns/locale';
-import Gauge from "../components/Gauge.js"
 import Timer from "../components/Timer.js"
 import VolumeBar from "../components/VolumeBar.js"
-import { useWorker } from "@koale/useworker";
+
 
 //FVC 검사 페이지
 const MeasurementPage = () =>{
@@ -851,23 +846,11 @@ useEffect(()=>
       let currItemR = dataList[flag.idx]; //현재 다룰 raw 데이터
       let currItem = dataCalculateStrategyE.convert(currItemR); // 데이터 전처리 후
       let preItem = rawDataList[flag.rIdx-1]; //그 이전 데이터
-
-
       let TrawDataList = [...rawDataList];
-      
-      // 호 <-> 흡 바뀔 때 0 넣기 주석
-      // let currItemR = data[data.length-1]; //방금 들어온 raw 데이터
-      // let currItem = dataCalculateStrategyE.convert(currItemR); // 데이터 전처리 후
-      // if(dataCalculateStrategyE.isExhale(preItem) !== dataCalculateStrategyE.isExhale(currItem)){
-      //   TrawDataList.push(dataCalculateStrategyE.getZero(dataCalculateStrategyE.isExhale(currItem)));
-      // }
 
       TrawDataList.push(currItem);
       setRawDataList(TrawDataList);
       setFlag({idx : flag.idx+1, rIdx: flag.rIdx+1})
-      
-      // console.log(123);
-      // setVolumeFlowList(setVFGraphData(item.volume, item.lps));
     }
   },[dataList, flag])
 
@@ -925,7 +908,6 @@ useEffect(()=>
   useEffect(()=>{
     if(startMsg){
       //시작 메세지 띄우기
-      console.log("시작 메세지 띄우기")
       setStartMsg(false);
       setConfirmStat(true);
       // setDataList([])
@@ -1000,7 +982,6 @@ useEffect(()=>
         }
       }
       volumeFlowList.push({x: x, y:rawF});
-      console.log(volumeFlowList);
       setVolumeFlowList(volumeFlowList);
     }
     catch(err){
@@ -1099,7 +1080,6 @@ useEffect(()=>
     const value = event.target.value;
     // 데이터 처리 및 UART 프로토콜 해석
 
-    console.log('Received data:', value);
     arrayToString(value)
   }
 
@@ -1367,9 +1347,7 @@ useEffect(()=>
     while (rDataList[rDataList.length-1].slice(0,1) == 1) {
       rDataList.pop()
     }
-    // console.log(dataList.slice(flagTo.from, flagTo.to+1).toString().replaceAll(","," ")); //---------------------------------------------------------------------------------------------------------
-    console.log(rDataList.join(' '))
-    console.log(`${chartNumber}|${type}`)
+    //---------------------------------------------------------------------------------------------------------
 
     axios.post(`/subjects/${chartNumber}/types/fvc/measurements`, 
     {
@@ -1393,7 +1371,6 @@ useEffect(()=>
 
   // volumeFlow 그래프 그리기
   useEffect(()=>{
-    console.log(rawDataList)
     let data = {
       labels: '',
       datasets: [{
@@ -1421,7 +1398,6 @@ useEffect(()=>
             tension: 0.4
       }],
     }
-    console.log(data)
     setGraphData(data);
   }
 
@@ -1429,7 +1405,6 @@ useEffect(()=>
     let time = setTimeout(() => {
       setTemp(true);
     },1000);
-    console.log(graphData)
     return ()=>{
       clearTimeout(time)
     }
@@ -1449,7 +1424,6 @@ useEffect(()=>
             tension: 0.4
       }],
     }
-    console.log(data)
     setGraphData2(data);
   },[calFlag])
 

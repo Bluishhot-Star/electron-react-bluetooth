@@ -11,8 +11,8 @@ import { Scatter } from 'react-chartjs-2';
 import { useLocation } from 'react-router-dom';
 import DateSelector from './DateSelector.js'
 import annotationPlugin from 'chartjs-plugin-annotation';
-import PdfView from "../components/PdfView.js";
-import { PDFViewer } from '@react-pdf/renderer';
+// import PdfView from "../components/PdfView.js";
+// import { PDFViewer } from '@react-pdf/renderer';
 import { RiCalendarEventLine } from "react-icons/ri";
 import { HiOutlineCog } from "react-icons/hi";
 import { BiSolidFileJpg } from "react-icons/bi";
@@ -20,7 +20,7 @@ import Report from './Report.js';
 
 function ResultPageCopy(){
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
-
+  const [measDate,setMeasDate] = useState('');
   const location = useLocation();
   const navigator = useNavigate();
   const state = location.state;
@@ -53,7 +53,6 @@ function ResultPageCopy(){
   const [allTimeVolumeList, setAllTimeVolumeList] = useState([]);
   const [allVolumeFlowList, setAllVolumeFlowList] = useState([]);
 useEffect(()=>{
-
   setTotalData(state);
 },[])
   //fvc 그래프 처리
@@ -763,21 +762,13 @@ useEffect(()=>{
       SVCBtnRef.current.classList += " clickedType"
     }
     console.log(state)
-    if(FvcSvc === 'fvc'){
-      console.log(FvcSvc)
-      setRep({
-        fvcSvc : state.fvc,
-        date: measDate !== '' ? measDate : state.date[0],
-        birth : state.birth
-      })
-    }else{
-      setRep({
-        fvcSvc : state.svc,
-        date: measDate !== '' ? measDate : state.date[0],
-        birth : state.birth
-      })
-    }
   },[FvcSvc])
+  useEffect(()=>{
+    setRep({
+      fvcSvc : FvcSvc == 'fvc' ? state.fvc : state.svc,
+      ...rep,
+    })
+  },[])
 
   const dateSelect = (select) =>{
     console.log(select);
@@ -826,6 +817,7 @@ useEffect(()=>{
   const [data2, setData2] = useState([]);
   const dateSelectorRef = useRef([]);
   const [dateSelectIdx, setDateSelectIdx] = useState(0);
+  const [selectedDate, setSelectedDate] = useState("");
   const [gray, setGray] = useState("");
   useEffect(()=>{
     setTimeout(()=>{
@@ -842,6 +834,7 @@ useEffect(()=>{
   
   const report = async(tDate)=>{
     console.log(tDate)
+    setMeasDate(tDate[0]);
     await axios.get(`/v3/subjects/${totalData.chartNumber}/types/fvc/results/${tDate[0]}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
@@ -875,7 +868,22 @@ useEffect(()=>{
   useEffect(()=>{
     console.log("adfas")
     console.log(date)
+    if(FvcSvc=='fvc' && data1.length){
+      setRep({
+        birth : state.birth,
+        date: measDate !== '' ? measDate : date[0],
+        fvcSvc: data1
+      })
+    }
+    else if(FvcSvc=='svc' && data2.length){
+      setRep({
+        birth : state.birth,
+        date: measDate !== '' ? measDate : date[0],
+        fvcSvc: data2
+      })
+    }
     if(goTO){
+      console.log("goTOTO");
       setTotalData({
         info : state.info,
         fvc : data1,
@@ -902,7 +910,7 @@ useEffect(()=>{
     report(date.split(' ')[0]);
 
   }
-  const [measDate,setMeasDate] = useState('');
+  
   useEffect(()=>{
     if(viewer===true){
       setTimeout(()=>{
@@ -999,7 +1007,7 @@ useEffect(()=>{
             </div>
           </div>
           <div className="patient-info-containerC">
-            <span>환자 정보</span>
+            <span onClick={()=>{console.log(rep)}}>환자 정보</span>
             <div className="patient-infoC">
               <div className="title">이름</div>
               <div className="content">{totalData.info === '' || totalData.info === 'Empty resource' ? '': totalData.info.name}</div>
@@ -1023,11 +1031,18 @@ useEffect(()=>{
         <div className="right-container">
           <div className="button-container">
             <div className="two-btn-container">
-            <div onClick={()=>{
-            // navigator('./report',{state:{data:rep}})
-            setViewer(!viewer)
-            
-            }}>다운로드</div>
+              {
+                FvcSvc == 'fvc' ?
+                  totalData.fvc === '' || totalData.fvc === 'Empty resource'?
+                    ""
+                  :
+                    <div onClick={()=>{setViewer(!viewer)}}><BiSolidFileJpg className='jpgIcon'/>다운로드</div>
+                :
+                  totalData.svc === '' || totalData.svc === 'Empty resource'?
+                    ""
+                  :  
+                    <div onClick={()=>{setViewer(!viewer)}}><BiSolidFileJpg className='jpgIcon'/>다운로드</div>
+              }
               <button ref={FVCBtnRef} onClick={()=>{changeType("fvc")}} id="clickme" className="FVC-btn">FVC</button>
               <button ref={SVCBtnRef} onClick={()=>{changeType("svc")}} className="SVC-btn">SVC</button>
             </div>
@@ -1192,7 +1207,8 @@ useEffect(()=>{
           </div>
         </div>
         {viewer ?
-        <Report data={rep} style={{zIndex: -1 }}/>  : null}
+          <Report data={rep} style={{zIndex: -1 }}/>  : null
+        }
       </div>
       
       

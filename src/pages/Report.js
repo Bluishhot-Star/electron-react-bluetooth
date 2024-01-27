@@ -7,6 +7,7 @@ import { Routes, Route, Link, useNavigate,useLocation } from 'react-router-dom'
 import html2canvas from "html2canvas";
 import img from '../img/FVC_v6.svg'
 const Report = (state)=>{
+  console.log(state)
     let navigatorR = useNavigate();
     const location = useLocation();
     // const state = location.state;

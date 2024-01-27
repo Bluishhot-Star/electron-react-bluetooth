@@ -337,6 +337,7 @@
   justify-content: center;
   position: relative;
 }
+
 .button-container button{
   all: unset;
   width: 100px;
@@ -351,6 +352,28 @@
 }
 .two-btn-container button{
   cursor: pointer;
+  font-weight: 600;
+}
+.two-btn-container div{
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  top: 0;
+  left: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgb(190, 39, 39);
+  cursor: pointer;
+}
+.jpgIcon{
+  color: rgb(190, 39, 39);
+  font-size: 1.2rem;
+  margin-right: 5px;
+}
+.two-btn-container div:active{
+  opacity: 0.3;
 }
 .button-container .clickedType{
   border: #018abe 1px solid;

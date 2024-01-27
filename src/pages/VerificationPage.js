@@ -50,20 +50,7 @@ const VerificationPage = () =>{
 //  // 호/흡 세션 완료 후 timer로 전환 여부
  const [timerReady, setTimerReady] = useState(false);
  
- //첫 가이드 컨텐츠 세팅
-//  useEffect(()=>{
-//    if(inF !== -1){
-//      if(inF && timerReady===false){//흡기 선
-//        setGaugeContent({r11:"1", r12:breathCount, r2:"IN"})
-//       //  setSessionVol(breathCount*2);
-//      }
-//      else if(!inF && timerReady===false){//호기 선
-//        setGaugeContent({r11:"1", r12:breathCount, r2:"OUT"})
-//       //  setSessionVol(breathCount*2-1);
-//      }
-//      setSessionCount(1);
-//    }
-//  },[inF, timerReady])
+
  
  // 세션 카운트
  const [sessionCount, setSessionCount] = useState(0);
