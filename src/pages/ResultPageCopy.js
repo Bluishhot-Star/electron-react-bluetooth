@@ -543,6 +543,7 @@ useEffect(()=>{
   // 창 크기 조절에 따른 그래프 크기 조절
   const [first, setFirst] = useState({x:window.innerWidth, y: window.innerHeight})
   const [second, setSecond] = useState({x:window.innerWidth, y: window.innerHeight})
+  const [grayBg, setGrayBg] = useState("");
   const [temp, setTemp] = useState(false);
 
   const handleResize = debounce(()=>{
@@ -556,6 +557,15 @@ useEffect(()=>{
   useEffect(()=>{
     setTemp(false);
   },[FvcSvc])
+
+  useEffect(()=>{
+    if(temp){
+      setGrayBg("");
+    }
+    else{
+      setGrayBg("loadingBG");
+    }
+  },[temp])
 
   useEffect(()=>{
     let time = setTimeout(() => {
@@ -580,9 +590,9 @@ useEffect(()=>{
         setTemp(false)
       };
     },300);
-    return()=>{clearTimeout(time)}
+    return()=>{clearTimeout(time);}
   })
-  
+
   useEffect(()=>{
     setFirst({
       x: window.innerWidth,
@@ -1014,9 +1024,9 @@ useEffect(()=>{
               <div className="title">성별</div>
               <div className="content">{totalData.info === '' || totalData.info === 'Empty resource' ? '': totalData.info.gender=="m"?"남자":"여자"}</div>
               <div className="title">신장</div>
-              <div className="content">{totalData.info === '' || totalData.info === 'Empty resource' ? '': totalData.info.height}cm</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? totalData.svc === '' || totalData.svc === 'Empty resource' ? "" : totalData.svc.subject.height : totalData.fvc.subject.height}cm</div>
               <div className="title">몸무게</div>
-              <div className="content">{totalData.info === '' || totalData.info === 'Empty resource' ? '': totalData.info.weight}kg</div>
+              <div className="content">{totalData.fvc === '' || totalData.fvc === 'Empty resource' ? totalData.svc === '' || totalData.svc === 'Empty resource' ? "" : totalData.svc.subject.weight : totalData.fvc.subject.weight}kg</div>
               <div className="title">생년월일</div>
               <div className="content">{totalData.info === '' || totalData.info === 'Empty resource' ? '': totalData.birth}</div>
               <div className="title">연간 흡연량</div>
@@ -1062,17 +1072,17 @@ useEffect(()=>{
           {
             FvcSvc == "fvc" ? 
             totalData.fvc === '' || totalData.fvc === 'Empty resource'? 
-              <div className="empty-graph-container">검사 결과 데이터가 없습니다.</div>
+              <div className={"empty-graph-container "+grayBg}>{temp?"검사 결과 데이터가 없습니다.":""}</div>
             :
               <div className="fvc-graph-container">
-                <div className="graph">
+                <div className={"graph "+grayBg}>
                   {temp?<div className="title-y">Flow(l/s)</div>:<></>}
-                  {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingBG'>화면 조정 중..</p>}
+                  {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:""}
                   {temp?<div className="title-x">Volume(L)</div>:<></>}
                 </div>
-                <div className="graph">
+                <div className={"graph "+grayBg}>
                   {temp?<div className="title-y">Volume(L)</div>:<></>}
-                  {temp?<Scatter ref={chartRef2} style={graphStyle} data={graphData2} options={graphOption2}/>:<p className='loadingG'>화면 조정 중..</p>}
+                  {temp?<Scatter ref={chartRef2} style={graphStyle} data={graphData2} options={graphOption2}/>:""}
                   {temp?<div className="title-x">Time(s)</div>:<></>}
                 </div>
               </div>
@@ -1081,127 +1091,130 @@ useEffect(()=>{
               <div className='empty-graph-container'>검사 내역 없음</div>
             :
               <div className='svc-graph-container'>
-                <div className="graph">
+                <div className={"graph "+grayBg}>
                   {temp?<div className="title-y">Volume(L)</div>:<></>}
-                  {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData3} options={graphOption3}/>:<p className='loadingG'>화면 조정 중..</p>}
+                  {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData3} options={graphOption3}/>:""}
                   {temp?<div className="title-x">Time(s)</div>:<></>}
                 </div>
               </div>
           }
 
-          <div className={"history-container "+sliderBg}>
+          <div className={"history-container "+sliderBg+" "+grayBg}>
             <div className={"slider"}>
             {
-              FvcSvc == "fvc" ?
-              totalData.fvc === '' || totalData.fvc === 'Empty resource'? <div className='empty-simple-container'></div> :
-              totalData.fvc.trials.map((item, index)=>(
-                <div ref={(el)=>{simpleResultsRef.current[index]=el}} onClick={()=>{console.log(simpleResultsRef.current[index]);console.log(item.measurementId);selectGraph(index)}} key={item.measurementId}  className='simple-result-container'>
-                  <div className='simple-result-title-container'>
-                    <FontAwesomeIcon className='deleteIcon' icon={faSquareXmark} style={{color: "#ff0000",}} onClick={(e)=>{e.stopPropagation(); simpleResult(item.measurementId, item.date)}}/>
-                    <div className='simple-result-title-date'>
-                      <div className='simple-result-title'>{item.bronchodilator}</div>
-                      <div className='simple-result-date'>({item.date})</div>
+              temp?
+                FvcSvc == "fvc" ?
+                totalData.fvc === '' || totalData.fvc === 'Empty resource'? <div className='empty-simple-container'></div> :
+                totalData.fvc.trials.map((item, index)=>(
+                  <div ref={(el)=>{simpleResultsRef.current[index]=el}} onClick={()=>{console.log(simpleResultsRef.current[index]);console.log(item.measurementId);selectGraph(index)}} key={item.measurementId}  className='simple-result-container'>
+                    <div className='simple-result-title-container'>
+                      <FontAwesomeIcon className='deleteIcon' icon={faSquareXmark} style={{color: "#ff0000",}} onClick={(e)=>{e.stopPropagation(); simpleResult(item.measurementId, item.date)}}/>
+                      <div className='simple-result-title-date'>
+                        <div className='simple-result-title'>{item.bronchodilator}</div>
+                        <div className='simple-result-date'>({item.date})</div>
+                      </div>
+                      <div className='simple-result-errorcode'>
+                        Error Code : {item.errorCode}
+                      </div>
                     </div>
-                    <div className='simple-result-errorcode'>
-                      Error Code : {item.errorCode}
+                    <div className='simple-result-table-container'>
+                      <div className='simple-result-table-column'>
+                        <p></p>
+                        <p>meas</p>
+                        <p>pred</p>
+                        <p>percent</p>
+                      </div>
+                      <div className='simple-result-table-FVC'>
+                        <p>{item.results[0].title}({item.results[0].unit})</p>
+                        <p>{item.results[0].meas?item.results[0].meas:"-"}</p>
+                        <p>{item.results[0].pred?item.results[0].pred:"-"}</p>
+                        <p>{item.results[0].per?item.results[0].per:"-"}</p>
+                      </div>
+                      <div className='simple-result-table-FEV1'>
+                        <p>{item.results[22].title}({item.results[22].unit})</p>
+                        <p>{item.results[22].meas?item.results[22].meas:"-"}</p>
+                        <p>{item.results[22].pred?item.results[22].pred:"-"}</p>
+                        <p>{item.results[22].per?item.results[22].per:"-"}</p>
+                      </div>
+                      <div className='simple-result-table-FEV1'>
+                        <p>{item.results[1].title}({item.results[1].unit})</p>
+                        <p>{item.results[1].meas?item.results[1].meas:"-"}</p>
+                        <p>{item.results[1].pred?item.results[1].pred:"-"}</p>
+                        <p>{item.results[1].per?item.results[1].per:"-"}</p>
+                      </div>
+                      <div className='simple-result-table-FEV1per'>
+                        <p>FEV1%</p>
+                        <p>{item.results[2].meas?item.results[2].meas:"-"}</p>
+                        <p>{item.results[2].pred?item.results[2].pred:"-"}</p>
+                        <p>{item.results[2].per?item.results[2].per:"-"}</p>
+                      </div>
+                      <div className='simple-result-table-PEF'>
+                        <p>PEF(L/s)</p>
+                        <p>{item.results[3].meas?item.results[3].meas:"-"}</p>
+                        <p>{item.results[3].pred?item.results[3].pred:"-"}</p>
+                        <p>{item.results[3].per?item.results[3].per:"-"}</p>
+                      </div>
                     </div>
                   </div>
-                  <div className='simple-result-table-container'>
-                    <div className='simple-result-table-column'>
-                      <p></p>
-                      <p>meas</p>
-                      <p>pred</p>
-                      <p>percent</p>
+                  ))
+                :
+                totalData.svc === "Empty resource" ? <div>비어있음</div>:
+                totalData.svc.trials.map((item, index)=>(
+                  <div ref={(el)=>{svcSimpleResultsRef.current[index]=el}} onClick={()=>{console.log(svcSimpleResultsRef.current[index]);console.log(item.measurementId);selectSvcGraph(index)}} key={item.measurementId}  className='simple-result-container'>
+                    <div className='simple-result-title-container'>
+                      <FontAwesomeIcon className='deleteIcon' icon={faSquareXmark} style={{color: "#ff0000",}} onClick={(e)=>{e.stopPropagation(); simpleResult(item.measurementId, item.date)}}/>
+                      <div className='simple-result-title-date'>
+                        <div className='simple-result-title'>{item.bronchodilator}</div>
+                        <div className='simple-result-date'>({item.date})</div>
+                      </div>
+                      <div className='simple-result-errorcode'>
+                        Error Code : {item.errorCode}
+                      </div>
                     </div>
-                    <div className='simple-result-table-FVC'>
-                      <p>{item.results[0].title}({item.results[0].unit})</p>
-                      <p>{item.results[0].meas?item.results[0].meas:"-"}</p>
-                      <p>{item.results[0].pred?item.results[0].pred:"-"}</p>
-                      <p>{item.results[0].per?item.results[0].per:"-"}</p>
-                    </div>
-                    <div className='simple-result-table-FEV1'>
-                      <p>{item.results[22].title}({item.results[22].unit})</p>
-                      <p>{item.results[22].meas?item.results[22].meas:"-"}</p>
-                      <p>{item.results[22].pred?item.results[22].pred:"-"}</p>
-                      <p>{item.results[22].per?item.results[22].per:"-"}</p>
-                    </div>
-                    <div className='simple-result-table-FEV1'>
-                      <p>{item.results[1].title}({item.results[1].unit})</p>
-                      <p>{item.results[1].meas?item.results[1].meas:"-"}</p>
-                      <p>{item.results[1].pred?item.results[1].pred:"-"}</p>
-                      <p>{item.results[1].per?item.results[1].per:"-"}</p>
-                    </div>
-                    <div className='simple-result-table-FEV1per'>
-                      <p>FEV1%</p>
-                      <p>{item.results[2].meas?item.results[2].meas:"-"}</p>
-                      <p>{item.results[2].pred?item.results[2].pred:"-"}</p>
-                      <p>{item.results[2].per?item.results[2].per:"-"}</p>
-                    </div>
-                    <div className='simple-result-table-PEF'>
-                      <p>PEF(L/s)</p>
-                      <p>{item.results[3].meas?item.results[3].meas:"-"}</p>
-                      <p>{item.results[3].pred?item.results[3].pred:"-"}</p>
-                      <p>{item.results[3].per?item.results[3].per:"-"}</p>
+                    <div className='simple-result-table-container'>
+                      <div className='simple-result-table-column'>
+                        <p></p>
+                        <p>meas</p>
+                        <p>pred</p>
+                        <p>percent</p>
+                      </div>
+                      <div className='simple-result-table-vc'>
+                        <p>{item.results[0].title}({item.results[0].unit})</p>
+                        <p>{item.results[0].meas?item.results[0].meas:"-"}</p>
+                        <p>{item.results[0].pred?item.results[0].pred:"-"}</p>
+                        <p>{item.results[0].per?item.results[0].per:"-"}</p>
+                      </div>
+                      <div className='simple-result-table-ic'>
+                        <p>{item.results[1].title}({item.results[1].unit})</p>
+                        <p>{item.results[1].meas?item.results[1].meas:"-"}</p>
+                        <p>{item.results[1].pred?item.results[1].pred:"-"}</p>
+                        <p>{item.results[1].per?item.results[1].per:"-"}</p>
+                      </div>
+                      <div className='simple-result-table-FEV1per'>
+                        <p>FEV1%</p>
+                        <p>{item.results[2].meas?item.results[2].meas:"-"}</p>
+                        <p>{item.results[2].pred?item.results[2].pred:"-"}</p>
+                        <p>{item.results[2].per?item.results[2].per:"-"}</p>
+                      </div>
+                      <div className='simple-result-table-PEF'>
+                        <p>PEF(L/s)</p>
+                        <p>{item.results[3].meas?item.results[3].meas:"-"}</p>
+                        <p>{item.results[3].pred?item.results[3].pred:"-"}</p>
+                        <p>{item.results[3].per?item.results[3].per:"-"}</p>
+                      </div>
+                      <div className='simple-result-table-PEF'>
+                        <p>-</p>
+                        <p>-</p>
+                        <p>-</p>
+                        <p>-</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-                ))
+                  ))
+                  // svcTrials.map((item,index)=>{
+                  // })
               :
-              totalData.svc === "Empty resource" ? <div>비어있음</div>:
-              totalData.svc.trials.map((item, index)=>(
-                <div ref={(el)=>{svcSimpleResultsRef.current[index]=el}} onClick={()=>{console.log(svcSimpleResultsRef.current[index]);console.log(item.measurementId);selectSvcGraph(index)}} key={item.measurementId}  className='simple-result-container'>
-                  <div className='simple-result-title-container'>
-                    <FontAwesomeIcon className='deleteIcon' icon={faSquareXmark} style={{color: "#ff0000",}} onClick={(e)=>{e.stopPropagation(); simpleResult(item.measurementId, item.date)}}/>
-                    <div className='simple-result-title-date'>
-                      <div className='simple-result-title'>{item.bronchodilator}</div>
-                      <div className='simple-result-date'>({item.date})</div>
-                    </div>
-                    <div className='simple-result-errorcode'>
-                      Error Code : {item.errorCode}
-                    </div>
-                  </div>
-                  <div className='simple-result-table-container'>
-                    <div className='simple-result-table-column'>
-                      <p></p>
-                      <p>meas</p>
-                      <p>pred</p>
-                      <p>percent</p>
-                    </div>
-                    <div className='simple-result-table-vc'>
-                      <p>{item.results[0].title}({item.results[0].unit})</p>
-                      <p>{item.results[0].meas?item.results[0].meas:"-"}</p>
-                      <p>{item.results[0].pred?item.results[0].pred:"-"}</p>
-                      <p>{item.results[0].per?item.results[0].per:"-"}</p>
-                    </div>
-                    <div className='simple-result-table-ic'>
-                      <p>{item.results[1].title}({item.results[1].unit})</p>
-                      <p>{item.results[1].meas?item.results[1].meas:"-"}</p>
-                      <p>{item.results[1].pred?item.results[1].pred:"-"}</p>
-                      <p>{item.results[1].per?item.results[1].per:"-"}</p>
-                    </div>
-                    <div className='simple-result-table-FEV1per'>
-                      <p>FEV1%</p>
-                      <p>{item.results[2].meas?item.results[2].meas:"-"}</p>
-                      <p>{item.results[2].pred?item.results[2].pred:"-"}</p>
-                      <p>{item.results[2].per?item.results[2].per:"-"}</p>
-                    </div>
-                    <div className='simple-result-table-PEF'>
-                      <p>PEF(L/s)</p>
-                      <p>{item.results[3].meas?item.results[3].meas:"-"}</p>
-                      <p>{item.results[3].pred?item.results[3].pred:"-"}</p>
-                      <p>{item.results[3].per?item.results[3].per:"-"}</p>
-                    </div>
-                    <div className='simple-result-table-PEF'>
-                      <p>-</p>
-                      <p>-</p>
-                      <p>-</p>
-                      <p>-</p>
-                    </div>
-                  </div>
-                </div>
-                ))
-                // svcTrials.map((item,index)=>{
-                // })
+              ""
             }
             </div> 
           </div>
