@@ -588,6 +588,30 @@ useEffect(()=>{
     
   },[])
 
+  const res = () =>{
+    const result = [];
+    if(state.data.fvcSvc.diagnosis.condition === 'NORMAL'){
+      result.push(
+        <div>
+          폐기능 소견상 정상입니다. 항상 호흡기 건강에 유의하시고 자주 검사를 받으시어 지금 상태를 유지하세요.
+        </div>
+      );
+    }else if(state.data.fvcSvc.diagnosis.condition === 'RESTRICTED'){
+      result.push(
+        <div>
+          제한성 환기 장애가 의심됩니다. 제한성 환기장애는 진폐증,폐렴,폐암 등이 있습니다. 진료 의사와 상담하시어 적절히 관리 받으시길 바랍니다.
+        </div>
+      )
+    }else{
+      result.push(
+        <div>
+          -
+        </div>
+      )
+    }
+    return result;
+  }
+
   return(
     <>
     <div onClick={()=>{navigatorR(-1)}}>빠꾸</div>
@@ -600,7 +624,17 @@ useEffect(()=>{
 			  backgroundRepeat: 'no-repeat',
         backgroundPosition:'top center',
       }}>
-          <div className='report-title-container'></div>
+          <div className='report-title-container'>
+            <div className='report-title-container-right'></div>
+            <div className='report-title-container-center'>
+              <div></div>
+              <div>[{state.data.fvcSvc.clinic.name}]</div>
+            </div>
+            <div className='report-title-container-left'>
+              <div></div>
+              <div></div>
+            </div>
+          </div>
           <div className='top-chart'>
             <div className='row-line'>
               <div></div>
@@ -627,8 +661,10 @@ useEffect(()=>{
               <div className='value'>{top.measDate !== '' ? top.measDate : '-'}</div>
             </div>
           </div>
-          <div></div>
-
+          <div className='serial-num'>
+            <div>SpiroKit Serial Number :</div>
+            <div>{state.data.fvcSvc.calibration.serialNumber !== '' ? state.data.fvcSvc.calibration.serialNumber : '-'}</div>
+          </div>
           <div className='second-chart'>
             <div className='row-line'>
               <div></div>
@@ -778,7 +814,11 @@ useEffect(()=>{
           </div>
           <div></div>
           <div className='sixth-chart'>
-            
+            <div>FVL Error Code {state.data.fvcSvc.diagnosis.errorCode !=='' ?state.data.fvcSvc.diagnosis.errorCode :'-' } </div>
+            <div> Grade {state.data.fvcSvc.diagnosis.suitability !== '' ?state.data.fvcSvc.diagnosis.suitability :'-' }</div>
+          </div>
+          <div className='report-result-container'>
+            {res()}
           </div>
         </div>
       </div>

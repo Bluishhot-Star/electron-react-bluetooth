@@ -73,7 +73,7 @@ useEffect(()=>{
     setTimeout(()=>{
 
       onCapture();
-    },1100)
+    },1200)
   }
 },[top])
   const onCapture = () =>{
@@ -316,7 +316,17 @@ useEffect(()=>{
 			  backgroundRepeat: 'no-repeat',
         backgroundPosition:'top center',
       }}>
-          <div className='report-title-container'></div>
+          <div className='report-title-container'>
+            <div className='report-title-container-right'></div>
+            <div className='report-title-container-center'>
+              <div></div>
+              <div>[{state.data.fvcSvc.clinic.name}]</div>
+            </div>
+            <div className='report-title-container-left'>
+              <div></div>
+              <div></div>
+            </div>
+          </div>
           <div className='top-chart'>
             <div className='row-line'>
               <div></div>
@@ -343,7 +353,10 @@ useEffect(()=>{
               <div className='value'>{top.measDate !== '' ? top.measDate : '-'}</div>
             </div>
           </div>
-          <div></div>
+          <div className='serial-num'>
+            <div>SpiroKit Serial Number :</div>
+            <div>{state.data.fvcSvc.calibration.serialNumber !== '' ? state.data.fvcSvc.calibration.serialNumber : '-'}</div>
+          </div>
 
           <div className='second-chart'>
             <div className='row-line'>
