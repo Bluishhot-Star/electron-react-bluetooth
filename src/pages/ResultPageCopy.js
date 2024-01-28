@@ -16,7 +16,8 @@ import annotationPlugin from 'chartjs-plugin-annotation';
 import { RiCalendarEventLine } from "react-icons/ri";
 import { HiOutlineCog } from "react-icons/hi";
 import { BiSolidFileJpg } from "react-icons/bi";
-import Report from './Report.js';
+import ReportFvc from './ReportFvc.js';
+import ReportSvc from './ReportSvc.js';
 
 function ResultPageCopy(){
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
@@ -37,7 +38,7 @@ function ResultPageCopy(){
     chartNumber:"",
   })
   const[rep,setRep] = useState({
-    data : "Empty resource",
+    fvcSvc : "Empty resource",
     date:"",
     birth:""
   });
@@ -63,7 +64,7 @@ useEffect(()=>{
     let volumeFlowList = [];
     let timeVolumeMaxList = [];
     let timeVolumeMaxListX = [];
-
+    console.log(trials)
     if(trials){
       console.log(trials.length);
       let temp = new Array(trials.length).fill(0);
@@ -613,7 +614,8 @@ useEffect(()=>{
   {
     let time = setTimeout(()=>{
       let time2 = setTimeout(() => {
-        let dataset = []
+        let dataset = [];
+        console.log(volumeFlow)
         volumeFlow.forEach((item,index)=>{
           dataset.push(
             {
@@ -632,6 +634,7 @@ useEffect(()=>{
             datasets: dataset,
           }
           let time4 = setTimeout(() => {
+            console.log(data)
             setGraphData(data);
           }, 50);
           return()=>{
@@ -771,7 +774,6 @@ useEffect(()=>{
       }
       SVCBtnRef.current.classList += " clickedType"
     }
-    console.log(state)
   },[FvcSvc])
   useEffect(()=>{
     setRep({
@@ -925,7 +927,7 @@ useEffect(()=>{
     if(viewer===true){
       setTimeout(()=>{
         setViewer(false);
-      },100)
+      },1300)
     }
   })  
   const [viewer,setViewer] = useState(false);
@@ -940,7 +942,28 @@ useEffect(()=>{
       else setSliderBg("");
     }
     return(()=>{setSliderBg("")})
+
+    
   },[totalData, FvcSvc])
+  useEffect(()=>{
+    console.log(state)
+    if(FvcSvc === 'fvc'){
+      console.log(totalData)
+      setRep({
+        fvcSvc : totalData.fvc,
+        date: measDate !== '' ? measDate[0] : state.date[0],
+        birth : totalData.birth
+      })
+    }else{
+      console.log(totalData.svc)
+      setRep({
+        fvcSvc : totalData.svc,
+        date: measDate !== '' ? measDate[0] : state.date[0],
+        birth : totalData.birth
+      })
+    }
+  },[totalData, FvcSvc])
+  
   return( 
     
     <div className="result-page-container">
@@ -1220,8 +1243,7 @@ useEffect(()=>{
           </div>
         </div>
         {viewer ?
-          <Report data={rep} style={{zIndex: -1 }}/>  : null
-        }
+        FvcSvc==='fvc' ? <div className='report-fvc-svc'><ReportFvc data={rep} style={{zIndex: -1 }}/></div>  : <div className='report-fvc-svc'><ReportSvc data={rep} style={{zIndex: -1 }}/> </div>: null}
       </div>
       
       
