@@ -399,7 +399,7 @@ window.api.receive("connectedBLEDevice", (data)=>{
                       <div>-</div>
                       <div>-</div>
                     </div>
-                    : null
+                    : <div className='none-device-text'>디바이스 연결 상태가 끊어졌습니다.</div>
                 }
                 </div>
           </div>

@@ -23,7 +23,7 @@ function Confirm(props){
     <>
       <div className="confirm-bg">
         <div className="confirm-container" onClick={(e)=>{e.stopPropagation(); return;}}>
-          <div className="confirm-logo"><p>The SpiroKit</p></div>
+          <div className="confirm-logo"><img src={process.env.PUBLIC_URL + '/spriokit.svg'} /></div>
           <div className="confirm-msg-container">
             <p>{props.content}</p>
           </div>

@@ -24,7 +24,7 @@ const MngClncs = () =>{
       }}).then((res)=>{
         console.log(res.data.response.clinicians);
         console.log(res.data.subCode);
-        if(res.data.subCode !== 2004){
+        if(res.data.response.total>(page-1)*10){
           setClinicians([...clinicians, ...res.data.response.clinicians]);
           setPage((page) => page + 1);
         }
@@ -50,21 +50,22 @@ const MngClncs = () =>{
   const statusChange = (e,id, index) =>{
     console.log(e.target.value);
     console.log(id);
-    // if(e.target.value === "true"){
-    //   console.log(cliniciansMngRef.current[index].children[0])
-    // }
-    // else{
-    //   console.log(cliniciansMngRef.current[index].children[1])
-    // }
-    // axios.put(`/clinicians/${id}`,{
-    //   headers: {
-    //     Authorization: `Bearer ${cookie.get('accessToken')}`
-    //   }},{
-    //     status : e.target.value
-    //   }).then((res)=>{
-    //   }).catch((err)=>{
-    //   console.log(err);
-    //   });
+    if(e.target.value === "true"){
+      console.log(cliniciansMngRef.current[index].children[0])
+    }
+    else{
+      console.log(cliniciansMngRef.current[index].children[1])
+    }
+    axios.put(`/clinicians/${id}`,{
+      headers: {
+        Authorization: `Bearer ${cookie.get('accessToken')}`
+      }},{
+        status : e.target.value
+      }).then((res)=>{
+        
+      }).catch((err)=>{
+      console.log(err);
+      });
   }
 
   return(

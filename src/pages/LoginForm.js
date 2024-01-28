@@ -119,7 +119,7 @@ const LoginForm = () =>{
         //중복 아이디 알림
         <Alert inputRef={errorAlert} contents={"로그인에 실패했습니다.\n아이디와 비밀번호를 확인해주세요."}/>
       }
-      <div className="logo"><p>The SpiroKit</p></div>
+      <div className="logo"><img src={process.env.PUBLIC_URL + '/spriokit.svg'} /></div>
       <form onSubmit={handleSubmit}>
         <div className="login-field">
           <label htmlFor="loginId">아이디</label>

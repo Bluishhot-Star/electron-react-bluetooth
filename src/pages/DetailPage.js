@@ -630,11 +630,6 @@ function DetailPage(){
     }
   }
 
-
-  
-  
-
-
   const fvcCompareBarData2 = {
     labels: ["pre","post"],
     datasets: [{
@@ -1188,7 +1183,7 @@ function DetailPage(){
       <div className="result-page-container detail-page-container">
       <div className="nav">
         <div className="nav-logo" onClick={()=>{console.log({preFvc, postFvc});}}>
-          <h1>The SpiroKit</h1>
+          <img src={process.env.PUBLIC_URL + '/spriokit.svg'} />
         </div>
         <div className="nav-content-container">
           <div className="nav-left-container">
@@ -1196,6 +1191,14 @@ function DetailPage(){
               <span>담당자</span>
               <span>{state.subject.clinicianName}</span>
             </div>
+            <div className='error'>
+                <span>Error Code </span>
+                <span>{state.diagnosis.errorCode}</span>
+              </div>
+              <div className='grade'>
+                <span>Grade </span>
+                <span>{state.diagnosis.suitability}</span>
+              </div>
           </div>
           {/* <div className="nav-right-container">
             <button className="select-patient-btn" onClick={()=>{navigator(-1)}}>환자 선택</button>
@@ -1205,7 +1208,6 @@ function DetailPage(){
       </div>
       <div className="nav-bottom">
         <div className="button-container">
-          <div className="suitability">검사 적합성 : {state.diagnosis.suitability}</div>
           <button className="detail-btn" onClick={()=>{navigator(-1)}}>결과 요약보기</button>
         </div>
       </div>

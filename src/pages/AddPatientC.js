@@ -117,9 +117,7 @@ const AddPatientCopy = ()=>{
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
     }}).then((res)=>{
-      
       setManagers(res.data.response.clinicians);
-      console.log(res.data.responsea);
     }).catch((err)=>{
       console.log(err);
     })
@@ -342,31 +340,10 @@ const AddPatientCopy = ()=>{
                 let copy = examinee.chartNumber;
                 copy = e.target.value;
                 setExaminee({...examinee, chartNumber: copy})
-              }}/>  
+              }}/>
+              <div className='charNumberInput-placeholder'>1글자 이상 20글자 이하인 영문과 숫자만 입력하세요.</div>
             </div>
-            <div className="input-container">
-              <label htmlFor="">담당자 선택</label>
-              {/* <FontAwesomeIcon htmlFor="adminSelect" className='admin-chevronDown' icon={faChevronDown} style={{color: "#4b75d6",}} /> */}
-              <select
-              id='adminSelect'
-              ref={mangerIdRef}
-              value={examinee.clinicianId}
-              onChange={(e)=>{
-                let copy = examinee.clinicianId;
-                copy = e.target.value;
-                setPatch(true);
-
-                setExaminee({...examinee, clinicianId: copy});
-              }}>
-                <option value="">담당자명</option>
-                {managers.map((item)=>(
-                  <option value={item.clinicianId} key={item.clinicianId}>
-                      {item.clinicianName}
-                  </option>
-                ))}
-              </select>
-              <FontAwesomeIcon className='admin-chevronDown' icon={faChevronDown} style={{color: "#4b75d6",}} />
-            </div>
+            
           </div>
         </div>
         <div className="add-patient-page-bottom-container">
@@ -437,9 +414,32 @@ const AddPatientCopy = ()=>{
         </div>
         <div className="add-patient-page-bottom-container">
           <div className="inner">
-          <div className="info-container">
-            <p>기본 정보</p>
-          </div>
+            <div className="info-container">
+              <p>추가 정보</p>
+            </div>
+            <div className="input-container">
+              <label htmlFor="">담당자 선택</label>
+              {/* <FontAwesomeIcon htmlFor="adminSelect" className='admin-chevronDown' icon={faChevronDown} style={{color: "#4b75d6",}} /> */}
+              <select
+              id='adminSelect'
+              ref={mangerIdRef}
+              value={examinee.clinicianId}
+              onChange={(e)=>{
+                let copy = examinee.clinicianId;
+                copy = e.target.value;
+                setPatch(true);
+
+                setExaminee({...examinee, clinicianId: copy});
+              }}>
+                <option value="">담당자명</option>
+                {managers.map((item)=>(
+                  <option value={item.clinicianId} key={item.clinicianId}>
+                      {item.clinicianName}
+                  </option>
+                ))}
+              </select>
+              <FontAwesomeIcon className='admin-chevronDown' icon={faChevronDown} style={{color: "#4b75d6",}} />
+            </div>
             <div className="info-input-container">
               <label htmlFor="">흡연경험</label>
               <div className="radio-container">

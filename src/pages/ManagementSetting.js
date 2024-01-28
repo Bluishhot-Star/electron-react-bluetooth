@@ -6,9 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft,faGear, faCog, faSearch, faCalendar, faChevronRight } from '@fortawesome/free-solid-svg-icons'
 
 import { Routes, Route, Link, useNavigate,useLocation } from 'react-router-dom'
-import DateSelector from './DateSelector.js'
-import { useInView } from 'react-intersection-observer';
-import { set, values } from 'lodash';
+import { MdLightbulbOutline } from "react-icons/md";
 const ManagementSetting= () =>{
     
   const cookies = new Cookies();
@@ -68,7 +66,12 @@ const ManagementSetting= () =>{
           
           <div className="change-respiration-field">
             <p>검사 중 호흡 횟수</p>
-            <p>노력성 호기 전 호흡 횟수를 설정할 수 있습니다. (기본값 3회)</p>
+            <div>
+              <div className='bulbIcon-container'>
+                <MdLightbulbOutline className='bulbIcon'/>
+              </div>
+              <p>노력성 호기 전 호흡 횟수를 설정할 수 있습니다. (기본값 3회)</p>
+            </div>
             <div className='respiration-rate-field'>
               <div className='respiration-rate-radio'>
                 <input ref={onceRef} 
@@ -100,13 +103,13 @@ const ManagementSetting= () =>{
 
               <div className='respiration-rate-radio'>
               <input ref={fiveTRef}
-                     onChange={(e)=>{setRate(e.target.value)}}  
+                    onChange={(e)=>{setRate(e.target.value)}}  
                   value="5" type="radio" name="rate" id="fiveT"/>
                 <label htmlFor="fiveT">5회</label>
               </div>
               <div className='respiration-rate-radio'>
                 <input ref={sixTRef}
-                     onChange={(e)=>{setRate(e.target.value)}} 
+                    onChange={(e)=>{setRate(e.target.value)}} 
                   value="6" type="radio" name="rate" id="sixT"/>
                 <label htmlFor="sixT">6회</label>
               </div>
@@ -115,7 +118,12 @@ const ManagementSetting= () =>{
           </div>
           <div className="change-respiration-field">
             <p>노력성 호기 시간 및 종료 시간 설정</p>
-            <p>노력성 호기 시간과 타이머 종료 시간을 설정할 수 있습니다.(기본값 6초 / 15 초)</p>
+            <div>
+              <div className='bulbIcon-container'>
+                <MdLightbulbOutline className='bulbIcon'/>
+              </div>
+              <p>노력성 호기 시간과 타이머 종료 시간을 설정할 수 있습니다.(기본값 6초 / 15 초)</p>
+            </div>
 
             <div className='respiration-time-field'>
               <div className='respiration-time-radio'>

@@ -130,7 +130,17 @@ const DeviceSetting= () =>{
       
       <div className='deviceList-page-right-container'>
         {
-          curtainStat ? <div className='curtain'></div> : null
+          curtainStat ? 
+          <div className='curtain'>
+            <div className='curtain-img-container'>
+              <div><img src={process.env.PUBLIC_URL + '/device.svg'} /></div>
+              <div><img src={process.env.PUBLIC_URL + '/device.svg'} /></div>
+              <div><img src={process.env.PUBLIC_URL + '/device.svg'} /></div>
+              <div className='curtain-img-text'>디바이스를 먼저 선택해주세요.</div>
+            </div>
+          </div> 
+          : 
+          null
         }
         <div className='device-personal-container'>
           <div className="calibration-date-container">
