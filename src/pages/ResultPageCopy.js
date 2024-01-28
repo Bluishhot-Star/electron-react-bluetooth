@@ -16,7 +16,8 @@ import { PDFViewer } from '@react-pdf/renderer';
 import { RiCalendarEventLine } from "react-icons/ri";
 import { HiOutlineCog } from "react-icons/hi";
 import { BiSolidFileJpg } from "react-icons/bi";
-import Report from './Report.js';
+import ReportFvc from './ReportFvc.js';
+import ReportSvc from './ReportSvc.js';
 
 function ResultPageCopy(){
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
@@ -37,7 +38,7 @@ function ResultPageCopy(){
     chartNumber:"",
   })
   const[rep,setRep] = useState({
-    data : "Empty resource",
+    fvcSvc : "Empty resource",
     date:"",
     birth:""
   });
@@ -64,7 +65,7 @@ useEffect(()=>{
     let volumeFlowList = [];
     let timeVolumeMaxList = [];
     let timeVolumeMaxListX = [];
-
+    console.log(trials)
     if(trials){
       console.log(trials.length);
       let temp = new Array(trials.length).fill(0);
@@ -604,7 +605,8 @@ useEffect(()=>{
   {
     let time = setTimeout(()=>{
       let time2 = setTimeout(() => {
-        let dataset = []
+        let dataset = [];
+        console.log(volumeFlow)
         volumeFlow.forEach((item,index)=>{
           dataset.push(
             {
@@ -623,6 +625,7 @@ useEffect(()=>{
             datasets: dataset,
           }
           let time4 = setTimeout(() => {
+            console.log(data)
             setGraphData(data);
           }, 50);
           return()=>{
@@ -762,21 +765,7 @@ useEffect(()=>{
       }
       SVCBtnRef.current.classList += " clickedType"
     }
-    console.log(state)
-    if(FvcSvc === 'fvc'){
-      console.log(FvcSvc)
-      setRep({
-        fvcSvc : state.fvc,
-        date: measDate !== '' ? measDate : state.date[0],
-        birth : state.birth
-      })
-    }else{
-      setRep({
-        fvcSvc : state.svc,
-        date: measDate !== '' ? measDate : state.date[0],
-        birth : state.birth
-      })
-    }
+    
   },[FvcSvc])
 
   const dateSelect = (select) =>{
@@ -842,6 +831,7 @@ useEffect(()=>{
   
   const report = async(tDate)=>{
     console.log(tDate)
+    setMeasDate(tDate);
     await axios.get(`/v3/subjects/${totalData.chartNumber}/types/fvc/results/${tDate[0]}` , {
       headers: {
         Authorization: `Bearer ${cookies.get('accessToken')}`
@@ -907,7 +897,7 @@ useEffect(()=>{
     if(viewer===true){
       setTimeout(()=>{
         setViewer(false);
-      },100)
+      },1200)
     }
   })  
   const [viewer,setViewer] = useState(false);
@@ -922,7 +912,28 @@ useEffect(()=>{
       else setSliderBg("");
     }
     return(()=>{setSliderBg("")})
+
+    
   },[totalData, FvcSvc])
+  useEffect(()=>{
+    console.log(state)
+    if(FvcSvc === 'fvc'){
+      console.log(totalData)
+      setRep({
+        fvcSvc : totalData.fvc,
+        date: measDate !== '' ? measDate[0] : state.date[0],
+        birth : totalData.birth
+      })
+    }else{
+      console.log(totalData.svc)
+      setRep({
+        fvcSvc : totalData.svc,
+        date: measDate !== '' ? measDate[0] : state.date[0],
+        birth : totalData.birth
+      })
+    }
+  },[totalData, FvcSvc])
+  
   return( 
     
     <div className="result-page-container">
@@ -1024,7 +1035,8 @@ useEffect(()=>{
           <div className="button-container">
             <div className="two-btn-container">
             <div onClick={()=>{
-            // navigator('./report',{state:{data:rep}})
+            // navigator('./reportFvc',{state:{data:rep}})
+            // navigator('./reportSvc',{state:{data:rep}})
             setViewer(!viewer)
             
             }}>다운로드</div>
@@ -1192,7 +1204,7 @@ useEffect(()=>{
           </div>
         </div>
         {viewer ?
-        <Report data={rep} style={{zIndex: -1 }}/>  : null}
+        FvcSvc==='fvc' ? <ReportFvc data={rep} style={{zIndex: -1 }}/>  : <ReportSvc data={rep} style={{zIndex: -1 }}/> : null}
       </div>
       
       
