@@ -897,7 +897,7 @@ useEffect(()=>{
     if(viewer===true){
       setTimeout(()=>{
         setViewer(false);
-      },1200)
+      },1300)
     }
   })  
   const [viewer,setViewer] = useState(false);
@@ -1204,7 +1204,7 @@ useEffect(()=>{
           </div>
         </div>
         {viewer ?
-        FvcSvc==='fvc' ? <ReportFvc data={rep} style={{zIndex: -1 }}/>  : <ReportSvc data={rep} style={{zIndex: -1 }}/> : null}
+        FvcSvc==='fvc' ? <div className='report-fvc-svc'><ReportFvc data={rep} style={{zIndex: -1 }}/></div>  : <div className='report-fvc-svc'><ReportSvc data={rep} style={{zIndex: -1 }}/> </div>: null}
       </div>
       
       
