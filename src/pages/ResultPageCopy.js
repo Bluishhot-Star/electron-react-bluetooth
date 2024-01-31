@@ -1181,7 +1181,7 @@ useEffect(()=>{
                   </div>
                   ))
                 :
-                totalData.svc === "Empty resource" ? <div>비어있음</div>:
+                totalData.svc === "Empty resource" ? null:
                 totalData.svc.trials.map((item, index)=>(
                   <div ref={(el)=>{svcSimpleResultsRef.current[index]=el}} onClick={()=>{console.log(svcSimpleResultsRef.current[index]);console.log(item.measurementId);selectSvcGraph(index)}} key={item.measurementId}  className='simple-result-container'>
                     <div className='simple-result-title-container'>

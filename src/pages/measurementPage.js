@@ -1623,6 +1623,15 @@ useEffect(()=>
     setGraphOnOff([...graphOnOff].fill(0))
   }
 
+  const [backStat, setBackStat] = useState(false);
+  let backConfirmFunc = (val)=>{
+    if(val=="confirm"){
+      navigatorR("/memberList");
+    }
+    else if(val=="cancel"){
+      setBackStat(false);
+    }
+  }
 
   return(
     <div className="measurement-page-container">
@@ -1630,25 +1639,37 @@ useEffect(()=>
       {saveBAlert ? <Confirm content={`${strongTime}초 이상 강하게 호흡을 불지 않아, 유효하지 않은 검사입니다.\n그대로 검사를 저장하시겠습니까?`} btn={true} onOff={setSaveBAlert} select={selectSave}/> : null}
       {confirmStat ? <Confirm content="검사를 시작하시겠습니까?" btn={true} onOff={setConfirmStat} select={confirmFunc}/> : null}
       {disconnectStat ? <Confirm content={"연결된 Spirokit기기가 없습니다.\n설정 페이지로 이동해서 Spirokit을 연결해주세요."} btn={true} onOff={setDisconnectStat} select={disconnectConfirmFunc}/> : null}
+      {backStat ? <Confirm content={"환자선택 화면으로 돌아가시겠습니까?"} btn={true} onOff={setBackStat} select={backConfirmFunc}/> : null}
       {readyAlert ? <Confirm content={"SpiroKit 동작 준비 중 입니다.\n잠시만 기다려주세요."} btn={false} onOff={setReadyAlert} select={confirmFunc}/> : null}
-        <div className="measurement-page-nav" onClick={()=>{console.log()}}>
-          <div className='measurement-page-backBtn' onClick={()=>{navigatorR(-1)}}>
+        <div className="measurement-page-nav">
+          <div className='measurement-page-backBtn' onClick={()=>{setBackStat(true)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6"}} />
           </div>
-          <p onClick={()=>{
-            // console.log(txCharRef.current);
-            // console.log(location.state.info);
-            measurementEnd()
-          }}>{location.state.name}</p>
-          <div ref={blueIconRef} className="device-connect" onClick={()=>{navigatorR("/setting")}}>
-              {
-                noneDevice ?
-                  <p>연결되지 않음</p>
-                  :
-                  <p>연결됨</p>
-              }
-              <FaBluetoothB/>
+          <p>{location.state.name}</p>
+          <div className='graph-status-container'>
+            <div className='error'>
+                  <span>Error Code </span>
+                  {
+                      <span className='error-data'>{totalData == " " || totalData == "Empty resource" || !totalData  ? '-': totalData.fvc.diagnosis.errorCode}</span>
+                  }
+                </div>
+                <div className='grade'>
+                  <span>Grade </span>
+                  {
+                      <span className='grade-data'>{totalData == " " || totalData == "Empty resource" || !totalData  ? '-': totalData.fvc.diagnosis.suitability}</span>
+                  }
+                  
+                </div>
+            <div ref={blueIconRef} className="device-connect" onClick={()=>{navigatorR("/setting")}}>
+                {
+                  noneDevice ?
+                    <p>연결되지 않음</p>
+                    :
+                    <p>연결됨</p>
+                }
+                <FaBluetoothB/>
             </div>
+          </div>
         </div>
 
       

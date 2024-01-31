@@ -681,7 +681,7 @@ text-align: right;
   margin-bottom: 10px;
 }
 .detail-fvc-graph-container .graph{
-  /* background: #000; */
+  background: #fff;
   width: 99.2%;
   height: 99.9%;
   border-radius: 7px;
@@ -706,6 +706,7 @@ text-align: right;
   padding: 10px;
   grid-template-columns: 1fr 1.5fr;
   grid-gap: 10px;
+  background: #fff;
 }
 .bottom-graph-container .quadrant-graph-container{
   width: 100%;
@@ -956,6 +957,7 @@ text-align: right;
   margin-top: 5vh; */
   overflow: hidden;
   scrollbar-width: none;
+  background: #fff;
 }
 .prePost-item-container::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera*/
@@ -991,7 +993,7 @@ text-align: right;
 .prePost-container .prePost-btn-container{
   width: 100%;
   height: 40px;
-  /* background: #000; */
+  background: #fff;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
@@ -3501,10 +3503,30 @@ text-align: right;
   align-items: center;
   cursor: pointer;
 }
-.measurement-page-nav .device-connect{
+.measurement-page-nav .graph-status-container{
   position: absolute;
+  display: flex;
+  position: absolute;
+  align-items: center;
   top: 0;
   right: 0;
+}
+.measurement-page-nav .graph-status-container .error,
+.measurement-page-nav .graph-status-container .grade{
+  font-size: .75rem;
+  font-weight: 600;
+  margin-right: 10px;
+}
+.measurement-page-nav .graph-status-container span{
+  margin-right: 10px;
+}
+.error-data{
+  color: #75bacb;
+}
+.grade-data{
+  color: rgb(255, 0, 0);
+}
+.measurement-page-nav .device-connect{
   display: flex;
   align-items: center;
   font-size: 0.8rem;
@@ -3524,8 +3546,8 @@ text-align: right;
 .measurement-page-nav .device-connect.connect{
   color: rgba(1, 138, 190, 1);
   border: 1px solid rgba(1, 138, 190, 1);
-
 }
+
 .measurement-page-left-container{
   width: 100%;
   height: 100%;
@@ -4332,11 +4354,11 @@ text-align: right;
 }
 .confirm-logo{
   position: absolute;
-  top: 15px;
-  width: 35%;
+  top: 20px;
+  left: 20px;
+  width: 45%;
   font-size: 1.2rem;
-  color: rgb(77, 174, 226);
-  font-weight: bold;
+  font-weight: 600;
 }
 .confirm-logo img{
   width: 100%;
