@@ -251,7 +251,7 @@ useEffect(()=>{
   },[totalData])
 
   useEffect(()=>{
-    if(FvcSvc=="fvc"){
+    if(FvcSvc=="fvc" && simpleResultsRef.current[0]){
       graphOnOff.forEach((item, index)=>{
         if(item == 1){
           simpleResultsRef.current[index].classList+=" selected";
@@ -259,7 +259,7 @@ useEffect(()=>{
         }
         else{
           if(simpleResultsRef.current[index].classList.contains("selected")){
-            simpleResultsRef.current[index].classList.remove("selected");
+            simpleResultsRef[index].classList.remove("selected");
           }
         }
       })
@@ -267,7 +267,7 @@ useEffect(()=>{
   },[graphOnOff])
   
   useEffect(()=>{
-    if(FvcSvc=="svc"){
+    if(FvcSvc=="svc" && svcSimpleResultsRef.curren[0]){
       svcGraphOnOff.forEach((item, index)=>{
       if(item == 1){
           svcSimpleResultsRef.current[index].classList+=" selected";

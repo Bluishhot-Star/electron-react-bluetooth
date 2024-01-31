@@ -14,14 +14,20 @@ let connectedBLEDevice;
 let callbackForBluetoothEvent = ()=>{};
 
 let mainWindow;
+let splash;
+
+
 function createWindow () {
   return new Promise((resolve, reject) => {
     try{
+      
+      
       mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
         minWidth: 800,
         minHeight: 600,
+        show: false,
         webPreferences: {
           nodeIntegration: true,
           contextIsolation: false,
@@ -39,8 +45,18 @@ function createWindow () {
           preload: path.join(__dirname, "/BLEDevicesPreload.js")
         }
       })
-
-
+      splash = new BrowserWindow({
+        width: 510, 
+        height: 310, 
+        transparent: true, 
+        frame: false, 
+        alwaysOnTop: true,
+        resizable: false,
+          // devTools: true,
+        // webviewTag: true,
+      });
+      splash.loadURL(`file://${__dirname}/../public/splash.html`);
+      splash.center();
       //******************************past START******************************************
       // mainWindow.webContents.on("select-bluetooth-device", (event, deviceList, callback) => {
       //   event.preventDefault();
@@ -108,7 +124,7 @@ function createWindow () {
           callbackForBluetoothEvent = callback; // to make it accessible outside https://technoteshelp.com/electron-web-bluetooth-api-requestdevice-error/
         }
       );
-
+      
 
 
       mainWindow.addListener("resize",(event)=>{
@@ -120,6 +136,7 @@ function createWindow () {
           BLEDevicesWindow.setSize(x, y);
         }
       })
+
       mainWindow.loadURL("http://localhost:3000") 
       
       // resolve(mainWindow);
@@ -207,6 +224,11 @@ ipcMain.on("getConnectedDevice", (event, args)=>{
 
 app.whenReady().then(() => {
   createWindow()
+
+  setTimeout(()=>{
+    splash.close()
+    mainWindow.show()
+  },3000)
 
   //for MacOS
   app.on('activate', () => {
