@@ -4,6 +4,8 @@ import { Cookies, useCookies } from 'react-cookie';
 import Alert from "../components/Alerts.js"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft,faGear, faCog, faSearch, faCalendar, faChevronRight } from '@fortawesome/free-solid-svg-icons'
+import { FaEdit } from "react-icons/fa";
+import { RiCalendarEventLine } from "react-icons/ri";
 
 import { Routes, Route, Link, useNavigate,useLocation } from 'react-router-dom'
 import DateSelector from './DateSelector.js'
@@ -104,7 +106,7 @@ const DeviceSetting= () =>{
               디바이스 목록
             </div>
             <div className="add-device-btn">
-              제조번호 재설정
+              <FaEdit />제조번호 재설정
             </div>
           </div>
           <div className='device-list'> 
@@ -155,7 +157,7 @@ const DeviceSetting= () =>{
             <div className="calibration-select-date-btn-container" onClick={()=>{
                   setDateSelectorStat(!dateSelectorStat)
                 }}>
-              <FontAwesomeIcon className='calenderIcon' icon={faCalendar} style={{color: "#4b75d6",}} />
+                <RiCalendarEventLine className='calenderIcon'/>
               <div className="calibration-select-date-btn">기간선택</div>
             </div>
           </div>

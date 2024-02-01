@@ -2709,7 +2709,7 @@ text-align: right;
   display: flex;
   padding: 0 1vh;
   align-items: center;
-  border-bottom: 1px solid #aaa;
+  border-bottom: 1px solid #ccc;
   justify-content: center;
   overflow: hidden;
   white-space:nowrap;
@@ -3204,7 +3204,8 @@ text-align: right;
   display: block;
   text-align: center;
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 .deviceList-page-container  .deviceList-page-left-container{
@@ -3239,11 +3240,15 @@ text-align: right;
   font-weight: bold;
   text-align: right;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 .deviceList-page-container .device-list-container .add-device-btn:active{
   opacity: .3;
 }
-
+.deviceList-page-container .device-list-container .add-device-btn svg{
+  margin-right: 5px;
+}
 .deviceList-page-container .device-list{
   width: 100%;
   margin-top: 5%;
@@ -3257,7 +3262,7 @@ text-align: right;
   overflow: hidden;
 }
 .deviceList-page-container .device-list .device-list-column{
-  border-bottom: .5px solid #333;
+  border-bottom: .5px solid #ccc;
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
@@ -3411,13 +3416,14 @@ text-align: right;
   text-align: right;
   cursor: pointer;
   display: flex;
+  align-items: center;
 }
 .calibration-select-date-btn-container:active{
   opacity: .3;
 }
 .calibration-select-date-btn-container .calenderIcon{
-  margin-right: .7vh;
-  cursor: pointer;
+  font-size: min(2.3vh, 1rem) ;
+  margin-right: 5px;
 }
 .calibration-list{
   width: 100%;
@@ -3732,7 +3738,8 @@ text-align: right;
   display: block;
   text-align: center;
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-weight: 600;
 }
 .gain-page-nav .gain-page-backBtn{
   position: absolute;
@@ -4021,7 +4028,7 @@ text-align: right;
 
 .respiration-rate-radio input:checked{
   border: 1px solid rgba(1, 138, 190, 1);
-  
+  color: rgb(236, 244, 218);
 }
 .respiration-rate-radio input:checked+label{
   color: rgba(1, 138, 190, 1);
@@ -4592,7 +4599,8 @@ text-align: right;
   display: block;
   text-align: center;
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-weight: 600;
 }
 .gain-info-page-container{
   height: 100%;
@@ -4676,10 +4684,12 @@ text-align: right;
   width: 100%;
   height : 100%;
   /* flex-direction: row; */
+  display: grid;
+  grid-template-rows: 40px 1fr;
 }
 .gain-measurement-page-graph-operation-container{
   display: grid;
-  grid-template-rows: 78% 15% 1fr;
+  grid-template-rows: 90% 10%;
   height: 100%;
   grid-row-gap: 1%;  
 }
@@ -4701,7 +4711,8 @@ text-align: right;
   display: block;
   text-align: center;
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-weight: 600;
 }
 .gain-measurement-page-nav .gain-measurement-page-backBtn{
   position: absolute;
@@ -4807,7 +4818,10 @@ text-align: right;
 .gain-measurement-calivration-table-container > div:last-child{
   border: none;
 }
-
+.trashIcon{
+  color: red;
+  margin-right: 5px;
+}
 
 /* .gain-measure-operation>div{
   border: #000 1px solid;
@@ -4857,6 +4871,9 @@ text-align: right;
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+  color: #018abe;
+  font-weight: 600;
+  font-size: min(2.5vh, 1.2rem);
 }
 /* .gain-measure-operation{
   width: 100%;
@@ -4870,7 +4887,7 @@ text-align: right;
 
 .gain-measure-operation>div{
   border: #000 1px solid;
-  width: 15vw;
+  width: 22vw;
   height: 70%;
   border-radius: 2vh;
   display: flex;
@@ -4878,6 +4895,9 @@ text-align: right;
   align-items: center;
   cursor: pointer;
   opacity: 1;
+}
+.gain-measure-operation>div:nth-child(4){
+  color: red;
 }
 /* .gain-measure-operation>div:disabled{
   opacity: 0.3;
@@ -4904,13 +4924,15 @@ text-align: right;
 .verify-measurement-page-container{
   width: 100%;
   height : 100%;
+  display: grid;
+  grid-template-rows: 40px 1fr;
   /* flex-direction: row; */
 }
 .verify-measurement-m-page-container{
   width: 100%;
-  height : 95%;
+  height : 100%;
   display: grid;
-  grid-template-columns: 60% 40% 1fr 1fr;
+  grid-template-columns: 60% 40%;
   /* grid-template-rows: 40px 1fr; */
   grid-column-gap: 10px;
 }
@@ -4925,7 +4947,8 @@ text-align: right;
   display: block;
   text-align: center;
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-weight: 600;
 }
 .verify-measurement-page-nav .verify-measurement-page-backBtn{
   position: absolute;
@@ -4936,11 +4959,28 @@ text-align: right;
   align-items: center;
   cursor: pointer;
 }
-
+.screenShot-btn{
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  color: #018abe;
+  cursor: pointer;
+}
+.screenShot-btn:active{
+  opacity: 0.3;
+}
+.screenShot-btn svg{
+  font-size: 1.2rem;
+  margin-right: 5px;
+}
 .verify-measurement-page-left-container{
   width: 100%;
   display: grid;
-  grid-template-rows: 83% 16% 1fr;
+  grid-template-rows: 90% 10%;
   grid-row-gap: 1%;
 }
 
@@ -4956,7 +4996,7 @@ text-align: right;
 
 .verify-measurement-page-right-container{
   display: grid;
-  grid-template-rows: 30% 69% 1fr;
+  grid-template-rows: 30% 70%;
   grid-row-gap: 1%;
 }
 .verify-measurement-page-right-container>div{
@@ -4966,7 +5006,7 @@ text-align: right;
   border-radius: 5px;
   display: grid;
   align-items: center;
-  padding-left: 10px; 
+  padding: 0 10px; 
 }
 .verify-measurement-page-right-container>div p{
   font-size: min(1.9vh, 1rem);
@@ -5106,6 +5146,9 @@ text-align: right;
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+  font-size: min(2.5vh, 1.5rem);
+  font-weight: 600;
+  color: #018abe;
 }
 
 .verify-measure-operation>div{
@@ -5119,6 +5162,9 @@ text-align: right;
   cursor: pointer;
   opacity: 1;
 }
+.verify-measure-operation>div:nth-child(3){
+  color: #000;
+}
 /* .gain-measure-operation>div:disabled{
   opacity: 0.3;
   cursor:default;
@@ -5129,7 +5175,9 @@ text-align: right;
 .gain-measure-operation>div:active{
   opacity: 0.3;
 } */
-
+.magnifyIcon{
+  margin-right: 5px;
+}
 .verify-measure-operation>.disabled{
   opacity: 0.3;
   cursor:default;
@@ -5469,7 +5517,14 @@ text-align: right;
 }
 
 
+.loadingBG{
+  background: linear-gradient(335deg, #fff, #ababab, #f3f3f3, #a8a8a8);
+  background-size: 800% 800%;
 
+  -webkit-animation: loading 2s ease infinite;
+  -moz-animation: loading 2s ease infinite;
+  animation: loading 2s ease infinite;
+}
 .history-container.loadingBG, .empty-graph-container.loadingBG{
   background: linear-gradient(335deg, #fff, #ababab, #f3f3f3, #a8a8a8);
   background-size: 800% 800%;
