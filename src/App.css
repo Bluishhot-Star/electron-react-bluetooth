@@ -5267,7 +5267,7 @@ text-align: right;
 }
 .third-chart{
   display: grid;
-  grid-template-columns: 54.3% 45.7%;
+  grid-template-columns: 54% 46%;
   margin-left: 3%;
   margin-right: 3%;
 }
@@ -5316,7 +5316,7 @@ text-align: right;
 }
 .third-chart-right{
   display: grid;
-  grid-template-columns: 50% 50%;
+  grid-template-columns: 49% 51%;
   
 }
 .third-chart-right-svc{

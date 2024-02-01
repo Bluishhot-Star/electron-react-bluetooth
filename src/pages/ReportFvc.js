@@ -10,13 +10,13 @@ import html2canvas from "html2canvas";
 import img from '../img/FVC_v6.svg'
 
 
-
-const ReportFvc = (state)=>{
+const ReportFvc = ()=>{
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
     let navigatorR = useNavigate();
     const location = useLocation();
     const[volumeFlow,setVolumeFlow] = useState([]);
-    // const state = location.state;
+    const state = location.state;
+    console.log(state)
     const [top,setTop] = useState({
       name : '',
       age : 0,
@@ -70,7 +70,7 @@ useEffect(()=>{
   if(top.name !== ''){
     setTimeout(()=>{
 
-      onCapture();
+      // onCapture();
     },1100)
   }
 },[top])
@@ -164,10 +164,27 @@ useEffect(()=>{
     plugins:{
       legend: {
           display: false,
-          
       },
       resizeDelay:0,
       datalabels: false,
+      annotation: {
+        annotations: {
+            box1: {
+                drawTime: 'beforeDraw',
+                type: 'box',
+                // yMin: 0.9,//
+                // yMax: 1.2,
+                backgroundColor: '#fff'
+            },
+    
+        },
+      },
+      chartAreaBorder: {
+        borderColor: 'red',
+        borderWidth: 2,
+        borderDash: [5, 5],
+        borderDashOffset: 2,
+      }
     },
     responsive: true,
     // aspectRatio: 0.2,
@@ -177,7 +194,8 @@ useEffect(()=>{
     layout: {
       padding: {
         top: 42,
-        bottom:22
+        bottom:22,
+        
       }
     },
     maintainAspectRatio: false,
@@ -192,28 +210,29 @@ useEffect(()=>{
         axios: 'x',
         // min: 0,
         // max: parseInt(Math.max(...tvMax)),
+        backgroundColor : '#fff',
+  
         ticks:{
           autoSkip: false,
           beginAtZero: false,
+          fontSize :14,
           
           // max: 12.0,
         },
         grid:{
-          color: function(context) {
-            if (context.index === 0){
-              return '#20a0b3';
-            }
-            else{
-              return '#bbdfe4';
-            }
-          },
+          color: 'rgba(211, 211, 211, 1)',
+          lineWidth:2,
+          tickWidth:0
         }
       },
       y: {
         gridLines:{
-          zeroLineColor:'#000000',
+          zeroLineColor:'blue',
+          
         },
         axios: 'y',
+        backgroundColor : '#fff',
+
         // min: -9,
         grace:"8%",
         ticks: {
@@ -225,7 +244,10 @@ useEffect(()=>{
           precision: 1,
         },
         grid:{
-          color: '#000000'
+          color: 'rgba(211, 211, 211, 1)',
+          lineWidth:2,
+          tickWidth:0,
+          zeroLineColor:'blue'
         }
       },
     },
@@ -306,7 +328,8 @@ useEffect(()=>{
           borderColor: `${colorList[index%10]}`,
           borderWidth: 2.5,
           showLine: true,
-          tension: 0.4
+          tension: 0.4,
+          backgroundColor: '#fff'
         }
       )
     })
@@ -327,7 +350,17 @@ useEffect(()=>{
       },
       resizeDelay:0,
       datalabels: false,
-      
+      annotation: {
+        annotations: {
+            box1: {
+                drawTime: 'beforeDraw',
+                type: 'box',
+                // yMin: 0.9,//
+                // yMax: 1.2,
+                backgroundColor: '#fff'
+            }
+        },
+      }
     },
     afterDraw: function (chart, easing) {
       console.log(chart);
@@ -337,7 +370,7 @@ useEffect(()=>{
     layout: {
       padding: {
         top: 42,
-        bottom:22
+        bottom:18
       }
     },
     animation:{
@@ -354,6 +387,8 @@ useEffect(()=>{
     scales: {
       x: {
         axios: 'x',
+        backgroundColor : '#fff',
+
         min: 0,
         suggestedMax: 3,
         ticks:{
@@ -363,14 +398,9 @@ useEffect(()=>{
           autoSkip: false,
         },
         grid:{
-          color: function(context) {
-            if (context.index === 0){
-              return '#20a0b3';
-            }
-            else{
-              return '#bbdfe4';
-            }
-          },
+          color: 'rgba(211, 211, 211, 1)',
+          lineWidth:2,
+          tickWidth:0
         }
       },
       y: {
@@ -380,6 +410,8 @@ useEffect(()=>{
         axios: 'y',
         // max: 3,
         min: 0,
+        backgroundColor : '#fff',
+
         suggestedMax:3.3,
         // suggestedMin:-6,
         ticks: {
@@ -391,14 +423,9 @@ useEffect(()=>{
           precision: 1,
         },
         grid:{
-          color: function(context) {
-            if (context.index === 0){
-              return '#20a0b3';
-            }
-            else{
-              return '#bbdfe4';
-            }
-          },
+          color: 'rgba(211, 211, 211, 1)',
+          lineWidth:2,
+          tickWidth:0
         }
       },
     },
@@ -437,21 +464,14 @@ useEffect(()=>{
         axios: 'x',
         // min: 0,
         // max: parseInt(Math.max(...tvMax)),
+
         ticks:{
           autoSkip: false,
           beginAtZero: false,
-          
           // max: 12.0,
         },
         grid:{
-          color: function(context) {
-            if (context.index === 0){
-              return '#20a0b3';
-            }
-            else{
-              return '#bbdfe4';
-            }
-          },
+          color: 'rgba(0, 0, 0, 0)'
         }
       },
       y: {
@@ -470,7 +490,7 @@ useEffect(()=>{
           precision: 1,
         },
         grid:{
-          color: '#000000'
+          color: 'rgba(0, 0, 0, 0)'
         }
       },
     },

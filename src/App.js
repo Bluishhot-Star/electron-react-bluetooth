@@ -29,7 +29,6 @@ import VerificationPage from './pages/VerificationPage.js';
 import MemberListCopy from './pages/MemberListCopy.js';
 import AddPatientCopy from './pages/AddPatientC.js';
 import ResultPageCopy from './pages/ResultPageCopy.js';
-import Pdf from './pages/Pdf.js';
 import ReportFvc from './pages/ReportFvc.js';
 import ReportSvc from './pages/ReportSvc.js';
 // Variable & State

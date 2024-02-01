@@ -251,7 +251,9 @@ useEffect(()=>{
   },[totalData])
 
   useEffect(()=>{
-    if(FvcSvc=="fvc"){
+    console.log(simpleResultsRef)
+
+    if(FvcSvc=="fvc" && simpleResultsRef.current.length !== 0){
       graphOnOff.forEach((item, index)=>{
         if(item == 1){
           simpleResultsRef.current[index].classList+=" selected";
@@ -1069,12 +1071,18 @@ useEffect(()=>{
                   totalData.fvc === '' || totalData.fvc === 'Empty resource'?
                     ""
                   :
-                    <div onClick={()=>{setViewer(!viewer)}}><BiSolidFileJpg className='jpgIcon'/>다운로드</div>
+                    <div onClick={()=>{
+                      // setViewer(!viewer)
+                      navigator('./reportFvc', {state :{data: rep}})
+                    }}><BiSolidFileJpg className='jpgIcon'/>다운로드</div>
                 :
                   totalData.svc === '' || totalData.svc === 'Empty resource'?
                     ""
                   :  
-                    <div onClick={()=>{setViewer(!viewer)}}><BiSolidFileJpg className='jpgIcon'/>다운로드</div>
+                    <div onClick={()=>{
+                      // setViewer(!viewer)
+                      navigator('./reportSvc', {data: rep})
+                    }}><BiSolidFileJpg className='jpgIcon'/>다운로드</div>
               }
               <button ref={FVCBtnRef} onClick={()=>{changeType("fvc")}} id="clickme" className="FVC-btn">FVC</button>
               <button ref={SVCBtnRef} onClick={()=>{changeType("svc")}} className="SVC-btn">SVC</button>
