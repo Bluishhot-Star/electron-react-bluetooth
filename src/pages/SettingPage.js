@@ -394,7 +394,7 @@ window.api.receive("connectedBLEDevice", (data)=>{
                     deviceSerialSetting ? 
                       <div className='connectDoneMsg'><p>{deviceInfo.name}이 연결되었습니다.</p></div>
                     :
-                    <div className="device-item" onClick={()=>{}}>
+                    <div className="device-item" onClick={()=>{setSerialSettingStat(true)}}>
                       <div>{deviceInfo.name}</div>
                       <div>-</div>
                       <div>-</div>
