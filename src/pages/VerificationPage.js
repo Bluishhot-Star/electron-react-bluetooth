@@ -910,49 +910,49 @@ useEffect(()=>{
             type: 'box',
             yMin: 1,
             yMax: 2,
-            backgroundColor: 'rgba(255, 99, 132, 0.25)',
+            backgroundColor: 'rgba(255, 199, 199,.3)',
             borderColor: 'rgba(0,0,0,0)'
           },
           box2: {
             type: 'box',
             yMin: -2,
             yMax: -1,
-            backgroundColor: 'rgba(255, 99, 132, 0.25)',
+            backgroundColor: 'rgba(255, 199, 199,.3)',
             borderColor: 'rgba(0,0,0,0)'
           },
           box3: {
             type: 'box',
             yMin: -5,
             yMax: -3,
-            backgroundColor: 'rgba(1, 138, 190, 0.25)',
+            backgroundColor: 'rgba(197, 223, 255,.3)',
             borderColor: 'rgba(0,0,0,0)'
           },
           box4: {
             type: 'box',
             yMin: 3,
             yMax: 5,
-            backgroundColor: 'rgba(1, 138, 190, 0.25)',
+            backgroundColor: 'rgba(197, 223, 255,.3)',
             borderColor: 'rgba(0,0,0,0)'
           },
           box5: {
             type: 'box',
             yMin: 6,
             yMax: 9,
-            backgroundColor: 'rgba(4, 162, 131, 0.25)',
+            backgroundColor: 'rgba(236, 244, 218,.3)',
             borderColor: 'rgba(0,0,0,0)'
           },
           box6: {
             type: 'box',
             yMin: -9,
             yMax: -6,
-            backgroundColor: 'rgba(4, 162, 131, 0.25)',
+            backgroundColor: 'rgba(236, 244, 218,.3)',
             borderColor: 'rgba(0,0,0,0)'
           },
           line1: {
             type: 'line',
             yMin: 0,
             yMax: 0,
-            borderColor: 'rgb(93, 188, 206)',
+            borderColor: 'rgba(1, 138, 190, .3)',
             borderWidth: 2,
           }
         }
@@ -1291,9 +1291,7 @@ const [calivration,setCalivration] = useState({
         <div className='verify-measurement-page-backBtn' onClick={()=>{navigatorR(-1)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
         </div>
-        <p onClick={()=>{
-          deleteee()
-        }}>보정 검증</p>
+        <p>보정 검증</p>
       <div className='screenShot-btn' onClick={onCapture}><RxImage />Screenshot</div>
       </div>
       <div className='verify-measurement-m-page-container'>

@@ -127,7 +127,6 @@
 
 .patient-measure-list{
   width: 100%;
-  margin-bottom: 10px;
   height: 100%;
   border-radius: 5px;
   border: #ccc 1px solid;
@@ -135,9 +134,7 @@
   position: relative;
   grid-template-columns: 1fr;
   grid-template-rows: 40px 1fr;
-  
   overflow: hidden;
-  /* margin-bottom: 10px; */
 }
 .result-page-container .left-container .measure-item-containerC{
   position: absolute;
@@ -146,7 +143,6 @@
   padding-top: 7vh;
   overflow: scroll;
   scrollbar-width: none;
-  margin-bottom: 7vh;
   background: #fff;
 }
 .result-page-container .left-container .measure-item-containerC::-webkit-scrollbar {
@@ -240,19 +236,22 @@
   width: 100%;
   height: -webkit-fill-available;
   background: #fff;
-  padding: 5%;
+  /* padding: 5%; */
   border-radius: 5px;
   border: #ccc 1px solid;
-  margin-top: 10px;
   /* position: absolute; */
   /* overflow: scroll; */
+  display: grid;
+  grid-template-rows: 30px 1fr;
 }
 .result-page-container .left-container .patient-info-containerC>span{
   display: block;
   color: #018abe;
   font-size: min(2.2vh, .9rem);
   font-weight: bold;
-  padding-bottom: 1vh; 
+  padding-top: 1vh;
+  padding-bottom: 1vh;
+  padding-left: 5%; 
   /* border-bottom: 1px #ccc solid; */
 }
 
@@ -260,6 +259,7 @@
   /* position: absolute; */
   display: grid;
   grid-template-columns: 1fr 1fr;
+  padding: 0 5%;
   /* margin-top: 10px; */
 }
 .patient-infoC .title{

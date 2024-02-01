@@ -267,7 +267,7 @@ useEffect(()=>{
   },[graphOnOff])
   
   useEffect(()=>{
-    if(FvcSvc=="svc" && svcSimpleResultsRef.curren[0]){
+    if(FvcSvc=="svc" && svcSimpleResultsRef.current[0]){
       svcGraphOnOff.forEach((item, index)=>{
       if(item == 1){
           svcSimpleResultsRef.current[index].classList+=" selected";
