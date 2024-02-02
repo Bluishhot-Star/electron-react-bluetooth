@@ -63,7 +63,6 @@ const ManagementSetting= () =>{
         <p>검사 설정</p>
       </div>
         <div className="respiration-container">
-          
           <div className="change-respiration-field">
             <p>검사 중 호흡 횟수</p>
             <div>
@@ -82,14 +81,14 @@ const ManagementSetting= () =>{
 
               <div className='respiration-rate-radio'>
                 <input ref={twiceRef}
-                     onChange={(e)=>{setRate(e.target.value)}} 
+                    onChange={(e)=>{setRate(e.target.value)}} 
                   value="2" type="radio" name="rate" id="twice"/>
                 <label htmlFor="twice">2회</label>
               </div>
 
               <div className='respiration-rate-radio'>
                 <input ref={threeTRef}
-                     onChange={(e)=>{setRate(e.target.value)}} 
+                    onChange={(e)=>{setRate(e.target.value)}} 
                   value="3" type="radio" name="rate" id="TreeT"/>
                 <label htmlFor="TreeT">3회</label>
               </div>

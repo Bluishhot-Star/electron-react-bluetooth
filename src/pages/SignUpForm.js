@@ -31,11 +31,6 @@ const SignUpForm = () =>{
       "confirmPassword": values["manager"]["reEnterPassword"],
     });
     
-    // ***************(TODO)**************
-    // select option --> 드롭다운 형식으로 새로만들기
-    // post할때 values 그대로 해도 괜찮은지 (가장 마지막에 서버CALLBACK 보면될듯?)
-    // ***********************************
-
     axios.post("/auth/sign-up",
     {
       "loginId": values["manager"]["loginId"],

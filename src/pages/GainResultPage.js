@@ -7,6 +7,7 @@ import {} from "@fortawesome/fontawesome-svg-core"
 import { FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import { debounce, values } from 'lodash'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+import { RxImage } from "react-icons/rx";
 import {registerables,Chart as ChartJS,RadialLinearScale,LineElement,Tooltip,Legend,} from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
 import annotationPlugin from 'chartjs-plugin-annotation';
@@ -178,49 +179,49 @@ const GainResultPage = () =>{
             type: 'box',
             yMin: 1,
             yMax: 2,
-            backgroundColor: 'rgba(255, 99, 132, 0.25)',
+            backgroundColor: 'rgba(255, 199, 199,.3)',
             borderColor: 'rgba(0,0,0,0)'
           },
           box2: {
             type: 'box',
             yMin: -2,
             yMax: -1,
-            backgroundColor: 'rgba(255, 99, 132, 0.25)',
+            backgroundColor: 'rgba(255, 199, 199,.3)',
             borderColor: 'rgba(0,0,0,0)'
           },
           box3: {
             type: 'box',
             yMin: -5,
             yMax: -3,
-            backgroundColor: 'rgba(1, 138, 190, 0.25)',
+            backgroundColor: 'rgba(197, 223, 255,.3)',
             borderColor: 'rgba(0,0,0,0)'
           },
           box4: {
             type: 'box',
             yMin: 3,
             yMax: 5,
-            backgroundColor: 'rgba(1, 138, 190, 0.25)',
+            backgroundColor: 'rgba(197, 223, 255,.3)',
             borderColor: 'rgba(0,0,0,0)'
           },
           box5: {
             type: 'box',
             yMin: 6,
             yMax: 9,
-            backgroundColor: 'rgba(4, 162, 131, 0.25)',
+            backgroundColor: 'rgba(236, 244, 218,.3)',
             borderColor: 'rgba(0,0,0,0)'
           },
           box6: {
             type: 'box',
             yMin: -9,
             yMax: -6,
-            backgroundColor: 'rgba(4, 162, 131, 0.25)',
+            backgroundColor: 'rgba(236, 244, 218,.3)',
             borderColor: 'rgba(0,0,0,0)'
           },
           line1: {
             type: 'line',
             yMin: 0,
             yMax: 0,
-            borderColor: 'rgb(93, 188, 206)',
+            borderColor: 'rgba(1, 138, 190, .3)',
             borderWidth: 2,
           }
         }
@@ -357,7 +358,15 @@ const GainResultPage = () =>{
 
   };
   const rootRef = useRef(null);
-  
+  const [grayBg, setGrayBg] = useState("");
+  useEffect(()=>{
+    if(temp){
+      setGrayBg("");
+    }
+    else{
+      setGrayBg("loadingBG");
+    }
+  },[temp])
   return(
     <div ref={rootRef} className="gain-page-container">
       <div className="gain-page-nav">
@@ -365,12 +374,12 @@ const GainResultPage = () =>{
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
         </div>
         <p>보정 결과</p>
-        <div onClick={onCapture}>스크린샷</div>
+        <div className='screenShot-btn' onClick={onCapture}><RxImage />Screenshot</div>
       </div>
       <div className='gain-page-left-right-container'>
-        <div className="gain-page-left-container" ref={graphConRef}>
+        <div className={"gain-page-left-container "+grayBg} ref={graphConRef}>
           {temp?<div className="title-y">Flow(l/s)</div>:<></>}
-          {temp?<div><Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/></div>:<p className='loadingG'>화면 조정 중..</p>}
+          {temp?<div><Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/></div>:null}
           {temp?<div className="title-x">Volume(L)</div>:<></>}
         </div>
 

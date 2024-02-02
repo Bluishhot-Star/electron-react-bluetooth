@@ -15,6 +15,7 @@ import { useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux"
 import Timer from "../components/Timer.js"
 import VolumeBar from "../components/VolumeBar.js"
+import Alert from "../components/Alerts.js"
 
 
 //FVC 검사 페이지
@@ -49,6 +50,8 @@ const MeasurementPage = () =>{
   const[volumeFlow,setVolumeFlow] = useState([]);
   const[timeVolume,setTimeVolume] = useState([]);
   const [trigger, setTrigger] = useState(-1);
+  //횟수 제한
+  const [limit,setLimit] = useState(false);
 
   // 첫 페이지 렌더링 시
   useEffect(()=>{
@@ -81,7 +84,12 @@ const MeasurementPage = () =>{
       if(res.data.subCode === 2004){
         setTotalData(res.data.message);
       }
-      else setTotalData(res.data.response);
+      else {
+        if(res.data.response.trials.length === 8){
+          setLimit(true);
+        }
+        setTotalData(res.data.response);
+      }
     }).catch((err)=>{
       console.log(err);
     })
@@ -192,8 +200,10 @@ const MeasurementPage = () =>{
       if(meaStart){
         setTrigger(0);
         simpleResultsRef.current.forEach((item,index)=>{
-          simpleResultsRef.current[index].disabled = true;
-          simpleResultsRef.current[index].classList += " disabled";
+          if(simpleResultsRef.current[index]){
+            simpleResultsRef.current[index].disabled = true;
+            simpleResultsRef.current[index].classList += " disabled";
+          }
         })
       }
       else{
@@ -1348,25 +1358,31 @@ useEffect(()=>
       rDataList.pop()
     }
     //---------------------------------------------------------------------------------------------------------
-
-    axios.post(`/subjects/${chartNumber}/types/fvc/measurements`, 
-    {
-      serialNumber:`${chartNumber}`,
-      bronchodilator: `${type}`,
-      // data:dataList.slice(flagTo.from, flagTo.to+1).toString().replaceAll(","," "),
-      data:rDataList.join(' ')+"000000000",
-      // date:{date}
-    },{
-      headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
-    }},
-    {withCredentials : true})
-    .then((res)=>{
-      console.log(res);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
+    if(!limit){
+      axios.post(`/subjects/${chartNumber}/types/fvc/measurements`, 
+      {
+        serialNumber:`${chartNumber}`,
+        bronchodilator: `${type}`,
+        // data:dataList.slice(flagTo.from, flagTo.to+1).toString().replaceAll(","," "),
+        data:rDataList.join(' ')+"000000000",
+        // date:{date}
+      },{
+        headers: {
+          Authorization: `Bearer ${cookies.get('accessToken')}`
+      }},
+      {withCredentials : true})
+      .then((res)=>{
+        console.log(res);
+      })
+      .catch((err)=>{
+        console.log(err);
+      })
+    }else{
+      alertRef.current.classList.add("visible");
+      setTimeout(()=> {
+        alertRef.current.classList.remove("visible");
+      }, 2000);
+    }
   }
 
   // volumeFlow 그래프 그리기
@@ -1580,14 +1596,21 @@ useEffect(()=>
   }
 
   const [saveMsg, setSaveMsg] = useState("");
-
+  const alertRef = useRef();
   const selectSave = (val)=>{
-    if(val == "confirm"){
-      setSaveMsg("검사 저장이 완료되었습니다.\n추가로 검사를 진행하고 싶다면 검사 시작 버튼을 눌러주세요.");
-      measurementEnd()
-    }
-    else{
-      setSaveMsg("검사 저장에 실패했습니다.\n검사를 다시 진행하여 저장해주세요.");
+    if(!limit){
+      if(val == "confirm"){
+        setSaveMsg("검사 저장이 완료되었습니다.\n추가로 검사를 진행하고 싶다면 검사 시작 버튼을 눌러주세요.");
+        measurementEnd()
+      }
+      else{
+        setSaveMsg("검사 저장에 실패했습니다.\n검사를 다시 진행하여 저장해주세요.");
+      }
+    }else{
+      alertRef.current.classList.add("visible");
+      setTimeout(()=> {
+        alertRef.current.classList.remove("visible");
+      }, 2000);
     }
     measureFin();
   }
@@ -1623,32 +1646,56 @@ useEffect(()=>
     setGraphOnOff([...graphOnOff].fill(0))
   }
 
-
+  const [backStat, setBackStat] = useState(false);
+  let backConfirmFunc = (val)=>{
+    if(val=="confirm"){
+      navigatorR("/memberList");
+    }
+    else if(val=="cancel"){
+      setBackStat(false);
+    }
+  }
+  useEffect(()=>{
+    console.log(limit)
+  },[limit])
   return(
     <div className="measurement-page-container">
+      {<Alert inputRef={alertRef} contents={"검사 저장에 실패했습니다.\n폐기능 검사는 하루 최대 8회 까지만 검사할 수 있습니다.."}/>}
       {saveGAlert ? <Confirm content={"검사를 저장하시려면 확인 버튼을 눌러주세요.\n해당 검사를 취소하고 싶다면 취소 버튼을 눌러주세요."} btn={true} onOff={setSaveGAlert} select={selectSave}/> : null}
       {saveBAlert ? <Confirm content={`${strongTime}초 이상 강하게 호흡을 불지 않아, 유효하지 않은 검사입니다.\n그대로 검사를 저장하시겠습니까?`} btn={true} onOff={setSaveBAlert} select={selectSave}/> : null}
       {confirmStat ? <Confirm content="검사를 시작하시겠습니까?" btn={true} onOff={setConfirmStat} select={confirmFunc}/> : null}
       {disconnectStat ? <Confirm content={"연결된 Spirokit기기가 없습니다.\n설정 페이지로 이동해서 Spirokit을 연결해주세요."} btn={true} onOff={setDisconnectStat} select={disconnectConfirmFunc}/> : null}
+      {backStat ? <Confirm content={"환자선택 화면으로 돌아가시겠습니까?"} btn={true} onOff={setBackStat} select={backConfirmFunc}/> : null}
       {readyAlert ? <Confirm content={"SpiroKit 동작 준비 중 입니다.\n잠시만 기다려주세요."} btn={false} onOff={setReadyAlert} select={confirmFunc}/> : null}
-        <div className="measurement-page-nav" onClick={()=>{console.log()}}>
-          <div className='measurement-page-backBtn' onClick={()=>{navigatorR(-1)}}>
+        <div className="measurement-page-nav">
+          <div className='measurement-page-backBtn' onClick={()=>{setBackStat(true)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6"}} />
           </div>
-          <p onClick={()=>{
-            // console.log(txCharRef.current);
-            // console.log(location.state.info);
-            measurementEnd()
-          }}>{location.state.name}</p>
-          <div ref={blueIconRef} className="device-connect" onClick={()=>{navigatorR("/setting")}}>
-              {
-                noneDevice ?
-                  <p>연결되지 않음</p>
-                  :
-                  <p>연결됨</p>
-              }
-              <FaBluetoothB/>
+          <p>{location.state.name}</p>
+          <div className='graph-status-container'>
+            <div className='error'>
+                  <span>Error Code </span>
+                  {
+                      <span className='error-data'>{totalData == " " || totalData == "Empty resource" || !totalData  ? '-': totalData.diagnosis.errorCode}</span>
+                  }
+                </div>
+                <div className='grade'>
+                  <span>Grade </span>
+                  {
+                      <span className='grade-data'>{totalData == " " || totalData == "Empty resource" || !totalData  ? '-': totalData.diagnosis.suitability}</span>
+                  }
+                  
+                </div>
+            <div ref={blueIconRef} className="device-connect" onClick={()=>{navigatorR("/setting")}}>
+                {
+                  noneDevice ?
+                    <p>연결되지 않음</p>
+                    :
+                    <p>연결됨</p>
+                }
+                <FaBluetoothB/>
             </div>
+          </div>
         </div>
 
       

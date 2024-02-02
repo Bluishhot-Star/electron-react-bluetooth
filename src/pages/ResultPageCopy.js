@@ -251,9 +251,7 @@ useEffect(()=>{
   },[totalData])
 
   useEffect(()=>{
-    console.log(simpleResultsRef)
-
-    if(FvcSvc=="fvc" && simpleResultsRef.current.length !== 0){
+    if(FvcSvc=="fvc" && simpleResultsRef.current[0]){
       graphOnOff.forEach((item, index)=>{
         if(item == 1){
           simpleResultsRef.current[index].classList+=" selected";
@@ -261,7 +259,7 @@ useEffect(()=>{
         }
         else{
           if(simpleResultsRef.current[index].classList.contains("selected")){
-            simpleResultsRef.current[index].classList.remove("selected");
+            simpleResultsRef[index].classList.remove("selected");
           }
         }
       })
@@ -269,7 +267,7 @@ useEffect(()=>{
   },[graphOnOff])
   
   useEffect(()=>{
-    if(FvcSvc=="svc"){
+    if(FvcSvc=="svc" && svcSimpleResultsRef.current[0]){
       svcGraphOnOff.forEach((item, index)=>{
       if(item == 1){
           svcSimpleResultsRef.current[index].classList+=" selected";
@@ -1189,7 +1187,7 @@ useEffect(()=>{
                   </div>
                   ))
                 :
-                totalData.svc === "Empty resource" ? <div>비어있음</div>:
+                totalData.svc === "Empty resource" ? null:
                 totalData.svc.trials.map((item, index)=>(
                   <div ref={(el)=>{svcSimpleResultsRef.current[index]=el}} onClick={()=>{console.log(svcSimpleResultsRef.current[index]);console.log(item.measurementId);selectSvcGraph(index)}} key={item.measurementId}  className='simple-result-container'>
                     <div className='simple-result-title-container'>
