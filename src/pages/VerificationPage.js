@@ -57,6 +57,7 @@ const VerificationPage = () =>{
   
   // 세션 카운트
   const [sessionCount, setSessionCount] = useState(0);
+  
 
   // in<->out flip
   let inOutFlip = (val) =>{
@@ -1245,8 +1246,9 @@ const [calivration,setCalivration] = useState({
   },[verify])
   //capture
   const onCapture = () =>{
+    
     console.log("onCapture");
-    html2canvas(document.getElementsByClassName('App')).then((canvas)=>{
+    html2canvas(document.body).then((canvas)=>{
       let now = new Date();
       const month = now.getMonth()+1 < 10 ? "0"+(now.getMonth()+1) : now.getMonth()+1;
       const date = now.getDate() < 10 ? "0"+now.getDate() : now.getDate();
