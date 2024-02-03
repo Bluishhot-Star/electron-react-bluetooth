@@ -335,11 +335,18 @@ useEffect(()=>
 
 
   // 노력성 호기 전 호흡 횟수 등 쿠키에서 받아오기
-  let breathCount = 3;
-  let strongTime = 6;
-  let stopTime = 15;
-  
+  const [breathCount,setBreathCount] = useState(3);
+  const [strongTime,setStrongTime] = useState(6);
+  const [stopTime,setStopTime] = useState(15);
+  useEffect(()=>{
+    if(cookies.get('manageRate') !==undefined){
+      setBreathCount(cookies.get('manageRate'));
 
+    }
+    if(cookies.get('manageTime') !== undefined){
+      setStrongTime(cookies.get('manageTime'));
+    }
+  },[]);
   // 검사 종료 여부
   const [measureDone, setMeasureDone] = useState(false);
 
@@ -676,9 +683,10 @@ useEffect(()=>
 
   const dataCalculateStrategyE = new DataCalculateStrategyE();
 
-  const inhaleCoefficient = 1.0364756559407444; // 흡기 계수 (API에서 가져올 예정)
-  const exhaleCoefficient = 1.0581318835872322; // 호기 계수
-
+  // 호기 계수
+  const [exhaleCoefficient,setExhaleCoefficient] = useState(1);
+  // 흡기 계수 (API에서 가져올 예정)
+  const [inhaleCoefficient,setInhaleCoefficient] = useState(1);
 
   const [dataResult, setDataResult] = useState([]);
   // 기기 없음 메세지
@@ -715,6 +723,23 @@ useEffect(()=>
   // time-volume 그래프 좌표
   // const [timeVolumeList, setTimeVolumeList] = useState([]);
 
+//-----------------------------------------------------------------------------------------------
+useEffect(()=>{
+  if(cookies.get('serialNum') !== undefined){
+    const serial = cookies.get('serialNum');
+    axios.get(`/devices/${serial}/gain` , {
+      headers: {
+        Authorization: `Bearer ${cookies.get('accessToken')}`
+      }
+    }).then((res)=>{
+      setExhaleCoefficient(res.data.response.gain.exhale);
+      setInhaleCoefficient(res.data.response.gain.inhale)
+    }).catch((err)=>{
+      console.log(err);
+    })
+  }
+},[])
+  
 //----------------------------------------------------------------------------------------------- 111111
 
   // 기기 연결 여부 검사

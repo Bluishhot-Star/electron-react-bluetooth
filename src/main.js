@@ -220,6 +220,31 @@ ipcMain.on("getConnectedDevice", (event, args)=>{
 })
 
 
+ipcMain.on('setRefreshToken', (event, data)=>{
+  session.defaultSession.cookies.set({
+    url : "http://localhost:3000", // 기본적으로 입력 해주어야함
+    name : "refreshToken",
+    value : data.refreschToken,
+    httpOnly : true, // client에서 쿠키를 접근함을 방지하기위해 설정 ( 보안 설정 )
+    expriationDtae : data.refreschTokenDate // 쿠키 만료 시간 설정
+  })
+})
+ipcMain.on('setAccessToken', (event, data)=>{
+  session.defaultSession.cookies.set({
+    url : "http://localhost:3000", // 기본적으로 입력 해주어야함
+    name : "accessToken",
+    value : data.accessToken,
+    httpOnly : true, // client에서 쿠키를 접근함을 방지하기위해 설정 ( 보안 설정 )
+    expriationDtae : data.accessTokenDate // 쿠키 만료 시간 설정
+  })
+})
+ipcMain.on('get-cookies', (event, arg) => {
+  session.defaultSession.cookies.get({}).then((cookies) => {
+    console.log(cookies)
+    event.returnValue = cookies
+  })
+})
+
 // app.on('ready', createWindow);
 
 app.whenReady().then(() => {

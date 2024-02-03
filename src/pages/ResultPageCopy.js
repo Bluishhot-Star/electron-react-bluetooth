@@ -253,6 +253,7 @@ useEffect(()=>{
   useEffect(()=>{
     if(FvcSvc=="fvc" && simpleResultsRef.current[0]){
       graphOnOff.forEach((item, index)=>{
+        console.log("adsf")
         if(item == 1){
           simpleResultsRef.current[index].classList+=" selected";
           simpleResultsRef.current[index].style+="";

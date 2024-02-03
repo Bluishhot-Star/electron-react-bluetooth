@@ -17,6 +17,7 @@ const SettingPage = () =>{
   let deviceInfo = useSelector((state) => state.deviceInfo )
   const cookiess = new Cookies();
   const [cookies, setCookie] = useCookies();
+  const date= new Date();
   let navigatorR = useNavigate();
 
   const logOut = () => {
@@ -33,7 +34,8 @@ const SettingPage = () =>{
   }
 
   const backToMemberList = async ()=>{
-    await setCookie('device', device, {secure:"true"}).then(
+    date.setFullYear(2100);
+    await setCookie('device', device, {expires:date,secure:"true"}).then(
       (res)=>{
         console.log(res);
         navigatorR(-1);

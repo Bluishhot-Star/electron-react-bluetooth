@@ -10,7 +10,7 @@ const LoginForm = () =>{
     password: "",
   });
   const [cookies, setCookie, removeCookie] = useCookies();
-
+  // const cookies = window.api.get("get-cookies");
   const [error, setError] = useState(undefined);
   const accessExpires = new Date();
   const refreshExpires = new Date();
@@ -30,6 +30,18 @@ const LoginForm = () =>{
     },{withCredentials : true})
     .then((res)=>{
       // 쿠키에 토큰 저장
+
+//   accessExpires.setMinutes(accessExpires.getMinutes() + 14);
+      // refreshExpires.setDate(refreshExpires.getDate()+7);
+      //   const data = {
+      //     refreschToken : res.data.response.refreshToken,
+      //     refreschTokenDate : refreshExpires,
+      //     accessToken : res.data.response.accessToken,
+      //     accessTokenDate : accessExpires
+      //   }
+      //   window.api.send("setRefreshToken", data);
+      //   window.api.send("setAccessToken", data);
+
       console.log(res);
       accessExpires.setMinutes(accessExpires.getMinutes() + 14);
       setCookie("accessToken", res.data.response.accessToken,{expires : accessExpires, secure:"true"});
@@ -101,6 +113,16 @@ const LoginForm = () =>{
         accessExpires.setMinutes(accessExpires.getMinutes() + 14);
         cookie.set('accessToken',res.data.response.accessToken,{expires : accessExpires,secure:"true"});
         navigate('/memberList', {state: {device:undefined}});
+
+
+      
+
+      // accessExpires.setMinutes(accessExpires.getMinutes() + 14);
+      //   const data = {
+      //     accessToken : res.data.response.accessToken,
+      //     accessTokenDate : accessExpires
+      //   }
+      //   window.api.send("setAccessToken", data);
       }).catch((err)=>{
         console.log(err);
         // window.location.replace('/');
