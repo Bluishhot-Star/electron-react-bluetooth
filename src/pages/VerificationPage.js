@@ -1119,109 +1119,112 @@ const [calivration,setCalivration] = useState({
   const verification = ()=>{
     let rDataList = [];
     rawDataList.map((num)=>rDataList.push(String(num).padStart(9, "0"))) 
-    axios.post(`/devices/000001/verify`, 
-    {
-      data:rDataList.join(' '),
-    },{
-      headers: {
-        Authorization: `Bearer ${cookie.get('accessToken')}`
-    }},
-    {withCredentials : true})
-    .then((res)=>{
-      console.log(res.data.response);
-      // setCalivration(res.data.response);
-      // setVolumeFlowList(res.data.response.volumeFlow);
-      // let passList = new Object();
-      console.log(volumeFlowList);
-      let veri = [];
-      res.data.response.verify.map((value,index)=>{
-        
-        if(value.strength === 'LOW'){
+    if(cookies.get('serialNum') !== undefined){
+      axios.post(`/devices/${cookies.get('serialNum')}/verify`, 
+      {
+        data:rDataList.join(' '),
+      },{
+        headers: {
+          Authorization: `Bearer ${cookie.get('accessToken')}`
+      }},
+      {withCredentials : true})
+      .then((res)=>{
+        console.log(res.data.response);
+        // setCalivration(res.data.response);
+        // setVolumeFlowList(res.data.response.volumeFlow);
+        // let passList = new Object();
+        console.log(volumeFlowList);
+        let veri = [];
+        res.data.response.verify.map((value,index)=>{
           
-          if(Math.sign(value.flow) === -1){
-            console.log('low')
-            pass["firstM"] = value.pass;
-            console.log(getGainVolume(res.data.response.graph.volumeFlow,value.flow))
-            veri = {
-              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
-              flow : value.flow, 
-              error:value.error
+          if(value.strength === 'LOW'){
+            
+            if(Math.sign(value.flow) === -1){
+              console.log('low')
+              pass["firstM"] = value.pass;
+              console.log(getGainVolume(res.data.response.graph.volumeFlow,value.flow))
+              veri = {
+                volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+                flow : value.flow, 
+                error:value.error
+              }
+              verify.push(veri);
+            }else{
+              console.log('low')
+              pass["firstP"] = value.pass;
+              veri = {
+                volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+                flow : value.flow, 
+                error:value.error,
+                pass:value.pass
+              }
+              verify.push(veri);
+  
             }
-            verify.push(veri);
-          }else{
-            console.log('low')
-            pass["firstP"] = value.pass;
-            veri = {
-              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
-              flow : value.flow, 
-              error:value.error,
-              pass:value.pass
-            }
-            verify.push(veri);
-
           }
-        }
-        else if(value.strength === 'MID'){
-          console.log('mid')
-          if(Math.sign(value.flow) === -1){
-            pass["secondM"] = value.pass;
-            veri = {
-              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
-              flow : value.flow, 
-              error:value.error,
-              pass:value.pass
+          else if(value.strength === 'MID'){
+            console.log('mid')
+            if(Math.sign(value.flow) === -1){
+              pass["secondM"] = value.pass;
+              veri = {
+                volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+                flow : value.flow, 
+                error:value.error,
+                pass:value.pass
+              }
+              verify.push(veri);
+  
+            }else{
+              pass["secondP"] = value.pass;
+              veri = {
+                volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+                flow : value.flow, 
+                error:value.error,
+                pass:value.pass
+              }
+              verify.push(veri);
+  
+  
             }
-            verify.push(veri);
-
-          }else{
-            pass["secondP"] = value.pass;
-            veri = {
-              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
-              flow : value.flow, 
-              error:value.error,
-              pass:value.pass
+          }else if(value.strength === 'HIGH'){
+            console.log('high')
+            if(Math.sign(value.flow) === -1){
+              pass["thirdM"] = value.pass;
+              veri = {
+                volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+                flow : value.flow, 
+                error:value.error,
+                pass:value.pass
+              }
+              console.log(veri)
+              verify.push(veri);
+  
+  
+            }else{
+              pass["thirdP"] = value.pass;
+              veri = {
+                volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
+                flow : value.flow, 
+                error:value.error,
+                pass:value.pass
+              }
+              verify.push(veri);
+  
             }
-            verify.push(veri);
-
-
           }
-        }else if(value.strength === 'HIGH'){
-          console.log('high')
-          if(Math.sign(value.flow) === -1){
-            pass["thirdM"] = value.pass;
-            veri = {
-              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
-              flow : value.flow, 
-              error:value.error,
-              pass:value.pass
-            }
-            console.log(veri)
-            verify.push(veri);
-
-
-          }else{
-            pass["thirdP"] = value.pass;
-            veri = {
-              volume : getGainVolume(res.data.response.graph.volumeFlow,value.flow), 
-              flow : value.flow, 
-              error:value.error,
-              pass:value.pass
-            }
-            verify.push(veri);
-
-          }
-        }
+        })
+  
+        setPass(pass);
+        setApply(true);
+        console.log(pass);
+        setVerify(verify);
+        
       })
-
-      setPass(pass);
-      setApply(true);
-      console.log(pass);
-      setVerify(verify);
-      
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
+      .catch((err)=>{
+        console.log(err);
+      })
+    }
+    
   }
   //-------------------------------------------
   const deleteee = () => {

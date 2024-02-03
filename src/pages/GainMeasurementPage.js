@@ -1151,25 +1151,28 @@ const [calivration,setCalivration] = useState({
     let rDataList = [];
     
     rawDataList.map((num)=>rDataList.push(String(num).padStart(9, "0"))) 
-    axios.post(`/devices/000255/calibrations`, 
-    {
-      temperature: state.temperature,
-      humidity: state.humidity,
-      pressure: state.pressure,
-      data:rDataList.join(' '),
-    },{
-      headers: {
-        Authorization: `Bearer ${cookie.get('accessToken')}`
-    }},
-    {withCredentials : true})
-    .then((res)=>{
-      console.log(res.data.response.calibrationId);
-      fourTBtnRef.current.classList.remove("disabled")
-      setCalivration(res.data.response);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
+    if(cookie.get('serialNum') !== undefined){
+      axios.post(`/devices/${cookie.get('serialNum')}/calibrations`, 
+      {
+        temperature: state.temperature,
+        humidity: state.humidity,
+        pressure: state.pressure,
+        data:rDataList.join(' '),
+      },{
+        headers: {
+          Authorization: `Bearer ${cookie.get('accessToken')}`
+      }},
+      {withCredentials : true})
+      .then((res)=>{
+        console.log(res.data.response.calibrationId);
+        fourTBtnRef.current.classList.remove("disabled")
+        setCalivration(res.data.response);
+      })
+      .catch((err)=>{
+        console.log(err);
+      })
+    }
+    
   }
   //----------------------------------------------
   //캘리브레이션 폐기
