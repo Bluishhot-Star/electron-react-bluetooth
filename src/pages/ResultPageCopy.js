@@ -260,7 +260,7 @@ useEffect(()=>{
         }
         else{
           if(simpleResultsRef.current[index].classList.contains("selected")){
-            simpleResultsRef[index].classList.remove("selected");
+            simpleResultsRef.current[index].classList.remove("selected");
           }
         }
       })
