@@ -34,7 +34,7 @@ const SettingPage = () =>{
   }
 
   const backToMemberList = async ()=>{
-    date.setFullYear(2100);
+    
     await setCookie('device', device, {expires:date,secure:"true"}).then(
       (res)=>{
         console.log(res);
@@ -337,7 +337,8 @@ window.api.receive("connectedBLEDevice", (data)=>{
   let serialFunc = async (val, data)=>{
     if(val=="confirm"){
       setSerialNum(data);
-      await setCookie("serialNum", data,{secure:"true"});
+      date.setFullYear(2100);
+      await setCookie("serialNum", data,{expires:date,secure:"true"});
       setDeviceSerialSetting(true);
     }
   }
