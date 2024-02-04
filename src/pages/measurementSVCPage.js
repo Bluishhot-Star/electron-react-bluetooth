@@ -53,7 +53,8 @@ const MeasurementSVCPage = () =>{
   const[timeVolume,setTimeVolume] = useState([]);
   const [trigger, setTrigger] = useState(-1);
 
-
+  //횟수 제한
+  const [limit,setLimit] = useState(false);
     
   //svc그래프
   const[svcGraph,setSvcGraph] = useState([]);
@@ -105,7 +106,12 @@ const MeasurementSVCPage = () =>{
       if(res.data.subCode === 2004){ 
         setTotalData(res.data.message);
       }
-      else setTotalData(res.data.response);
+      else {
+        if(res.data.response.trials.length === 8){
+          setLimit(true);
+        }
+        setTotalData(res.data.response);
+      }
     }).catch((err)=>{
       console.log(err);
     })
@@ -299,9 +305,18 @@ const MeasurementSVCPage = () =>{
 
 
   // 노력성 호기 전 호흡 횟수 등 쿠키에서 받아오기
-  let breathCount = 3;
-  let strongTime = 6;
-  let stopTime = 15;
+  const [breathCount,setBreathCount] = useState(3);
+  const [strongTime,setStrongTime] = useState(6);
+  const [stopTime,setStopTime] = useState(15);
+  useEffect(()=>{
+    if(cookies.get('manageRate') !==undefined){
+      setBreathCount(cookies.get('manageRate'));
+
+    }
+    if(cookies.get('manageTime') !== undefined){
+      setStrongTime(cookies.get('manageTime'));
+    }
+  },[]);
   
 
   // 검사 종료 여부
@@ -640,8 +655,10 @@ const MeasurementSVCPage = () =>{
 
   const dataCalculateStrategyE = new DataCalculateStrategyE();
 
-  const inhaleCoefficient = 1.0364756559407444; // 흡기 계수 (API에서 가져올 예정)
-  const exhaleCoefficient = 1.0581318835872322; // 호기 계수
+  // 호기 계수
+  const [exhaleCoefficient,setExhaleCoefficient] = useState(1);
+  // 흡기 계수 (API에서 가져올 예정)
+  const [inhaleCoefficient,setInhaleCoefficient] = useState(1);
 
   // 기기 없음 메세지
   const [noneDevice, setNoneDevice] = useState(false);
@@ -675,6 +692,22 @@ const MeasurementSVCPage = () =>{
   // time-volume 그래프 좌표
   // const [timeVolumeList, setTimeVolumeList] = useState([]);
 
+//-----------------------------------------------------------------------------------------------
+useEffect(()=>{
+  if(cookies.get('serialNum') !== undefined){
+    const serial = cookies.get('serialNum');
+    axios.get(`/devices/${serial}/gain` , {
+      headers: {
+        Authorization: `Bearer ${cookies.get('accessToken')}`
+      }
+    }).then((res)=>{
+      setExhaleCoefficient(res.data.response.gain.exhale);
+      setInhaleCoefficient(res.data.response.gain.inhale)
+    }).catch((err)=>{
+      console.log(err);
+    })
+  }
+},[])
 //----------------------------------------------------------------------------------------------- 111111
 
   // 기기 연결 여부 검사
@@ -1363,25 +1396,31 @@ const MeasurementSVCPage = () =>{
     // console.log(dataList.slice(flagTo.from, flagTo.to+1).toString().replaceAll(","," ")); //---------------------------------------------------------------------------------------------------------
     console.log(rDataList.join(' '))
     console.log(`${chartNumber}|${type}`)
-
-    axios.post(`/subjects/${chartNumber}/types/svc/measurements`, 
-    {
-      serialNumber:`${chartNumber}`,
-      bronchodilator: `${type}`,
-      // data:dataList.slice(flagTo.from, flagTo.to+1).toString().replaceAll(","," "),
-      data:rDataList.join(' ')+"000000000",
-      // date:{date}
-    },{
-      headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
-    }},
-    {withCredentials : true})
-    .then((res)=>{
-      console.log(res);
-    })
-    .catch((err)=>{
-      console.log(err);
-    })
+    if(!limit){
+      axios.post(`/subjects/${chartNumber}/types/svc/measurements`, 
+      {
+        serialNumber:`${chartNumber}`,
+        bronchodilator: `${type}`,
+        // data:dataList.slice(flagTo.from, flagTo.to+1).toString().replaceAll(","," "),
+        data:rDataList.join(' ')+"000000000",
+        // date:{date}
+      },{
+        headers: {
+          Authorization: `Bearer ${cookies.get('accessToken')}`
+      }},
+      {withCredentials : true})
+      .then((res)=>{
+        console.log(res);
+      })
+      .catch((err)=>{
+        console.log(err);
+      })
+    }else{
+      alertRef.current.classList.add("visible");
+      setTimeout(()=> {
+        alertRef.current.classList.remove("visible");
+      }, 2000);
+    }
   }
 
   // volumeFlow 그래프 그리기
@@ -1573,14 +1612,22 @@ const MeasurementSVCPage = () =>{
   }
 
   const [saveMsg, setSaveMsg] = useState("");
+  const alertRef = useRef();
 
   const selectSave = (val)=>{
-    if(val == "confirm"){
-      setSaveMsg("검사 저장이 완료되었습니다.\n추가로 검사를 진행하고 싶다면 검사 시작 버튼을 눌러주세요.");
-      measurementEnd()
-    }
-    else{
-      setSaveMsg("검사 저장에 실패했습니다.\n검사를 다시 진행하여 저장해주세요.");
+    if(!limit){
+      if(val == "confirm"){
+        setSaveMsg("검사 저장이 완료되었습니다.\n추가로 검사를 진행하고 싶다면 검사 시작 버튼을 눌러주세요.");
+        measurementEnd()
+      }
+      else{
+        setSaveMsg("검사 저장에 실패했습니다.\n검사를 다시 진행하여 저장해주세요.");
+      }
+    }else{
+      alertRef.current.classList.add("visible");
+      setTimeout(()=> {
+        alertRef.current.classList.remove("visible");
+      }, 2000);
     }
     measureFin();
   }
@@ -1619,6 +1666,7 @@ const MeasurementSVCPage = () =>{
 
   return(
     <div className="measurement-page-container">
+      {<Alert inputRef={alertRef} contents={"검사 저장에 실패했습니다.\n폐기능 검사는 하루 최대 8회 까지만 검사할 수 있습니다.."}/>}
       {saveGAlert ? <Confirm content={"검사를 저장하시려면 확인 버튼을 눌러주세요.\n해당 검사를 취소하고 싶다면 취소 버튼을 눌러주세요."} btn={true} onOff={setSaveGAlert} select={selectSave}/> : null}
       {saveBAlert ? <Confirm content={`${strongTime}초 이상 강하게 호흡을 불지 않아, 유효하지 않은 검사입니다.\n그대로 검사를 저장하시겠습니까?`} btn={true} onOff={setSaveBAlert} select={selectSave}/> : null}
       {confirmStat ? <Confirm content="검사를 시작하시겠습니까?" btn={true} onOff={setConfirmStat} select={confirmFunc}/> : null}

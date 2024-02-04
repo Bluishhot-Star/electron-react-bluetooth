@@ -17,6 +17,7 @@ const SettingPage = () =>{
   let deviceInfo = useSelector((state) => state.deviceInfo )
   const cookiess = new Cookies();
   const [cookies, setCookie] = useCookies();
+  const date= new Date();
   let navigatorR = useNavigate();
 
   const logOut = () => {
@@ -33,7 +34,8 @@ const SettingPage = () =>{
   }
 
   const backToMemberList = async ()=>{
-    await setCookie('device', device, {secure:"true"}).then(
+    
+    await setCookie('device', device, {expires:date,secure:"true"}).then(
       (res)=>{
         console.log(res);
         navigatorR(-1);
@@ -335,7 +337,8 @@ window.api.receive("connectedBLEDevice", (data)=>{
   let serialFunc = async (val, data)=>{
     if(val=="confirm"){
       setSerialNum(data);
-      await setCookie("serialNum", data,{secure:"true"});
+      date.setFullYear(2100);
+      await setCookie("serialNum", data,{expires:date,secure:"true"});
       setDeviceSerialSetting(true);
     }
   }

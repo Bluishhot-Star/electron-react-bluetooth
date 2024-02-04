@@ -10,11 +10,10 @@ import { MdLightbulbOutline } from "react-icons/md";
 const ManagementSetting= () =>{
     
   const cookies = new Cookies();
-  const [rate,setRate] = useState('3');
-  const [time,setTime] = useState({
-    exhaleT: 6,
-    timerE : 15
-  });
+  const [rate,setRate] = useState(cookies.get('manageRate'));
+  const [time,setTime] = useState(cookies.get('manageTime'));
+  const date= new Date();
+
 
   let navigator = useNavigate();
   const location = useLocation();
@@ -34,22 +33,65 @@ const ManagementSetting= () =>{
   const thirtySRef = useRef();
 
   useEffect(()=>{
-    threeTRef.current.checked = true;
-    sixSRef.current.checked = true;
+    console.log(cookies.get('manageTime'))
+
+    if(cookies.get('manageTime') == 3){        
+      threeSRef.current.checked = true;
+    }else if(cookies.get('manageTime') == 6){
+      sixSRef.current.checked = true;
+    }else if(cookies.get('manageTime') == 10){
+      tenSRef.current.checked = true;
+    }else if(cookies.get('manageTime') == 15){
+      fifteenSRef.current.checked = true;
+    }else if(cookies.get('manageTime') == 20){
+      twentySRef.current.checked = true;
+    }else if(cookies.get('manageTime') == 30){
+      thirtySRef.current.checked = true;
+    }else{
+      sixSRef.current.checked = true;
+    }
+
+    console.log(cookies.get('manageRate'))  
+    if(cookies.get('manageRate') === '1'){
+          
+      onceRef.current.checked = true;
+    }else if(cookies.get('manageRate') === '2'){
+      twiceRef.current.checked = true;
+
+    }else if(cookies.get('manageRate') === '3'){
+      threeTRef.current.checked = true;
+
+    }else if(cookies.get('manageRate') === '4'){
+      fourTRef.current.checked = true;
+
+    }else if(cookies.get('manageRate') === '5'){
+      fiveTRef.current.checked = true;
+
+    }else if(cookies.get('manageRate') === "6"){
+      sixTRef.current.checked = true;
+
+    }else{
+      threeTRef.current.checked = true;
+    }
+    
+    
+    
   },[])
 
   const timeF=(exhaleT,timerE)=>{
-    setTime({exhaleT:exhaleT,timerE:timerE});
+    setTime(exhaleT);
   }
   useEffect(()=>{
     cookies.remove("manageTime");
-    cookies.set('manageTime',time);
+    date.setFullYear(2100);
+    cookies.set('manageTime',time,{expires:date});
     
   },[time])
 
   useEffect(()=>{
     cookies.remove("manageRate")
-    cookies.set('manageRate',rate);
+    date.setFullYear(2100);
+    cookies.set('manageRate',rate,{expires:date});
   },[rate])
 
 
