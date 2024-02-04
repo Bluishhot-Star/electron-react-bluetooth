@@ -3571,12 +3571,15 @@ text-align: right;
   grid-template-columns: 1fr;
   grid-template-rows: 1fr 0.3fr 0.7fr;
   padding: 10px;
+  overflow: hidden;
+  justify-content: center;
 }
 .measure-gauge-container{
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  height: 100%;
 }
 .measure-gauge-container>div{
   transform: translateY(-10px);
@@ -3587,15 +3590,16 @@ text-align: right;
   text-align: center;
 }
 .measure-msg-picture{
+  width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.measure-msg-picture div{
-  width: 20vh;
-  height: 20vh;
-  border: 1px solid #000;
+.measure-msg-picture img{
+  height: 100%;
+  width: 80%;
+  max-width: 350px;
 }
 .measure-msg-container .measure-msg{
   display: inline-block;
@@ -4083,8 +4087,8 @@ text-align: right;
 }
 
 .gauge-container{
-  width: 35vh;
-  height: 35vh;
+  width: 33vh;
+  height: 33vh;
   /* width: 150px;
   height: 150px; */
   /* background: #efefef; */
