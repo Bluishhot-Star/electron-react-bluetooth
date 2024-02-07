@@ -32,7 +32,6 @@ const MeasurementPage = () =>{
 
   // const cookies = new Cookies();?
   const [accessToken,setAccessToken] = useState(window.api.get("get-cookies",'accessToken'));
-  const [refreshToken,serRefreshToken] = useState(window.api.get("get-cookies",'refreschToken'));
 
   const [setCookie] = useCookies();
   let navigatorR = useNavigate();
@@ -688,9 +687,9 @@ useEffect(()=>
   const dataCalculateStrategyE = new DataCalculateStrategyE();
 
   // 호기 계수
-  const [exhaleCoefficient,setExhaleCoefficient] = useState(1);
+  const [exhaleCoefficient,setExhaleCoefficient] = useState(0.9);
   // 흡기 계수 (API에서 가져올 예정)
-  const [inhaleCoefficient,setInhaleCoefficient] = useState(1);
+  const [inhaleCoefficient,setInhaleCoefficient] = useState(0.9);
 
   const [dataResult, setDataResult] = useState([]);
   // 기기 없음 메세지
@@ -736,6 +735,7 @@ useEffect(()=>{
         Authorization: `Bearer ${accessToken}`
       }
     }).then((res)=>{
+      console.log(res.data.response.gain)
       setExhaleCoefficient(res.data.response.gain.exhale);
       setInhaleCoefficient(res.data.response.gain.inhale)
     }).catch((err)=>{
@@ -743,6 +743,10 @@ useEffect(()=>{
     })
   }
 },[])
+useEffect(()=>{
+  console.log(exhaleCoefficient);
+  console.log(inhaleCoefficient)
+},[exhaleCoefficient,inhaleCoefficient])
   
 //----------------------------------------------------------------------------------------------- 111111
 

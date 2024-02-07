@@ -9,7 +9,6 @@ import axios from 'axios';
 import { Provider } from "react-redux";
 import deviceInfo from "./deviceInfo.js"
 const root = ReactDOM.createRoot(document.getElementById('root'));
-
 axios.interceptors.response.use(
   (res)=>{
 
@@ -17,25 +16,32 @@ axios.interceptors.response.use(
 
   },
   async (err)=>{
-
+    const refreschToken = await window.api.get("get-cookies",'refreshToken');
+    console.log(window.api.get("get-cookies",'refreshToken'));
     if(err.response.status===401){
-
-      const cookies = new Cookies();
       const accessExpires = new Date();
       await axios.post("/auth/renewal" ,{},{
         headers: {
-          Authorization: `Bearer ${cookies.get('refreshToken')}`
-      }}).then((res)=>{
+          Authorization: `Bearer ${refreschToken}`
+      }}).then(async(res)=>{
         accessExpires.setMinutes(accessExpires.getMinutes() + 14);
-        cookies.set('accessToken',res.data.response.accessToken,{expires : accessExpires,secure:"true"});
+
+        const accessTokenData = {
+          name: 'accessToken',
+          data : res.data.response.accessToken,
+          date : accessExpires
+        }
+        await window.api.send("set-cookie", accessTokenData);
       }).catch((err)=>{
         console.log(err);
         window.location.replace('/');
 
       });
+      const accessToken = await window.api.get("get-cookies",'accessToken');
+
       err.config.headers = {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${cookies.get("accessToken")}`,
+        Authorization: `Bearer ${accessToken}`,
       };
 
       // 중단된 요청을(에러난 요청)을 토큰 갱신 후 재요청
