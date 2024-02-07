@@ -4,6 +4,8 @@ import Alert from "../components/Alerts.js"
 import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+import { GrView } from "react-icons/gr";
+
 const SignUpForm = () =>{
   const [values, setValues] = useState({
     countryId: "",
@@ -409,6 +411,10 @@ const SignUpForm = () =>{
     }
   },[btnStatus])
 
+  const [passType, setPassType] = useState(false);
+  const [newPassType, setNewPassType] = useState(false);
+  const [newPassChkType, setNewPassChkType] = useState(false);
+
   return(
     <div className="signUp-page-container">
       {
@@ -476,7 +482,7 @@ const SignUpForm = () =>{
           }
           </label>
           <input
-            type="password" placeholder='비밀번호' name='user-pwd'
+            type={passType ? "text" : "password"} placeholder='비밀번호' name='user-pwd'
             ref = {passwordRef}
             onChange={(e)=>{
               let copy = values.manager
@@ -484,6 +490,7 @@ const SignUpForm = () =>{
               setValues({...values, manager: copy})}}
             value={values.manager.password}
           />
+          <GrView className='passViewIcon' onClick={()=>{setPassType(!passType)}}/>
         </div>
         <div className="signUp-field">
           <label htmlFor="reEnterPassword">
@@ -494,7 +501,7 @@ const SignUpForm = () =>{
             }
           </label>
           <input
-            type="password" name='reEnterPassword'
+            type={newPassType ? "text" : "password"} name='reEnterPassword'
             ref={reEnterPasswordRef}
             onChange={(e)=>{
               let copy = values.manager
@@ -502,6 +509,7 @@ const SignUpForm = () =>{
               setValues({...values, manager: copy})}}
             value={values.manager.reEnterPassword}
           />
+          <GrView className='passViewIcon' onClick={()=>{setNewPassType(!newPassType)}}/>
         </div>
         <div className="signUp-field">
           <label htmlFor="tel">전화번호

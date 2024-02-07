@@ -391,7 +391,7 @@ useEffect(()=>
   },[])
   
    // 세션 가이드 컨텐츠
-  const [gaugeContent, setGaugeContent] = useState()
+  const [gaugeContent, setGaugeContent] = useState(null)
 
    //흡기 선?
   const [inF, setInF] = useState(-1);
@@ -1809,19 +1809,77 @@ useEffect(()=>{
           <div className="measure-msg-container">
             {
             meaPreStart?
-              meaStart? 
-              <p className='measure-msg'>{"편하게 호흡을 시작해주세요."}</p>
+              meaStart?
+                inF == -1 ?
+                  <p className='measure-msg'>{"편하게 호흡을 시작해주세요."}</p>
+                :
+                  <>
+                    {
+                      gaugeContent ?
+                        !timerReady ?
+                            gaugeContent.r2 == "IN"?
+                              <p className='measure-msg'>{"편안히 숨을 들이쉬세요"}</p>
+                              :
+                              <p className='measure-msg'>{"편안히 숨을 내쉬세요"}</p>
+                        :
+                          timerStart ?
+                          <p className='measure-msg'>{"강하게 숨을 내쉬세요"}</p>
+                          :
+                          <p className='measure-msg'>{"크게 숨을 들이쉬세요"}</p>
+                      :
+                        <></>
+                    }
+                  </>
               :
               saveMsg ? <p className='measure-msg'>{saveMsg}</p> : <p className='measure-msg'>{"바람을 불어서 활성화해주세요."}</p>
             :
               notifyDone?
-              // <p className="measure-msg">준비중입니다...</p>
               <p></p>
               :
               <p className='measure-msg'>{noneDevice==false?"SpiroKit 연동이 완료되었습니다.\nSpiroKit 동작버튼을 켜주시고, 마우스피스 입구에 살짝 입김을 불어 검사 시작 버튼을 활성화 해주세요.":"SpiroKit 연동이 필요합니다."}</p>
             }
           </div>
-          <div className='measure-msg-picture'><div></div></div>
+          <div className='measure-msg-picture'>
+            {
+              meaPreStart?
+                meaStart?
+                  inF == -1 ?
+                    <img src={process.env.PUBLIC_URL + '/measOUT.svg'} />
+                  :
+                    <>
+                      {
+                        gaugeContent ?
+                          !timerReady ?
+                              gaugeContent.r2 == "IN"?
+                                <img src={process.env.PUBLIC_URL + '/measIN.svg'} />
+                                :
+                                <img src={process.env.PUBLIC_URL + '/measOUT.svg'} />
+                          :
+                            timerStart?
+                              <img src={process.env.PUBLIC_URL + '/measStrongOUT.svg'} />
+                            :
+                              <img src={process.env.PUBLIC_URL + '/measIN.svg'} />
+                        :
+                          <></>
+                      }
+                    </>
+                :
+                <img src={process.env.PUBLIC_URL + '/measDONE.svg'} />
+                  
+              :
+                notifyDone?
+                  <img src={process.env.PUBLIC_URL + '/measDONE.svg'} />
+                  :
+                    <>
+                      {
+                        noneDevice==false?
+                        <img src={process.env.PUBLIC_URL + '/measDONE.svg'} />
+                        :
+                        <img src={process.env.PUBLIC_URL + '/meas1.svg'} />
+                      }
+                    </>
+            }
+          </div>
         </div>
         <div className="measurement-page-right-container">
           <div className="fvc-graph-container">

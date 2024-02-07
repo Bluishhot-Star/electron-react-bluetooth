@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Cookies, useCookies } from 'react-cookie';
 import Alert from "../components/Alerts.js"
 import { Routes, Route, Link, useNavigate } from 'react-router-dom'
+import { GrView } from "react-icons/gr";
 
 const LoginForm = () =>{
   const [values, setValues] = useState({
@@ -129,7 +130,7 @@ const LoginForm = () =>{
       });
     }
   },[])
-
+  const [passType, setPassType] = useState(false);
 
   return(
     <div className="login-page-container">
@@ -155,17 +156,17 @@ const LoginForm = () =>{
         <div className="login-field">
           <label htmlFor="password">비밀번호</label>
           <input
-            type="password" name='password'
+            type={passType ? "text":"password"} name='password'
             onChange={(e)=>setValues({...values, password: e.target.value})}
             placeholder='비밀번호'
             value={values.password}
           />
+          <GrView className='passViewIcon' onClick={()=>{setPassType(!passType)}}/>
         </div>
         {error ? <p className='error'>{error}</p> : <p></p>}
         <button type='submit' className='loginBtn'>로그인</button>
         <div className='login-signUpBtn' onClick={()=>{
           setSignUpPage(true);
-          console.log("HELLLL");
         }
         }><p></p>회원가입</div>
         

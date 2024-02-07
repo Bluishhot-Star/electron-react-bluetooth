@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import Alert from "../components/Alerts.js"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronDown } from '@fortawesome/free-solid-svg-icons'
-
+import { GrView } from "react-icons/gr";
 const SubjectSetting = () =>{
   const [psw, setPsw] = useState("");
   const [newPsw, setNewPsw] = useState({
@@ -75,6 +75,10 @@ const SubjectSetting = () =>{
       // })
   }
 
+  const [passType, setPassType] = useState(false);
+  const [newPassType, setNewPassType] = useState(false);
+  const [newPassChkType, setNewPassChkType] = useState(false);
+
   return(
     <div className="subjectSetting-page-container">
       <div className="subjectSetting-page-nav">  
@@ -88,13 +92,12 @@ const SubjectSetting = () =>{
           <div className="change-password-field">
 
             <div className='password-field'>
-              <label htmlFor="password"> 현재 비밀번호
-              
-              </label>
+              <label htmlFor="password"> 현재 비밀번호</label>
               <input
-                type="password" placeholder='현재 비밀번호' name='user-pwd'
+                type={passType ? "string":"password"} placeholder='현재 비밀번호' name='user-pwd'
                 onChange={(e)=>setPsw(e.target.value)}
               />
+              <GrView className='passViewIcon' onClick={()=>{setPassType(!passType)}}/>
               <div className='password-valition'>
               {
                 pswConfirm === true ?
@@ -106,13 +109,12 @@ const SubjectSetting = () =>{
           </div>
           <div className="change-password-field">
             <div className='password-field'>
-              <label htmlFor="password"> 새로운 비밀번호
-              
-              </label>
+              <label htmlFor="password"> 새로운 비밀번호</label>
               <input
-                type="password" placeholder='변경 할 비밀번호' name='user-pwd'
+                type={newPassType ? "string":"password"} placeholder='변경 할 비밀번호' name='user-pwd'
                 onChange={(e)=>{setNewPsw({...newPsw, newPassword : e.target.value})}}
               />
+              <GrView className='passViewIcon' onClick={()=>{setNewPassType(!newPassType)}}/>
                 <div className='password-valition'>
                 {
                   newPswConfirm === false ?
@@ -133,9 +135,10 @@ const SubjectSetting = () =>{
               
             </label>
             <input
-              type="password" name='reEnterPassword' placeholder='비밀번호 확인'
+              type={newPassChkType ? "string":"password"} name='reEnterPassword' placeholder='비밀번호 확인'
               onChange={(e)=>{setNewPsw({...newPsw, confirmPassword : e.target.value})}}
             />
+            <GrView className='passViewIcon' onClick={()=>{setNewPassChkType(!newPassChkType)}}/>
             <div className='password-valition'>
               {
                 newPsw.confirmPassword === newPsw.newPassword || newPsw.confirmPassword === ""? 
