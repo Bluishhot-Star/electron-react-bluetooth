@@ -5299,7 +5299,7 @@ text-align: right;
   /* overflow-x: auto;
   overflow-y: auto; */
   display: grid;
-  grid-template-rows: 9.3% 5% 2.5% 3.3% 2.7% 18.5% 2.4% 20% 28.3% 0.6% 2.4%;
+  grid-template-rows: 9.3% 5% 2.5% 3.3% 2.7% 18.5% 2.4% 20% 26% 3% 2.4%;
 }
 .report{
   width: 950px;
@@ -5394,13 +5394,28 @@ text-align: right;
 }
 .third-chart-right{
   display: grid;
-  grid-template-columns: 49% 51%;
+  grid-template-columns: 48% 52%;
+  overflow: hidden;
   
 }
+.third-chart-right .volum-flow{
+  background-color: #fff;
+  margin-top: 37px;
+}
+.third-chart-right .time-volum{
+  background-color: #fff;
+  margin-top: 37px;
+}
+
 .third-chart-right-svc{
   display: grid;
   /* grid-template-columns: 50% 50%; */
+  overflow: hidden;
   
+}
+.third-chart-right-svc .volum-flow{
+  background-color: #fff;
+  margin-top: 40px;
 }
 
 .fourth-chart{
@@ -5439,6 +5454,9 @@ text-align: right;
   margin-left: 3%;
   margin-right: 3%;
 }
+.fifth-chart .column-line{
+  background-color: #fff;
+}
 .fifth-chart .column-line:nth-child(2){
   margin-left: 7px;
 }
@@ -5457,6 +5475,21 @@ text-align: right;
 .fifth-chart .column-line:nth-child(8){
   margin-left: 7px;
 }
+
+.fifth-chart .column-line .pre-tirial-container{
+  position: absolute;
+}
+.fifth-chart .pre-tirial{
+  position: relative;
+  font-size: 8px;
+  font-weight: 500;
+}
+.fifth-chart .column-line .pre-tirial{
+  left: 82px;
+}
+
+
+
 .report-title-container{
   display: grid;
   grid-template-columns: 33.5% 33% 33.5%

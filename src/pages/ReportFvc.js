@@ -165,6 +165,13 @@ useEffect(()=>{
       legend: {
           display: false,
       },
+      title: {
+        display: true,
+        text: 'Volum(L) - Flow(L/s) graph',
+        font: {
+          size: 10
+        },
+      },
       resizeDelay:0,
       datalabels: false,
       annotation: {
@@ -193,7 +200,7 @@ useEffect(()=>{
     },
     layout: {
       padding: {
-        top: 42,
+        // top: 21,
         bottom:22,
         
       }
@@ -216,6 +223,10 @@ useEffect(()=>{
           autoSkip: false,
           beginAtZero: false,
           fontSize :14,
+          font: {
+            size: 8,
+            
+          },
           
           // max: 12.0,
         },
@@ -239,9 +250,13 @@ useEffect(()=>{
           major: true,
           beginAtZero: true,
           stepSize : 1,
-          fontSize : 3,
+          font: {
+            size: 8,
+            
+          },
           textStrokeColor: 10,
           precision: 1,
+
         },
         grid:{
           color: 'rgba(211, 211, 211, 1)',
@@ -347,6 +362,12 @@ useEffect(()=>{
       },
       legend: {
           display: false
+      },title: {
+        display: true,
+        text: 'Time(s) - Volume(L) graph',
+        font: {
+          size: 10
+        },
       },
       resizeDelay:0,
       datalabels: false,
@@ -368,9 +389,8 @@ useEffect(()=>{
     
     responsive: true,
     layout: {
-      padding: {
-        top: 42,
-        bottom:18
+      padding:{
+        bottom:22
       }
     },
     animation:{
@@ -392,7 +412,11 @@ useEffect(()=>{
         min: 0,
         suggestedMax: 3,
         ticks:{
-          stepSize : .5,
+          font: {
+            size: 8,
+            
+          },
+          stepSize : 1,
           beginAtZero: false,
           max: 12.0,
           autoSkip: false,
@@ -415,6 +439,10 @@ useEffect(()=>{
         suggestedMax:3.3,
         // suggestedMin:-6,
         ticks: {
+          font: {
+            size: 8,
+            
+          },
           major: true,
           beginAtZero: true,
           stepSize : .5,
@@ -436,6 +464,16 @@ useEffect(()=>{
       legend: {
           display: false,
           
+      },annotation: {
+        annotations: {
+            box1: {
+                drawTime: 'beforeDraw',
+                type: 'box',
+                // yMin: 0.9,//
+                // yMax: 1.2,
+                backgroundColor: '#fff'
+            }
+        },
       },
       resizeDelay:0,
       datalabels: false,
@@ -449,7 +487,7 @@ useEffect(()=>{
       padding: {
         top: 17,
         right : 30,
-        // bottom:0
+        bottom:10
       }
     },
     maintainAspectRatio: false,
@@ -466,12 +504,18 @@ useEffect(()=>{
         // max: parseInt(Math.max(...tvMax)),
 
         ticks:{
+          font: {
+            size: 8,
+            
+          },
           autoSkip: false,
           beginAtZero: false,
           // max: 12.0,
         },
         grid:{
-          color: 'rgba(0, 0, 0, 0)'
+          color: 'rgba(211, 211, 211, 1)',
+          lineWidth:2,
+          tickWidth:0
         }
       },
       y: {
@@ -482,6 +526,10 @@ useEffect(()=>{
         // min: -9,
         grace:"8%",
         ticks: {
+            font: {
+              size: 8,
+              
+            },
           major: true,
           beginAtZero: true,
           stepSize : 1,
@@ -490,7 +538,9 @@ useEffect(()=>{
           precision: 1,
         },
         grid:{
-          color: 'rgba(0, 0, 0, 0)'
+          color: 'rgba(211, 211, 211, 1)',
+          lineWidth:2,
+          tickWidth:0
         }
       },
     },
@@ -555,13 +605,20 @@ useEffect(()=>{
       console.log(state.data.fvcSvc.trials.length)
       if(i < state.data.fvcSvc.trials.length){
         result.push(
-          <div className='column-line' >
+          <div className='column-line'>
+            <div className='pre-tirial-container'>
+              <div className='pre-tirial'>Pre Tirial {i+1}</div>
+            </div>
             {temp?<Scatter style={graphStyle} ref={chartRef}  data={graphData3(i)} options={graphOption3}/>:<p className='loadingBG'>화면 조정 중..</p>}
           </div>
         );
       }else{
         result.push(
           <div className='column-line'>
+            <div className='pre-tirial-container'>
+              <div className='pre-tirial'>Pre Tirial {i+1}</div>
+            </div>
+            {temp?<Scatter style={graphStyle} ref={chartRef}  data={graphData3(9)} options={graphOption3}/>:<p className='loadingBG'>화면 조정 중..</p>}
           </div>
         );
       }
@@ -571,11 +628,13 @@ useEffect(()=>{
   };
   
   const graphData3 = (i) =>{
+
     let dataset = []
+
     dataset.push(
       {
         label: "",
-        data: state.data.fvcSvc.trials[i].graph.volumeFlow,
+        data: i != 9 ? state.data.fvcSvc.trials[i].graph.volumeFlow : [{x:0,y:0}],
         borderColor: 'rgb(255,0,0)',
         borderWidth: 2.5,
         backgroundColor: 'rgb(0,0,0)',
@@ -830,6 +889,8 @@ useEffect(()=>{
 
           </div>
           <div className='fifth-chart'>
+
+
             {fifthRendering()}
           </div>
           <div></div>

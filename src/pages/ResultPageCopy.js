@@ -1080,7 +1080,7 @@ useEffect(()=>{
                   :  
                     <div onClick={()=>{
                       // setViewer(!viewer)
-                      navigator('./reportSvc', {data: rep})
+                      navigator('./reportSvc', {state :{data: rep}})
                     }}><BiSolidFileJpg className='jpgIcon'/>다운로드</div>
               }
               <button ref={FVCBtnRef} onClick={()=>{changeType("fvc")}} id="clickme" className="FVC-btn">FVC</button>
