@@ -9,9 +9,9 @@ import { Routes, Route, Link, useNavigate,useLocation } from 'react-router-dom'
 import { MdLightbulbOutline } from "react-icons/md";
 const ManagementSetting= () =>{
     
-  const cookies = new Cookies();
-  const [rate,setRate] = useState(cookies.get('manageRate'));
-  const [time,setTime] = useState(cookies.get('manageTime'));
+  // const cookies = new Cookies();
+  const [rate,setRate] = useState(window.api.get("get-cookies","manageRate"));
+  const [time,setTime] = useState(window.api.get("get-cookies","manageTime"));
   const date= new Date();
 
 
@@ -33,41 +33,41 @@ const ManagementSetting= () =>{
   const thirtySRef = useRef();
 
   useEffect(()=>{
-    console.log(cookies.get('manageTime'))
+    console.log(time)
 
-    if(cookies.get('manageTime') == 3){        
+    if(time == 3){        
       threeSRef.current.checked = true;
-    }else if(cookies.get('manageTime') == 6){
+    }else if(time == 6){
       sixSRef.current.checked = true;
-    }else if(cookies.get('manageTime') == 10){
+    }else if(time == 10){
       tenSRef.current.checked = true;
-    }else if(cookies.get('manageTime') == 15){
+    }else if(time == 15){
       fifteenSRef.current.checked = true;
-    }else if(cookies.get('manageTime') == 20){
+    }else if(time == 20){
       twentySRef.current.checked = true;
-    }else if(cookies.get('manageTime') == 30){
+    }else if(time == 30){
       thirtySRef.current.checked = true;
     }else{
       sixSRef.current.checked = true;
     }
 
-    console.log(cookies.get('manageRate'))  
-    if(cookies.get('manageRate') === '1'){
+    console.log(rate)  
+    if(rate === '1'){
           
       onceRef.current.checked = true;
-    }else if(cookies.get('manageRate') === '2'){
+    }else if(rate === '2'){
       twiceRef.current.checked = true;
 
-    }else if(cookies.get('manageRate') === '3'){
+    }else if(rate === '3'){
       threeTRef.current.checked = true;
 
-    }else if(cookies.get('manageRate') === '4'){
+    }else if(rate === '4'){
       fourTRef.current.checked = true;
 
-    }else if(cookies.get('manageRate') === '5'){
+    }else if(rate === '5'){
       fiveTRef.current.checked = true;
 
-    }else if(cookies.get('manageRate') === "6"){
+    }else if(rate === "6"){
       sixTRef.current.checked = true;
 
     }else{
@@ -82,16 +82,29 @@ const ManagementSetting= () =>{
     setTime(exhaleT);
   }
   useEffect(()=>{
-    cookies.remove("manageTime");
+
     date.setFullYear(2100);
-    cookies.set('manageTime',time,{expires:date});
-    
+    const manageTimeData = {
+      name: 'manageTime',
+      data : `${time}`,
+      date : date
+    }
+    window.api.send("set-cookie", manageTimeData);
+    console.log(typeof(manageTimeData.data))
+
   },[time])
 
   useEffect(()=>{
-    cookies.remove("manageRate")
+    console.log(typeof(rate))
     date.setFullYear(2100);
-    cookies.set('manageRate',rate,{expires:date});
+    const manageRateData = {
+      name: 'manageRate',
+      data : rate,
+      date : date
+    }
+    window.api.send("set-cookie", manageRateData);
+
+
   },[rate])
 
 

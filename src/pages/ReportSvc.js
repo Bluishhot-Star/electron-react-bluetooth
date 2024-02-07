@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect} from 'react';
 import axios from 'axios';
-import {Cookies, useCookies } from 'react-cookie';
 // import background from "../../public/FVC_v6_page-0001.jpg";
 import { registerables,Chart as ChartJS,RadialLinearScale,LineElement,Tooltip,Legend} from 'chart.js';
 import { Scatter } from 'react-chartjs-2';
@@ -11,12 +10,14 @@ import img from '../img/SVC_v5.svg'
 
 
 
-const ReportSvc = (state)=>{
+const ReportSvc = ()=>{
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
     let navigatorR = useNavigate();
     const location = useLocation();
     const[volumeFlow,setVolumeFlow] = useState([]);
-    // const state = location.state;
+    const state = location.state;
+    console.log(state)
+
     const [top,setTop] = useState({
       name : '',
       age : 0,
@@ -37,7 +38,6 @@ const ReportSvc = (state)=>{
       
 //capture
 useEffect(()=>{
-    console.log(state)
     if(state.data.fvcSvc !== "Empty resource"){
       let race = 'Other'
       if(state.data.fvcSvc.subject.race === '0'){
@@ -72,7 +72,7 @@ useEffect(()=>{
   if(top.name !== ''){
     setTimeout(()=>{
 
-      onCapture();
+      // onCapture();
     },1200)
   }
 },[top])
@@ -105,8 +105,8 @@ useEffect(()=>{
   //graph
   const chartRef = useRef();
   const [temp, setTemp] = useState(false);
-  let colorList = ['rgb(5,128,190)','rgb(158,178,243)','rgb(83, 225, 232)','rgb(67,185,162)','rgb(106,219,182)','rgb(255,189,145)','rgb(255,130,130)','rgb(236,144,236)','rgb(175,175,175)','rgb(97,97,97)'];
-  const graphStyle = {width:"60px" ,height:"60px", transition:"none"}
+  let colorList = ['#FF5654','#3A7DA9'];
+  const graphStyle = {width:"60px" ,height:"60px", transition:"none",}
   const [graphData, setGraphData] = useState({
     labels: ['FVC'],
     datasets: [{
@@ -128,7 +128,7 @@ useEffect(()=>{
             {
               label: "",
               data: pre.data.graph.timeVolume,
-              borderColor: 'rgb(255,0,0)',
+              borderColor: colorList[0],
               borderWidth: 2.5,
               backgroundColor: 'rgb(0,0,0)',
               showLine: true,
@@ -142,7 +142,7 @@ useEffect(()=>{
             {
               label: "",
               data: post.data.graph.timeVolume,
-              borderColor: 'rgb(0,0,255)',
+              borderColor: colorList[1],
               borderWidth: 2.5,
               backgroundColor: 'rgb(0,0,0)',
               showLine: true,
@@ -167,6 +167,12 @@ useEffect(()=>{
       legend: {
           display: false,
           
+      },title: {
+        display: true,
+        text: 'Time(s) - Volume(L) graph',
+        font: {
+          size: 10
+        },
       },
       resizeDelay:0,
       datalabels: false,
@@ -178,8 +184,8 @@ useEffect(()=>{
     },
     layout: {
       padding: {
-        top: 42,
-        bottom:22
+        // top: 42,
+        bottom:10
       }
     },
     maintainAspectRatio: false,
@@ -197,16 +203,23 @@ useEffect(()=>{
         ticks:{
           autoSkip: false,
           beginAtZero: false,
-          
+          font: {
+            size: 8,
+            
+          },
           // max: 12.0,
         },
         grid:{
+          // color: 'rgba(211, 211, 211, 1)',
+          lineWidth:2,
+          tickWidth:0,
           color: function(context) {
+            console.log(context);
             if (context.index === 0){
-              return '#20a0b3';
+              return 'black';
             }
             else{
-              return '#bbdfe4';
+              return 'rgba(211, 211, 211, 1)';
             }
           },
         }
@@ -222,12 +235,25 @@ useEffect(()=>{
           major: true,
           beginAtZero: true,
           stepSize : 1,
-          fontSize : 3,
-          textStrokeColor: 10,
+          font: {
+            size: 8,
+            
+          },
+          // textStrokeColor: 10,
           precision: 1,
         },
         grid:{
-          color: '#000000'
+          // color: 'rgba(211, 211, 211, 1)',
+          color: function(context) {
+            if (context.index === 0){
+              return 'black';
+            }
+            else{
+              return 'rgba(211, 211, 211, 1)';
+            }
+          },
+          lineWidth:2,
+          tickWidth:0
         }
       },
     },

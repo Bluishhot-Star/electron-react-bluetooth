@@ -5,7 +5,7 @@ const { contextBridge, ipcRenderer } = require("electron");
 contextBridge.exposeInMainWorld("api", {
   send: (channel, data) => {
     // whitelist channels
-    let validChannels = ["toMain", "BLEScannFinished", "getBLEDeviceList", "getConnectedDevice","setRefreshToken","setAccessToken"];
+    let validChannels = ["toMain", "BLEScannFinished", "getBLEDeviceList", "getConnectedDevice","set-cookie","remove-cookies"];
     if (validChannels.includes(channel)) {
       ipcRenderer.send(channel, data);
     }
@@ -17,9 +17,10 @@ contextBridge.exposeInMainWorld("api", {
       ipcRenderer.on(channel, (event, ...args) => func(...args));
     }
   },
-  get: (channel) => {
+  get: (channel,data) => {
     if(channel === 'get-cookies'){
-      return ipcRenderer.sendSync(channel);
+      // console.log(key)
+      return ipcRenderer.sendSync(channel,data);
     }
   },
 });

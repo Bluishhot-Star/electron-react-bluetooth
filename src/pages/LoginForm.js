@@ -10,45 +10,52 @@ const LoginForm = () =>{
     loginId: "",
     password: "",
   });
-  const [cookies, setCookie, removeCookie] = useCookies();
-  // const cookies = window.api.get("get-cookies");
+  // const [cookies, setCookie, removeCookie] = useCookies();
   const [error, setError] = useState(undefined);
+  const [accessToken,setAccessToken] = useState(window.api.get("get-cookies",'accessToken'));
+  const [refreshToken,serRefreshToken] = useState(window.api.get("get-cookies",'refreschToken'));
   const accessExpires = new Date();
   const refreshExpires = new Date();
 
   let navigate = useNavigate();
 
   const handleSubmit = async (event)=>{
+ 
+
     event.preventDefault();
     if(values["loginId"]==false||values["password"]==false){
       setBlankAlertVisible(true);
       return;
     }
-    axios.post("/auth/sign-in", 
+    await axios.post("/auth/sign-in", 
     {
       loginId: values.loginId,
       password: values.password,
     },{withCredentials : true})
-    .then((res)=>{
+    .then(async(res)=>{
       // 쿠키에 토큰 저장
 
-//   accessExpires.setMinutes(accessExpires.getMinutes() + 14);
-      // refreshExpires.setDate(refreshExpires.getDate()+7);
-      //   const data = {
-      //     refreschToken : res.data.response.refreshToken,
-      //     refreschTokenDate : refreshExpires,
-      //     accessToken : res.data.response.accessToken,
-      //     accessTokenDate : accessExpires
-      //   }
-      //   window.api.send("setRefreshToken", data);
-      //   window.api.send("setAccessToken", data);
-
-      console.log(res);
       accessExpires.setMinutes(accessExpires.getMinutes() + 14);
-      setCookie("accessToken", res.data.response.accessToken,{expires : accessExpires, secure:"true"});
       refreshExpires.setDate(refreshExpires.getDate()+7);
-      setCookie("refreshToken",res.data.response.refreshToken,{expires : refreshExpires, secure:"true"});
-      navigate('/memberList')
+        const refreschTokenData = {
+          name: 'refreshToken',
+          data : res.data.response.refreshToken,
+          date : refreshExpires,
+        }
+        const accessTokenData = {
+          name: 'accessToken',
+          data : res.data.response.accessToken,
+          date : accessExpires
+        }
+      await window.api.send("set-cookie", accessTokenData);
+
+      await window.api.send("set-cookie", refreschTokenData);
+      console.log(res);
+      // accessExpires.setMinutes(accessExpires.getMinutes() + 14);
+      // setCookie("accessToken", res.data.response.accessToken,{expires : accessExpires, secure:"true"});
+      // refreshExpires.setDate(refreshExpires.getDate()+7);
+      // setCookie("refreshToken",res.data.response.refreshToken,{expires : refreshExpires, secure:"true"});
+      // navigate('/memberList')
       // setTimeout(()=>{
       //     refresh(null);
       // },(1000*60*14)); //14분 마다 refresh
@@ -56,6 +63,8 @@ const LoginForm = () =>{
     .catch((error)=>{
       setErrorAlertVisible(true);
     })
+
+    console.log(accessToken);
     navigate('/memberList')
   };
 
@@ -105,25 +114,24 @@ const LoginForm = () =>{
   },[signUpPage])
 
   useEffect(()=>{
-    const cookie = new Cookies();
-    if(cookie.get('refreshToken') !== undefined){
+    // const cookie = new Cookies();
+    console.log(window.api.get("get-cookies",'accessToken'));
+    if(refreshToken !== undefined){
       axios.post("/auth/renewal" ,{},{
         headers: {
-          Authorization: `Bearer ${cookie.get('refreshToken')}`
+          Authorization: `Bearer ${refreshToken}`
       }}).then((res)=>{
+        // accessExpires.setMinutes(accessExpires.getMinutes() + 14);
+        // cookie.set('accessToken',res.data.response.accessToken,{expires : accessExpires,secure:"true"});
+        // navigate('/memberList', {state: {device:undefined}});
+
         accessExpires.setMinutes(accessExpires.getMinutes() + 14);
-        cookie.set('accessToken',res.data.response.accessToken,{expires : accessExpires,secure:"true"});
-        navigate('/memberList', {state: {device:undefined}});
-
-
-      
-
-      // accessExpires.setMinutes(accessExpires.getMinutes() + 14);
-      //   const data = {
-      //     accessToken : res.data.response.accessToken,
-      //     accessTokenDate : accessExpires
-      //   }
-      //   window.api.send("setAccessToken", data);
+        const accessTokenData = {
+          name: 'refreshToken',
+          data : res.data.response.accessToken,
+          date : accessExpires
+        }
+        window.api.send("set-cookie", accessTokenData);
       }).catch((err)=>{
         console.log(err);
         // window.location.replace('/');

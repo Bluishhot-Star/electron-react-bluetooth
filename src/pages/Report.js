@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect} from 'react';
 import axios from 'axios';
-import {Cookies, useCookies } from 'react-cookie';
 // import background from "../../public/FVC_v6_page-0001.jpg";
 
 import { Routes, Route, Link, useNavigate,useLocation } from 'react-router-dom'

@@ -19,7 +19,7 @@ const MemberListCopy = ()=>{
   const [chartNumber, setChartNumber] = useState("");
   const [birth, setBirth] = useState("");
   const [loading, setLoading] = useState(false)
-  const cookies = new Cookies();
+  const [accessToken,setAccessToken] = useState(window.api.get("get-cookies",'accessToken'));
   let location = useLocation();
   let navigator = useNavigate();
 
@@ -30,7 +30,7 @@ const MemberListCopy = ()=>{
 
     axios.get(`/subjects/${chartNumber}/histories` , {
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }
     }).then((res)=>{
       report(res.data.response, chartNumber);
@@ -45,7 +45,7 @@ const MemberListCopy = ()=>{
   const report = async(date,chartNum)=>{
     await axios.get(`/subjects/${chartNum}`,{
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }
     }).then((res)=>{
       console.log(res);
@@ -57,7 +57,7 @@ const MemberListCopy = ()=>{
 
     await axios.get(`/v3/subjects/${chartNum}/types/fvc/results/${date[0]}` , {
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }
     }).then((res)=>{
       console.log(res);
@@ -71,7 +71,7 @@ const MemberListCopy = ()=>{
     await axios.get(`/subjects/${chartNum}/histories`
     , {
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
     }}).then((res)=>{
       console.log(res.data.response);
       setDate(res.data.response);
@@ -80,7 +80,7 @@ const MemberListCopy = ()=>{
     })
     await axios.get(`/v3/subjects/${chartNum}/types/svc/results/${date[0]}` , {
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }
     }).then((res)=>{
       console.log(res);
@@ -115,7 +115,7 @@ const MemberListCopy = ()=>{
     if(chartNumber !== ""){
       axios.get(`/subjects/${chartNumber}/histories?from=${inspectionDate.start === "" ? "2000-01-01" : inspectionDate.start}&end=${inspectionDate.end === "" ? "2099-01-01" : inspectionDate.end}` , {
         headers: {
-          Authorization: `Bearer ${cookies.get('accessToken')}`
+          Authorization: `Bearer ${accessToken}`
         }}).then((res)=>{
           console.log(inspectionDate);
           setDate(res.data.response);
@@ -145,7 +145,7 @@ const MemberListCopy = ()=>{
     setLoading(true)
     axios.get(`/subjects?page=${page}&size=10&name=${searchVal}`,{
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }}).then((res)=>{
         if(res.data.subCode !== 2004){
           setExaminees([...examinees, ...res.data.response.subjects]);

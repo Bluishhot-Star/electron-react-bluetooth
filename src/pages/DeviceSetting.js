@@ -12,7 +12,7 @@ import DateSelector from './DateSelector.js'
 import { useInView } from 'react-intersection-observer';
 const DeviceSetting= () =>{
     
-  const cookies = new Cookies();
+  const [accessToken,setAccessToken] = useState(window.api.get("get-cookies",'accessToken'));
   const [deviceList,setDeviceList] = useState([]);
   const [calibrations,setCalibrations] = useState([]);
   const [chartNumber, setChartNumber] = useState("");
@@ -30,7 +30,7 @@ const DeviceSetting= () =>{
   useEffect(()=>{
     axios.get(`/devices?sort=serialNumber&order=asc`,{
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }}).then((res)=>{
         // console.log(res.data.response);
         if(res.subCode !== 2004){
@@ -44,7 +44,7 @@ const DeviceSetting= () =>{
   const click = (deviceNum) =>{
     axios.get(`/devices/${deviceNum}/calibrations`,{
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }}).then((res)=>{
         console.log(res.data.response);
         setCurtainStat(false)
@@ -59,7 +59,7 @@ const DeviceSetting= () =>{
     if(chartNumber !== ""){
       axios.get(`/devices/${chartNumber}/calibrations?from=${inspectionDate.start === "" ? "2000-01-01" : inspectionDate.start}&to=${inspectionDate.end === "" ? "2099-01-01" : inspectionDate.end}`,{
         headers: {
-          Authorization: `Bearer ${cookies.get('accessToken')}`
+          Authorization: `Bearer ${accessToken}`
         }}).then((res)=>{
           console.log(res.data.response);
           setCurtainStat(false)
@@ -79,7 +79,7 @@ const DeviceSetting= () =>{
   const gainResult = (calibrationId) =>{
     axios.get(`/calibrations/${calibrationId}`,{
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }}).then((res)=>{
         console.log(res.data.response);
         navigator('/setting/deviceSetting/gainResultPage',{state:{result:res.data.response}});

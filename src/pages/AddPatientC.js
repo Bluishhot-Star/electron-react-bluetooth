@@ -83,7 +83,7 @@ const AddPatientCopy = ()=>{
     navigator("/memberList/measureInfo", {state: {chartNumber : examinee.chartNumber, name:examinee.name}, date:`${date.getFullYear}-${(date.getMonth+1).toString().padStart(2, '0')}-${(date.getDay).toString().padStart(2, '0')}`});
   }
   const location = useLocation();
-  const cookies = new Cookies();
+  const [accessToken,setAccessToken] = useState(window.api.get("get-cookies",'accessToken'));
 
   // 숫자Input 강제성
   const numberInput = (target)=>{
@@ -115,7 +115,7 @@ const AddPatientCopy = ()=>{
   useEffect(()=>{
     axios.get('/clinicians?page=1&size=10',{
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
     }}).then((res)=>{
       setManagers(res.data.response.clinicians);
     }).catch((err)=>{
@@ -268,7 +268,7 @@ const AddPatientCopy = ()=>{
       console.log(chartNumberRef)
       axios.get(`/subjects/${location.state.chartNumber}`,{
         headers: {
-          Authorization: `Bearer ${cookies.get('accessToken')}`
+          Authorization: `Bearer ${accessToken}`
       }}).then((res)=>{
         const exData = res.data.response;
         console.log(exData)

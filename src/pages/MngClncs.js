@@ -10,7 +10,7 @@ const MngClncs = () =>{
   let navigator = useNavigate();
 
   const [clinicians, setClinicians] = useState([]);
-  const cookie = new Cookies();
+  const [accessToken,setAccessToken] = useState(window.api.get("get-cookies",'accessToken'));
   const [loading, setLoading] = useState(false)
   const [ref, inView] = useInView();
   const [page, setPage] = useState(1); // 현재 페이지 번호 (페이지네이션)
@@ -20,7 +20,7 @@ const MngClncs = () =>{
     setLoading(true)
     axios.get(`/clinicians?page=${page}&size=10&name=${searchVal}`,{
       headers: {
-        Authorization: `Bearer ${cookie.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }}).then((res)=>{
         console.log(res.data.response.clinicians);
         console.log(res.data.subCode);
@@ -58,7 +58,7 @@ const MngClncs = () =>{
     }
     axios.put(`/clinicians/${id}`,{
       headers: {
-        Authorization: `Bearer ${cookie.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }},{
         status : e.target.value
       }).then((res)=>{

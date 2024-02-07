@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect} from 'react';
 import axios from 'axios';
-import { Cookies, useCookies } from 'react-cookie';
 import Alert from "../components/Alerts.js"
 import { Routes, Route, Link,useNavigate,useLocation } from 'react-router-dom'
 import {} from "@fortawesome/fontawesome-svg-core"
@@ -14,7 +13,6 @@ import annotationPlugin from 'chartjs-plugin-annotation';
 import html2canvas from "html2canvas";
 const GainResultPage = () =>{
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
-  const cookie = new Cookies();
   const location = useLocation();
   const chartRef = useRef();
   // const graphStyle = {width:"0" ,height:"0", transition:"none"}

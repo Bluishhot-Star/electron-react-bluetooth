@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain,session } = require('electron')
 const { Menu, MenuItem, dialog } = require('@electron/remote/main');
 const path = require('path')
 const url = require('url')
@@ -220,29 +220,39 @@ ipcMain.on("getConnectedDevice", (event, args)=>{
 })
 
 
-ipcMain.on('setRefreshToken', (event, data)=>{
-  session.defaultSession.cookies.set({
+ipcMain.on('set-cookie', async(event, data)=>{
+  console.log(data.name)
+  await session.defaultSession.cookies.set({
     url : "http://localhost:3000", // 기본적으로 입력 해주어야함
-    name : "refreshToken",
-    value : data.refreschToken,
+    name : data.name,
+    value : data.data,
     httpOnly : true, // client에서 쿠키를 접근함을 방지하기위해 설정 ( 보안 설정 )
-    expriationDtae : data.refreschTokenDate // 쿠키 만료 시간 설정
+    expriationDtae : data.date // 쿠키 만료 시간 설정
+  })
+  
+  
+})
+ipcMain.on('get-cookies', (event,data) => {
+  var value = {
+    name: data// the request must have this format to search the cookie.
+  };
+
+  session.defaultSession.cookies.get(value).then((cookies) => {
+    try {
+      console.log(cookies)
+      event.returnValue = cookies[0].value
+    } catch (error) {
+      event.returnValue = undefined
+    }
+
   })
 })
-ipcMain.on('setAccessToken', (event, data)=>{
-  session.defaultSession.cookies.set({
-    url : "http://localhost:3000", // 기본적으로 입력 해주어야함
-    name : "accessToken",
-    value : data.accessToken,
-    httpOnly : true, // client에서 쿠키를 접근함을 방지하기위해 설정 ( 보안 설정 )
-    expriationDtae : data.accessTokenDate // 쿠키 만료 시간 설정
-  })
-})
-ipcMain.on('get-cookies', (event, arg) => {
-  session.defaultSession.cookies.get({}).then((cookies) => {
-    console.log(cookies)
-    event.returnValue = cookies
-  })
+ipcMain.on('remove-cookies', (event, data)=>{
+  try {
+    session.defaultSession.cookies.remove(data.url,data.name);
+  } catch (error) {
+    console.log(error)
+  }
 })
 
 // app.on('ready', createWindow);
