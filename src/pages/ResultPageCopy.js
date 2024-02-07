@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Cookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -25,7 +24,7 @@ function ResultPageCopy(){
   const location = useLocation();
   const navigator = useNavigate();
   const state = location.state;
-  const cookies = new Cookies();
+  const [accessToken,setAccessToken] = useState(window.api.get("get-cookies",'accessToken'));
   const [FvcSvc, setFvcSvc] = useState("fvc"); //fvc, svc
   const [info, setInfo] = useState();
   const [tvMax, setTvMax] = useState([10]);
@@ -241,8 +240,9 @@ useEffect(()=>{
         svcGraphList.push(item.graph.timeVolume);
 
         //현 svc 최대값 찾기
-        svcMaxList.push(parseFloat(item.results[0].meas));
+        svcMaxList.push(parseFloat(item.results[0].meas)+3);
       })
+    console.log(svcTrials)
       setSvcGraph(svcGraphList);
       setAllSvcGraph(svcGraphList);
       setSvcMax(svcMaxList);
@@ -797,7 +797,7 @@ useEffect(()=>{
     if(totalData.chartNumber){
       axios.get(`/subjects/${totalData.chartNumber}/histories?from=${inspectionDate.start === "" ? "2000-01-01" : inspectionDate.start}&to=${inspectionDate.end === "" ? "2099-01-01" : inspectionDate.end}` , {
         headers: {
-          Authorization: `Bearer ${cookies.get('accessToken')}`
+          Authorization: `Bearer ${accessToken}`
         }}).then((res)=>{
           console.log(res)
           console.log(inspectionDate);
@@ -850,7 +850,7 @@ useEffect(()=>{
     setMeasDate(tDate[0]);
     await axios.get(`/v3/subjects/${totalData.chartNumber}/types/fvc/results/${tDate[0]}` , {
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }
     }).then((res)=>{
       console.log(res.data.response);
@@ -863,7 +863,7 @@ useEffect(()=>{
     })
     await axios.get(`/v3/subjects/${totalData.chartNumber}/types/svc/results/${tDate[0]}` , {
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }
     }).then((res)=>{
       console.log(res);
@@ -912,7 +912,7 @@ useEffect(()=>{
   const simpleResult = async(id,date)=>{
     await axios.delete(`/measurements/${id}` , {
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }
     }).then((res)=>{
       console.log(res);

@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect} from 'react';
 import axios from 'axios';
-import { Cookies, useCookies } from 'react-cookie';
 import { useNavigate } from 'react-router-dom'
 import Alert from "../components/Alerts.js"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -13,7 +12,6 @@ const SubjectSetting = () =>{
 	  confirmPassword : ""
   });
   const chBtn = useRef();
-  const cookies = new Cookies();
   let navigator = useNavigate();
 
 

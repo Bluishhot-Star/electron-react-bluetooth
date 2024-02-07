@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect} from 'react';
 import axios from 'axios';
-import {Cookies, useCookies } from 'react-cookie';
 
 import { Routes, Route, Link, useNavigate,useLocation } from 'react-router-dom'
 
@@ -8,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 const MeasureInfo = ()=>{
   
-  const cookies = new Cookies();
+  const [accessToken,setAccessToken] = useState(window.api.get("get-cookies",'accessToken'));
 
   //검사 정보
   const [info,setInfo] = useState({
@@ -75,7 +74,7 @@ const MeasureInfo = ()=>{
     if(date){
       axios.get(`/subjects/${location.state.chartNumber}/histories/?from=${date}`,{
         headers: {
-          Authorization: `Bearer ${cookies.get('accessToken')}`
+          Authorization: `Bearer ${accessToken}`
           }
         })
         .then((res)=>{
@@ -100,7 +99,7 @@ const MeasureInfo = ()=>{
     if(info.type == "FVC"){
       await axios.get(`/subjects/${state.chartNumber}/types/fvc/results/${date}` , {
         headers: {
-          Authorization: `Bearer ${cookies.get('accessToken')}`
+          Authorization: `Bearer ${accessToken}`
         }
       }).then((res)=>{
         console.log(res);
@@ -115,7 +114,7 @@ const MeasureInfo = ()=>{
     else if(info.type=="SVC"){
       await axios.get(`/subjects/${state.chartNumber}/types/svc/results/${date}` , {
         headers: {
-          Authorization: `Bearer ${cookies.get('accessToken')}`
+          Authorization: `Bearer ${accessToken}`
         }
       }).then((res)=>{
         console.log(res);

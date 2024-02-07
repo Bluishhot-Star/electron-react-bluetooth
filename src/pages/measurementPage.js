@@ -30,7 +30,10 @@ const MeasurementPage = () =>{
   let type = location.state.type;
   let chartNumber = location.state.chartNumber;
 
-  const cookies = new Cookies();
+  // const cookies = new Cookies();?
+  const [accessToken,setAccessToken] = useState(window.api.get("get-cookies",'accessToken'));
+  const [refreshToken,serRefreshToken] = useState(window.api.get("get-cookies",'refreschToken'));
+
   const [setCookie] = useCookies();
   let navigatorR = useNavigate();
   let dispatch = useDispatch();
@@ -65,7 +68,7 @@ const MeasurementPage = () =>{
   const simpleResult = async(id,date)=>{
     await axios.delete(`/measurements/${id}` , {
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }
     }).then((res)=>{
       console.log(res);
@@ -77,7 +80,7 @@ const MeasurementPage = () =>{
   const getMeasureData = async(date)=>{
     await axios.get(`/subjects/${chartNumber}/types/fvc/results/${date}` , {
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }
     }).then((res)=>{
       console.log(res);
@@ -339,12 +342,13 @@ useEffect(()=>
   const [strongTime,setStrongTime] = useState(6);
   const [stopTime,setStopTime] = useState(15);
   useEffect(()=>{
-    if(cookies.get('manageRate') !==undefined){
-      setBreathCount(cookies.get('manageRate'));
+    console.log(window.api.get("get-cookies",'manageRate'));
+    if(window.api.get("get-cookies",'manageRate') !==undefined){
+      setBreathCount(window.api.get("get-cookies",'manageRate'));
 
     }
-    if(cookies.get('manageTime') !== undefined){
-      setStrongTime(cookies.get('manageTime'));
+    if(window.api.get("get-cookies",'manageTime') !== undefined){
+      setStrongTime(window.api.get("get-cookies",'manageTime'));
     }
   },[]);
   // 검사 종료 여부
@@ -725,11 +729,11 @@ useEffect(()=>
 
 //-----------------------------------------------------------------------------------------------
 useEffect(()=>{
-  if(cookies.get('serialNum') !== undefined){
-    const serial = cookies.get('serialNum');
+  if(window.api.get("get-cookies",'serialNum') !== undefined){
+    const serial = window.api.get("get-cookies",'serialNum');
     axios.get(`/devices/${serial}/gain` , {
       headers: {
-        Authorization: `Bearer ${cookies.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }
     }).then((res)=>{
       setExhaleCoefficient(res.data.response.gain.exhale);
@@ -1393,7 +1397,7 @@ useEffect(()=>{
         // date:{date}
       },{
         headers: {
-          Authorization: `Bearer ${cookies.get('accessToken')}`
+          Authorization: `Bearer ${accessToken}`
       }},
       {withCredentials : true})
       .then((res)=>{

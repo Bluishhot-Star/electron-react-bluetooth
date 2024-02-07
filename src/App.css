@@ -5524,11 +5524,11 @@ text-align: right;
   grid-template-rows: 60% 40%
 }
 .report-title-container-center div:nth-child(2){
-  font-weight: 500;
+  font-weight: 600;
   background-color: #fff;
   font-size: 22px;
   text-align: center;
-  color: #3C88B9;
+  color: rgb(27, 63, 167);
 }
 .serial-num{
   margin-left: 3%;
@@ -5537,7 +5537,8 @@ text-align: right;
 }
 .serial-num div{
   padding-top: 1%;
-  color: #3C88B9;
+  color: rgb(27, 63, 167);
+  font-weight: 600;
 }
 .sixth-chart{
   margin-left: 3%;

@@ -18,7 +18,8 @@ import { changeDeviceInfo, reset } from "./../deviceInfo.js"
 import { useDispatch, useSelector } from "react-redux"
 const GainMeasurementPage = () =>{
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
-  const cookie = new Cookies();
+  const [accessToken,setAccessToken] = useState(window.api.get("get-cookies",'accessToken'));
+  const [serialNum, setSerialNum] = useState(window.api.get("get-cookies",'serialNum'));
   const location = useLocation();
   const chartRef = useRef();
   let firstBtnRef = useRef();
@@ -1151,8 +1152,8 @@ const [calivration,setCalivration] = useState({
     let rDataList = [];
     
     rawDataList.map((num)=>rDataList.push(String(num).padStart(9, "0"))) 
-    if(cookie.get('serialNum') !== undefined){
-      axios.post(`/devices/${cookie.get('serialNum')}/calibrations`, 
+    if(serialNum !== undefined){
+      axios.post(`/devices/${serialNum}/calibrations`, 
       {
         temperature: state.temperature,
         humidity: state.humidity,
@@ -1160,7 +1161,7 @@ const [calivration,setCalivration] = useState({
         data:rDataList.join(' '),
       },{
         headers: {
-          Authorization: `Bearer ${cookie.get('accessToken')}`
+          Authorization: `Bearer ${accessToken}`
       }},
       {withCredentials : true})
       .then((res)=>{
@@ -1180,7 +1181,7 @@ const [calivration,setCalivration] = useState({
     axios.delete(`/calibrations/${calivration.calibrationId}`, 
     {
       headers: {
-        Authorization: `Bearer ${cookie.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
     }},
     {withCredentials : true})
     .then((res)=>{

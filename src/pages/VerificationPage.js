@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect} from 'react';
 import axios from 'axios';
-import { Cookies, useCookies } from 'react-cookie';
 import Alert from "../components/Alerts.js"
 import { Routes, Route, Link,useNavigate,useLocation } from 'react-router-dom'
 import {} from "@fortawesome/fontawesome-svg-core"
@@ -20,7 +19,8 @@ import { useInView } from 'react-intersection-observer';
 import html2canvas from "html2canvas";
 const VerificationPage = () =>{
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
-  const cookie = new Cookies();
+  const [accessToken,setAccessToken] = useState(window.api.get("get-cookies",'accessToken'));
+  const [serialNum, setSerialNum] = useState(window.api.get("get-cookies",'serialNum'));
   const location = useLocation();
   const chartRef = useRef();
   let firstBtnRef = useRef();
@@ -1119,13 +1119,13 @@ const [calivration,setCalivration] = useState({
   const verification = ()=>{
     let rDataList = [];
     rawDataList.map((num)=>rDataList.push(String(num).padStart(9, "0"))) 
-    if(cookies.get('serialNum') !== undefined){
-      axios.post(`/devices/${cookies.get('serialNum')}/verify`, 
+    if(serialNum !== undefined){
+      axios.post(`/devices/${serialNum}/verify`, 
       {
         data:rDataList.join(' '),
       },{
         headers: {
-          Authorization: `Bearer ${cookie.get('accessToken')}`
+          Authorization: `Bearer ${accessToken}`
       }},
       {withCredentials : true})
       .then((res)=>{
@@ -1230,7 +1230,7 @@ const [calivration,setCalivration] = useState({
   const deleteee = () => {
     axios.delete(`/calibrations/{calibrationId}` , {
       headers: {
-        Authorization: `Bearer ${cookie.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }
     }).then((res)=>{
       console.log(res);

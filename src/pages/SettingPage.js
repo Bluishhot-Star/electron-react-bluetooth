@@ -15,18 +15,17 @@ import SerialSetting from "../components/SerialSetting.js"
 const SettingPage = () =>{
   let dispatch = useDispatch()
   let deviceInfo = useSelector((state) => state.deviceInfo )
-  const cookiess = new Cookies();
-  const [cookies, setCookie] = useCookies();
+  const [accessToken,setAccessToken] = useState(window.api.get("get-cookies",'accessToken'));
   const date= new Date();
   let navigatorR = useNavigate();
 
   const logOut = () => {
     axios.post(`/auth/sign-out`,{
       headers: {
-        Authorization: `Bearer ${cookiess.get('accessToken')}`
+        Authorization: `Bearer ${accessToken}`
       }}).then((res)=>{
-        cookiess.remove('refreshToken',{path : '/'});
-        cookiess.remove('accessToken',{path : '/'});
+        window.api.send("remove-cookies", {url:'/',name:'refreshToken'});
+        window.api.send("remove-cookies", {url:'/',name:'accessToken'});
         window.location.replace('/');
       }).catch((err)=>{
         console.log(err);
@@ -338,12 +337,13 @@ window.api.receive("connectedBLEDevice", (data)=>{
     if(val=="confirm"){
       setSerialNum(data);
       date.setFullYear(2100);
-      await setCookie("serialNum", data,{expires:date,secure:"true"});
+      await window.api.send("set-cookie", {name:'serialNum',data:data,date:date});
+      // await setCookie("serialNum", data,{expires:date,secure:"true"});
       setDeviceSerialSetting(true);
     }
   }
   useEffect(()=>{
-    setSerialNum(cookiess.get('serialNum'))
+    setSerialNum(window.api.get("get-cookies",'serialNum'))
     if(deviceInfo.id){
       setDeviceSerialSetting(true);
     }
