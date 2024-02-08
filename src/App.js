@@ -31,6 +31,8 @@ import AddPatientCopy from './pages/AddPatientC.js';
 import ResultPageCopy from './pages/ResultPageCopy.js';
 import ReportFvc from './pages/ReportFvc.js';
 import ReportSvc from './pages/ReportSvc.js';
+import ModeSelect from './pages/ModeSelect.js';
+
 // Variable & State
 const author = "KASSID&HAI";
 
@@ -38,7 +40,8 @@ function App() {
   return (
     <div className="App">
       <Routes>
-        <Route path='/' element={<LoginForm/>}/>
+        <Route path='/' element={<ModeSelect/>}/>
+        <Route path='/login' element={<LoginForm/>}/>
         <Route path='/signUp' element={<SignUpForm/>}/>
         <Route path='/memberList/measureInfo' element={<MeasureInfo/>}/>
         
