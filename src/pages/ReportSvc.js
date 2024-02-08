@@ -10,13 +10,16 @@ import img from '../img/SVC_v5.svg'
 
 let graphOptionXLastGrid;
 let graphOptionYLastGrid;
+let yMax = 1;
 
 
 const ReportSvc = (state)=>{
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
+
     let navigatorR = useNavigate();
     const location = useLocation();
     const[volumeFlow,setVolumeFlow] = useState([]);
+    const [max,setMax] = useState(1);
     // const state = location.state;
     console.log(state)
 
@@ -72,6 +75,7 @@ useEffect(()=>{
 },[])
 useEffect(()=>{
   if(top.name !== ''){
+
     setTimeout(()=>{
 
       onCapture();
@@ -88,7 +92,7 @@ useEffect(()=>{
       const minutes= now.getMinutes() < 10 ? "0"+now.getMinutes() : now.getMinutes();
       const seconds = now.getSeconds() < 10 ? "0"+now.getSeconds() : now.getSeconds();
       const time = hour+""+minutes+""+seconds;
-
+      yMax = undefined;
       onSaveAs(canvas.toDataURL('image/jpeg'),`${state.data.fvcSvc.calibration.serialNumber}_${state.data.fvcSvc.subject.chartNumber}_${YMD}_${time}.jpeg`,);
     });
     
@@ -202,14 +206,16 @@ useEffect(()=>{
         axios: 'x',
         // min: 0,
         // max: parseInt(Math.max(...tvMax)),
+        suggestedMax:60.5,
         ticks:{
           color:'black',
           autoSkip: false,
           beginAtZero: false,
+          stepSize:5.5,
           font: {
             size: 8,
           },
-          callback: function(value, index, ticks) {
+          callback: (value, index, ticks) =>{
             console.log(index);
             graphOptionXLastGrid = index;
             return value
@@ -236,22 +242,30 @@ useEffect(()=>{
         },
         axios: 'y',
         // min: -9,
-        grace:"8%",
+        
         ticks: {
           color:'black',
           major: true,
           beginAtZero: true,
-          stepSize : 1,
+          stepSize : 0.5,
           font: {
             size: 8,
           },
-          callback: function(value, index, ticks) {
-            console.log(index);
-            graphOptionYLastGrid = index;
-            return value
+          callback: (value, index, ticks) =>{
+            console.log(value)
+
+          if(yMax === undefined || Math.abs(value) > yMax){
+            yMax = Math.abs(value);
+          }
+          setMax(yMax);
+          graphOptionYLastGrid = index;
+          return value
           },
           precision: 1,
+
         },
+        suggestedMax: max,
+        suggestedMin: max*-1,
         grid:{
           color: function(context) {
             if (context.index === 0 || context.index === graphOptionYLastGrid){
@@ -263,11 +277,11 @@ useEffect(()=>{
           },
           lineWidth:2,
           tickWidth:0
-        }
+        },
+
       },
     },
   }
-
   useEffect(()=>{
     console.log(chartRef)
     setTimeout(() => {
