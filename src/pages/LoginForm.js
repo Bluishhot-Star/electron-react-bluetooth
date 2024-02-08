@@ -13,7 +13,7 @@ const LoginForm = () =>{
   // const [cookies, setCookie, removeCookie] = useCookies();
   const [error, setError] = useState(undefined);
   const [accessToken,setAccessToken] = useState(window.api.get("get-cookies",'accessToken'));
-  const [refreshToken,serRefreshToken] = useState(window.api.get("get-cookies",'refreschToken'));
+  const [refreshToken,serRefreshToken] = useState(window.api.get("get-cookies",'refreshToken'));
   const accessExpires = new Date();
   const refreshExpires = new Date();
 
@@ -37,7 +37,7 @@ const LoginForm = () =>{
 
       accessExpires.setMinutes(accessExpires.getMinutes() + 14);
       refreshExpires.setDate(refreshExpires.getDate()+7);
-        const refreschTokenData = {
+        const refreshTokenData = {
           name: 'refreshToken',
           data : res.data.response.refreshToken,
           date : refreshExpires,
@@ -49,7 +49,7 @@ const LoginForm = () =>{
         }
       await window.api.send("set-cookie", accessTokenData);
 
-      await window.api.send("set-cookie", refreschTokenData);
+      await window.api.send("set-cookie", refreshTokenData);
       console.log(res);
       // accessExpires.setMinutes(accessExpires.getMinutes() + 14);
       // setCookie("accessToken", res.data.response.accessToken,{expires : accessExpires, secure:"true"});

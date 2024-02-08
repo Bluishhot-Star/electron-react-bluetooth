@@ -63,7 +63,7 @@ useEffect(()=>{
     let volumeFlowList = [];
     let timeVolumeMaxList = [];
     let timeVolumeMaxListX = [];
-    console.log(trials)
+    console.log(totalData)
     if(trials){
       console.log(trials.length);
       let temp = new Array(trials.length).fill(0);
@@ -879,8 +879,6 @@ useEffect(()=>{
 
 
   useEffect(()=>{
-    console.log("adfas")
-    console.log(date)
     if(FvcSvc=='fvc' && data1.length){
       setRep({
         birth : state.birth,
@@ -897,10 +895,11 @@ useEffect(()=>{
     }
     if(goTO){
       console.log("goTOTO");
+      console.log(data1)
       setTotalData({
         info : state.info,
-        fvc : data1,
-        svc : data2,
+        fvc : Object.keys(data1).length !== 0 ? data1 : 'Empty resource',
+        svc : Object.keys(data2).length !== 0 ? data2 : 'Empty resource',
         date : date,
         birth : state.birth,
         chartNumber: state.chartNumber,
@@ -920,7 +919,7 @@ useEffect(()=>{
       console.log(err);
     })
     console.log(date.split(' ')[0]);
-    report(date.split(' ')[0]);
+    report(date.split(' '));
 
   }
   
@@ -1079,8 +1078,8 @@ useEffect(()=>{
                     ""
                   :  
                     <div onClick={()=>{
-                      // setViewer(!viewer)
-                      navigator('./reportSvc', {state :{data: rep}})
+                      setViewer(!viewer)
+                      // navigator('./reportSvc', {state :{data: rep}})
                     }}><BiSolidFileJpg className='jpgIcon'/>다운로드</div>
               }
               <button ref={FVCBtnRef} onClick={()=>{changeType("fvc")}} id="clickme" className="FVC-btn">FVC</button>

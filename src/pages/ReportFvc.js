@@ -8,6 +8,12 @@ import { Routes, Route, Link, useNavigate,useLocation } from 'react-router-dom'
 import html2canvas from "html2canvas";
 import img from '../img/FVC_v6.svg'
 
+let graphOptionXLastGrid;
+let graphOptionYLastGrid;
+let graphOption2XLastGrid;
+let graphOption2YLastGrid;
+let graphOption3XLastGrid;
+let graphOption3YLastGrid;
 
 const ReportFvc = ()=>{
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
@@ -15,7 +21,6 @@ const ReportFvc = ()=>{
     const location = useLocation();
     const[volumeFlow,setVolumeFlow] = useState([]);
     const state = location.state;
-    console.log(state)
     const [top,setTop] = useState({
       name : '',
       age : 0,
@@ -35,7 +40,6 @@ const ReportFvc = ()=>{
     });
 //capture
 useEffect(()=>{
-    console.log(state)
     if(state.data.fvcSvc !== "Empty resource"){
       let race = 'Other'
       if(state.data.fvcSvc.subject.race === '0'){
@@ -69,7 +73,7 @@ useEffect(()=>{
   if(top.name !== ''){
     setTimeout(()=>{
 
-      // onCapture();
+      onCapture();
     },1100)
   }
 },[top])
@@ -84,7 +88,7 @@ useEffect(()=>{
       const seconds = now.getSeconds() < 10 ? "0"+now.getSeconds() : now.getSeconds();
       const time = hour+""+minutes+""+seconds;
 
-      onSaveAs(canvas.toDataURL('image/jpeg'),`car_verify_${YMD}_${time}.png`,);
+      onSaveAs(canvas.toDataURL('image/jpeg'),`${state.data.fvcSvc.calibration.serialNumber}_${state.data.fvcSvc.subject.chartNumber}_${YMD}_${time}.jpeg`,);
     });
     
   };
@@ -118,8 +122,7 @@ useEffect(()=>{
   useEffect(()=>
   {
     let dataset = []
-    console.log(pre)
-    console.log(post)
+
     if(pre.tf){
         dataset.push(
             {
@@ -134,7 +137,6 @@ useEffect(()=>{
         )
     }
     if(post.tf){
-        console.log("post")
         dataset.push(
             {
               label: "",
@@ -152,12 +154,10 @@ useEffect(()=>{
       labels: '',
       datasets: dataset,
     }
-    console.log(data)
     setGraphData(data);
   },[pre,post])
 
   
-
   const graphOption={
     responsive: false,
     plugins:{
@@ -185,12 +185,6 @@ useEffect(()=>{
     
         },
       },
-      chartAreaBorder: {
-        borderColor: 'red',
-        borderWidth: 2,
-        borderDash: [5, 5],
-        borderDashOffset: 2,
-      }
     },
     responsive: true,
     // aspectRatio: 0.2,
@@ -219,20 +213,23 @@ useEffect(()=>{
         backgroundColor : '#fff',
   
         ticks:{
+          color:'black',
           autoSkip: false,
           beginAtZero: false,
           fontSize :14,
           font: {
             size: 8,
-            
+          },
+          callback: function(value, index, ticks) {
+            graphOptionXLastGrid = index;
+            return value
           },
           
           // max: 12.0,
         },
         grid:{
           color: function(context) {
-            console.log(context);
-            if (context.index === 0){
+            if (context.index === 0 || context.index === graphOptionXLastGrid){
               return 'black';
             }
             else{
@@ -245,7 +242,7 @@ useEffect(()=>{
       },
       y: {
         gridLines:{
-          zeroLineColor:'blue',
+          zeroLineColor:'black',
           
         },
         axios: 'y',
@@ -253,12 +250,16 @@ useEffect(()=>{
 
         grace:"8%",
         ticks: {
+          color:'black',
           major: true,
           beginAtZero: true,
           stepSize : 1,
           font: {
             size: 8,
-            
+          },
+          callback: function(value, index, ticks) {
+            graphOptionYLastGrid = index;
+            return value
           },
           textStrokeColor: 10,
           precision: 1,
@@ -266,7 +267,7 @@ useEffect(()=>{
         },
         grid:{
           color: function(context) {
-            if (context.index === 0){
+            if (context.index === 0 || context.index === graphOptionYLastGrid){
               return 'black';
             }
             else{
@@ -282,7 +283,6 @@ useEffect(()=>{
   }
 
   useEffect(()=>{
-    console.log(chartRef)
     setTimeout(() => {
       
       setTemp(true);
@@ -306,16 +306,13 @@ useEffect(()=>{
   let trials;
   useEffect(()=>{
     //fvc의 심플카드
-    console.log(state.data.fvcSvc )
     trials = state.data.fvcSvc.trials;
-    console.log("adsf")
     let timeVolumeList = [];
     let volumeFlowList = [];
     let timeVolumeMaxList = [];
     let timeVolumeMaxListX = [];
 
     if(trials){
-      console.log(trials);
       let temp = new Array(trials.length).fill(0);
 
       // 매 결과에서 데이터 추출
@@ -359,7 +356,6 @@ useEffect(()=>{
       )
   }
   if(post.tf){
-      console.log("post")
       dataset.push(
           {
             label: "",
@@ -435,9 +431,13 @@ useEffect(()=>{
         min: 0,
         suggestedMax: 3,
         ticks:{
+          color:'black',
           font: {
             size: 8,
-            
+          },
+          callback: function(value, index, ticks) {
+            graphOption2XLastGrid = index;
+            return value
           },
           stepSize : 1,
           beginAtZero: false,
@@ -446,7 +446,7 @@ useEffect(()=>{
         },
         grid:{
           color: function(context) {
-            if (context.index === 0){
+            if (context.index === 0 || context.index === graphOption2XLastGrid){
               return 'black';
             }
             else{
@@ -469,20 +469,24 @@ useEffect(()=>{
         suggestedMax:3.3,
         // suggestedMin:-6,
         ticks: {
+          color:'black',
           font: {
             size: 8,
-            
+          },
+          callback: function(value, index, ticks) {
+            graphOption2YLastGrid = index;
+            return value
           },
           major: true,
           beginAtZero: true,
-          stepSize : .5,
+          stepSize : 1,
           fontSize : 10,
           textStrokeColor: 10,
           precision: 1,
         },
         grid:{
           color: function(context) {
-            if (context.index === 0){
+            if (context.index === 0 || context.index === graphOption2YLastGrid){
               return 'black';
             }
             else{
@@ -538,17 +542,20 @@ useEffect(()=>{
  
 
         ticks:{
+          color:'black',
           font: {
             size: 8,
-            
+          },
+          callback: function(value, index, ticks) {
+            graphOption3XLastGrid = index;
+            return value
           },
           autoSkip: false,
           beginAtZero: false,
         },
         grid:{
           color: function(context) {
-            // console.log(context);
-            if (context.index === 0){
+            if (context.index === 0 || context.index === graphOption3XLastGrid){
               return 'black';
             }
             else{
@@ -567,10 +574,14 @@ useEffect(()=>{
         // min: -9,
         grace:"8%",
         ticks: {
-            font: {
-              size: 8,
-              
-            },
+          color:'black',
+          font: {
+            size: 8,
+          },
+          callback: function(value, index, ticks) {
+            graphOption3YLastGrid = index;
+            return value
+          },
           major: true,
           beginAtZero: true,
           stepSize : 1,
@@ -580,13 +591,16 @@ useEffect(()=>{
         },
         grid:{
           color: function(context) {
-            if (context.index === 0){
+            if (context.index === 0 || context.index === graphOption3YLastGrid){
               return 'black';
             }
             else{
               return 'rgba(211, 211, 211, 1)';
             }
           },
+          // zeroLineColor:'black',
+          // color:'rgba(211, 211, 211, 1)',
+
           lineWidth:2,
           tickWidth:0
         }
@@ -598,10 +612,8 @@ useEffect(()=>{
 
   const fourthRendering = () => {
     const result = [];
-    console.log(state.data.fvcSvc.trials[0].results[0].meas)
 
     for (let i = 0; i < 8; i++) {
-      console.log(state.data.fvcSvc.trials.length)
       if(i < state.data.fvcSvc.trials.length){
         result.push(
           <div className='column-line' >
@@ -647,10 +659,8 @@ useEffect(()=>{
 
   const fifthRendering = () => {
     const result = [];
-    console.log(state.data.fvcSvc.trials)
 
     for (let i = 0; i < 8; i++) {
-      console.log(state.data.fvcSvc.trials.length)
       if(i < state.data.fvcSvc.trials.length){
         result.push(
           <div className='column-line'>
@@ -702,7 +712,6 @@ useEffect(()=>{
     state.data.fvcSvc.trials.forEach((item) => {
 
         if(item.best === true){
-        console.log(item)
             if(item.bronchodilator === 'pre' && !pr){
                 pr = true;
                 setPre({...pre, tf : true, data :item})
@@ -727,6 +736,49 @@ useEffect(()=>{
       result.push(
         <div>
           제한성 환기 장애가 의심됩니다. 제한성 환기장애는 진폐증,폐렴,폐암 등이 있습니다. 진료 의사와 상담하시어 적절히 관리 받으시길 바랍니다.
+        </div>
+      )
+    }else if(state.data.fvcSvc.diagnosis.condition === 'OBSTRUCTIVE_MILD'){
+      result.push(
+        <div>
+          폐쇄성 환기장애 경증이 의심됩니다. 폐쇄성 환기장애에는 천식, 폐기종, 만성 기관지염등이 있습니다. 진료 의사와 상담하시어 적절히 관리받으시길 바랍니다.
+        </div>
+      )
+    }else if(state.data.fvcSvc.diagnosis.condition === 'OBSTRUCTIVE_ABNORMAL'){
+      result.push(
+        <div>
+          폐쇄성 환기장애 중등도 정도로 의심됩니다. 폐쇄성 환기장애에는 천식, 폐기종, 만성 기관지염등이 있습니다. 진료 의사와 상담하시어 적절히 관리받으시길 바랍니다.
+        </div>
+      )
+    }else if(state.data.fvcSvc.diagnosis.condition === 'OBSTRUCTIVE_MODERATE'){
+      result.push(
+        <div>
+          폐쇄성 환기장애 중등 중증으로 의심됩니다. 폐쇄성 환기장애에는 천식, 폐기종, 만성 기관지염등이 있습니다. 진료 의사와 상담하시어 적절히 관리받으시길 바랍니다.
+        </div>
+      )
+    }
+    else if(state.data.fvcSvc.diagnosis.condition === 'OBSTRUCTIVE_SEVERE'){
+      result.push(
+        <div>
+          폐쇄성 환기장애 중증으로 의심됩니다. 폐쇄성 환기장애에는 천식, 폐기종, 만성 기관지염등이 있습니다. 진료 의사와 상담하시어 적절히 관리받으시길 바랍니다.
+        </div>
+      )
+    }else if(state.data.fvcSvc.diagnosis.condition === 'OBSTRUCTIVE_VERY_SEVERE'){
+      result.push(
+        <div>
+          폐쇄성 환기장애 매우 중증으로 의심됩니다. 폐쇄성 환기장애에는 천식, 폐기종, 만성 기관지염등이 있습니다. 진료 의사와 상담하시어 적절히 관리받으시길 바랍니다.
+        </div>
+      )
+    }else if(state.data.fvcSvc.diagnosis.condition === 'MIXED'){
+      result.push(
+        <div>
+          혼합성 폐질환이 의심됩니다. 의료진에게 상세 진단을 받아 보시길 바랍니다.
+        </div>
+      )
+    }else if(state.data.fvcSvc.diagnosis.condition === 'ASTHMA'){
+      result.push(
+        <div>
+          천식이 의십됩니다. 의료진에게 상세 진단을 받아 보시길 바랍니다. ASTHMA
         </div>
       )
     }else{

@@ -8,14 +8,16 @@ import { Routes, Route, Link, useNavigate,useLocation } from 'react-router-dom'
 import html2canvas from "html2canvas";
 import img from '../img/SVC_v5.svg'
 
+let graphOptionXLastGrid;
+let graphOptionYLastGrid;
 
 
-const ReportSvc = ()=>{
+const ReportSvc = (state)=>{
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
     let navigatorR = useNavigate();
     const location = useLocation();
     const[volumeFlow,setVolumeFlow] = useState([]);
-    const state = location.state;
+    // const state = location.state;
     console.log(state)
 
     const [top,setTop] = useState({
@@ -72,7 +74,7 @@ useEffect(()=>{
   if(top.name !== ''){
     setTimeout(()=>{
 
-      // onCapture();
+      onCapture();
     },1200)
   }
 },[top])
@@ -87,7 +89,7 @@ useEffect(()=>{
       const seconds = now.getSeconds() < 10 ? "0"+now.getSeconds() : now.getSeconds();
       const time = hour+""+minutes+""+seconds;
 
-      onSaveAs(canvas.toDataURL('image/jpeg'),`car_verify_${YMD}_${time}.png`,);
+      onSaveAs(canvas.toDataURL('image/jpeg'),`${state.data.fvcSvc.calibration.serialNumber}_${state.data.fvcSvc.subject.chartNumber}_${YMD}_${time}.jpeg`,);
     });
     
   };
@@ -201,13 +203,17 @@ useEffect(()=>{
         // min: 0,
         // max: parseInt(Math.max(...tvMax)),
         ticks:{
+          color:'black',
           autoSkip: false,
           beginAtZero: false,
           font: {
             size: 8,
-            
           },
-          // max: 12.0,
+          callback: function(value, index, ticks) {
+            console.log(index);
+            graphOptionXLastGrid = index;
+            return value
+          },
         },
         grid:{
           // color: 'rgba(211, 211, 211, 1)',
@@ -215,7 +221,7 @@ useEffect(()=>{
           tickWidth:0,
           color: function(context) {
             console.log(context);
-            if (context.index === 0){
+            if (context.index === 0 || context.index === graphOptionXLastGrid){
               return 'black';
             }
             else{
@@ -232,20 +238,23 @@ useEffect(()=>{
         // min: -9,
         grace:"8%",
         ticks: {
+          color:'black',
           major: true,
           beginAtZero: true,
           stepSize : 1,
           font: {
             size: 8,
-            
           },
-          // textStrokeColor: 10,
+          callback: function(value, index, ticks) {
+            console.log(index);
+            graphOptionYLastGrid = index;
+            return value
+          },
           precision: 1,
         },
         grid:{
-          // color: 'rgba(211, 211, 211, 1)',
           color: function(context) {
-            if (context.index === 0){
+            if (context.index === 0 || context.index === graphOptionYLastGrid){
               return 'black';
             }
             else{
