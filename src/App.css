@@ -1045,7 +1045,7 @@ text-align: right;
   border-radius: 5px;
   box-shadow: 0px 0px 5px #aaa;
   background: #fff;
-  
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1124,6 +1124,9 @@ text-align: right;
 }
 .login-page-container form .loginBtn{
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .login-page-container form .login-signUpBtn{
   all:unset;
@@ -1138,6 +1141,9 @@ text-align: right;
   font-size: 2.3vh;
   font-weight: 600;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .login-page-container form button:active{
   opacity: .3;
@@ -2949,6 +2955,7 @@ text-align: right;
   position: absolute;
   right: 10px;
   top: 50%;
+  font-size: min(3vh, 1.5rem);
 }
 
 .password-valition  .hint{
