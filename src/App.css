@@ -793,12 +793,25 @@ text-align: right;
   display: grid;
   grid-template-rows: 1fr 1fr 1fr;
 }
+.bottom-graph-container .compare-svc-graph-container{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
 .bottom-graph-container .compare-graph-container>div{
   display: grid;
   grid-template-columns: 5.5vw 1fr;
   align-items: center;
   width: 100%;
   height: 100%;
+}
+.bottom-graph-container .compare-svc-graph-container>div{
+  display: grid;
+  grid-template-columns: 5.5vw 1fr;
+  align-items: center;
+  width: 100%;
+  height: 33.3%;
 }
 .compare-canvas-container{
   width: 100%;
@@ -1032,7 +1045,7 @@ text-align: right;
   border-radius: 5px;
   box-shadow: 0px 0px 5px #aaa;
   background: #fff;
-  
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1111,6 +1124,9 @@ text-align: right;
 }
 .login-page-container form .loginBtn{
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .login-page-container form .login-signUpBtn{
   all:unset;
@@ -1125,6 +1141,9 @@ text-align: right;
   font-size: 2.3vh;
   font-weight: 600;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .login-page-container form button:active{
   opacity: .3;
@@ -2584,6 +2603,7 @@ text-align: right;
 .setting-page-left-container-nav .device-connect svg,
 .setting-page-left-container-nav .device-connect path{
   cursor: default;
+  transform: translateY(3px);
 }
 .connect-info-container{
   display: flex;
@@ -2935,6 +2955,7 @@ text-align: right;
   position: absolute;
   right: 10px;
   top: 50%;
+  font-size: min(3vh, 1.5rem);
 }
 
 .password-valition  .hint{
@@ -5609,6 +5630,66 @@ text-align: right;
   50%{background-position:100% 50%}
   100%{background-position:0% 51%}
 }
+
+/* Mode Select */
+.mode-select-page-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+.mode-select-main-container{
+  border: 1px solid #ccc;
+  width: 90%;
+  height: 90%;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mode-select-btn-container{
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100%;
+  height: 50%;
+}
+.mode-select-btn-container>p{
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #018abe;
+  font-weight: 600;
+}
+.mode-select-btn{
+  width: 25%;
+  height: 50%;
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+}
+.mode-select-btn:active{
+  opacity: 0.3;
+}
+.mode-select-btn p{
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  margin: 0;
+  font-size: min(2.5vh, 1.2rem);
+  color: #fff;
+  font-weight: 600;
+}
+.public-mode-btn{
+  background: #018abe;
+}
+.private-mode-btn{
+  background: #42d0e6;
+}
+
+
 
 
 input::placeholder{

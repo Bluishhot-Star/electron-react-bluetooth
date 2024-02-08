@@ -3,7 +3,10 @@ import axios from 'axios';
 import { Cookies, useCookies } from 'react-cookie';
 import Alert from "../components/Alerts.js"
 import { Routes, Route, Link, useNavigate } from 'react-router-dom'
-import { GrView } from "react-icons/gr";
+import { RiEyeFill, RiEyeLine } from "react-icons/ri";
+import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
 
 const LoginForm = () =>{
   const [values, setValues] = useState({
@@ -20,7 +23,6 @@ const LoginForm = () =>{
   let navigate = useNavigate();
 
   const handleSubmit = async (event)=>{
- 
 
     event.preventDefault();
     if(values["loginId"]==false||values["password"]==false){
@@ -150,6 +152,9 @@ const LoginForm = () =>{
         //중복 아이디 알림
         <Alert inputRef={errorAlert} contents={"로그인에 실패했습니다.\n아이디와 비밀번호를 확인해주세요."}/>
       }
+      <div className='backBtn' onClick={()=>{navigate("/")}}>
+        <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6",}} />
+      </div>
       <div className="logo"><img src={process.env.PUBLIC_URL + '/spriokit.svg'} /></div>
       <form onSubmit={handleSubmit}>
         <div className="login-field">
@@ -169,14 +174,18 @@ const LoginForm = () =>{
             placeholder='비밀번호'
             value={values.password}
           />
-          <GrView className='passViewIcon' onClick={()=>{setPassType(!passType)}}/>
+          {passType ? 
+            <RiEyeFill className='passViewIcon' onClick={()=>{setPassType(!passType)}}/>
+          :
+            <RiEyeLine className='passViewIcon' onClick={()=>{setPassType(!passType)}}/>
+          }
         </div>
         {error ? <p className='error'>{error}</p> : <p></p>}
         <button type='submit' className='loginBtn'>로그인</button>
         <div className='login-signUpBtn' onClick={()=>{
           setSignUpPage(true);
         }
-        }><p></p>회원가입</div>
+        }>회원가입</div>
         
       </form>
       

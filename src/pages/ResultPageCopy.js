@@ -830,8 +830,7 @@ useEffect(()=>{
   const [data2, setData2] = useState([]);
   const dateSelectorRef = useRef([]);
   const [dateSelectIdx, setDateSelectIdx] = useState(0);
-  const [selectedDate, setSelectedDate] = useState("");
-  const [gray, setGray] = useState("");
+
   useEffect(()=>{
     setTimeout(()=>{
       if(dateSelectorRef.current[0] && dateSelectIdx !== null){

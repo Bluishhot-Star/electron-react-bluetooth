@@ -299,8 +299,8 @@ function DetailSvcPage(){
     },{
       label: "post",
       fill: false,
-      pointBackgroundColor: "blue",
-      pointBorderColor:"blue",
+      pointBackgroundColor: "rgba(1, 136, 190, 1)",
+      pointBorderColor:"rgba(1, 136, 190, 1)",
       pointRadius: 7,
       pointHoverRadius: 7,
       data: [{x:postVc.showVal, y : 0.4}],
@@ -605,7 +605,7 @@ function DetailSvcPage(){
         let dataset = []
         svcGraph.forEach((item,index)=>{
           let color = "red";
-          if([...graphPostCount].includes(index)) color = 'blue';
+          if([...graphPostCount].includes(index)) color = 'rgba(1, 136, 190, 1)';
           dataset.push(
             {
               label: "",
@@ -666,25 +666,28 @@ function DetailSvcPage(){
     return (
         <div className="result-page-container detail-page-container">
         <div className="nav">
-          <div className="nav-logo" onClick={()=>{}}>
-            <h1>The SpiroKit</h1>
-          </div>
+        <div className="nav-logo" onClick={()=>{console.log({preFvc, postFvc});}}>
+          <img src={process.env.PUBLIC_URL + '/spriokit.svg'} />
+        </div>
           <div className="nav-content-container">
             <div className="nav-left-container">
               <div className="admin">
                 <span>담당자</span>
-                {/* <span>{state.subject[7].value}</span> */}
+                <span>{state.subject.clinicianName}</span>
               </div>
+              <div className='error'>
+                  <span>Error Code </span>
+                  <span>{state.diagnosis.errorCode}</span>
+                </div>
+                <div className='grade'>
+                  <span>Grade </span>
+                  <span>{state.diagnosis.suitability}</span>
+                </div>
             </div>
-            {/* <div className="nav-right-container">
-              <button className="select-patient-btn" onClick={()=>{navigator(-1)}}>환자 선택</button>
-              <button className="setting-btn">설정</button>
-            </div> */}
           </div>
         </div>
         <div className="nav-bottom">
           <div className="button-container">
-            <div className="suitability">검사 적합성 : </div>
             <button className="detail-btn" onClick={()=>{navigator(-1)}}>결과 요약보기</button>
           </div>
         </div>
@@ -719,9 +722,9 @@ function DetailSvcPage(){
                 {/* <div className="quadrantXY">({quadrant4XY.x.toFixed(2)},{quadrant4XY.y.toFixed(2)})</div> */}
               </div>
             </div>
-            <div className="compare-graph-container">
-              <div className="fvc-compare-graph">
-                <div className="compare-title">VC(L)(L)</div>
+            <div className="compare-svc-graph-container">
+              <div className="svc-compare-graph">
+                <div className="compare-title">FVC(L)</div>
                 <div className="compare-canvas-container">
                   <div className="compare-background2"></div>
                   <div className="compare-background"></div>
@@ -732,14 +735,6 @@ function DetailSvcPage(){
                   <div className="compare-border-bottom"></div>
                   <div className="compare-border-top"></div>
                 </div>
-              </div>
-              <div className="fev1-compare-graph">
-                <div className="compare-title"></div>
-
-              </div>
-              <div className="fev1per-compare-graph">
-                <div className="compare-title"></div>
-
               </div>
             </div>
           </div>

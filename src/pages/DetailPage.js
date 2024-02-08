@@ -305,8 +305,8 @@ function DetailPage(){
     },{
       label: "post",
       fill: false,
-      pointBackgroundColor: "blue",
-      pointBorderColor:"blue",
+      pointBackgroundColor: "rgba(1, 136, 190, 1)",
+      pointBorderColor:"rgba(1, 136, 190, 1)",
       pointRadius: 7,
       pointHoverRadius: 7,
       data: [{x:postFvc.showVal, y : 0.4}],
@@ -411,8 +411,8 @@ function DetailPage(){
     },{
       label: "post",
       fill: false,
-      pointBackgroundColor: "blue",
-      pointBorderColor: "blue",
+      pointBackgroundColor: "rgba(1, 136, 190, 1)",
+      pointBorderColor: "rgba(1, 136, 190, 1)",
       pointRadius: 7,
       pointHoverRadius: 7,
       data: [{x:postFev1.showVal, y : 0.4}],
@@ -546,8 +546,8 @@ function DetailPage(){
     },{
       label: "post",
       fill: false,
-      pointBackgroundColor: "blue",
-      pointBorderColor: "blue",
+      pointBackgroundColor: "rgba(1, 136, 190, 1)",
+      pointBorderColor: "rgba(1, 136, 190, 1)",
       pointRadius: 7,
       pointHoverRadius: 7,
       data: [{x:postFev1Per.showVal, y : 0.4}],
@@ -645,8 +645,8 @@ function DetailPage(){
       label: "post",
       fill: false,
       data: [postFvc.meas],
-      // pointBackgroundColor: "blue",
-      // pointBorderColor:"blue",
+      // pointBackgroundColor: "rgba(1, 136, 190, 1)",
+      // pointBorderColor:"rgba(1, 136, 190, 1)",
       // pointRadius: 5,
       // tension: 0.4,
     }]
@@ -998,6 +998,7 @@ function DetailPage(){
   const [first, setFirst] = useState({x:window.innerWidth, y: window.innerHeight})
   const [second, setSecond] = useState({x:window.innerWidth, y: window.innerHeight})
   const [temp, setTemp] = useState(false);
+  const [grayBg, setGrayBg] = useState("");
 
   const handleResize = debounce(()=>{
     setTemp(false);
@@ -1016,6 +1017,15 @@ function DetailPage(){
   useEffect(()=>{
     setFirst(second)
   },[second])
+
+  useEffect(()=>{
+    if(temp){
+      setGrayBg("");
+    }
+    else{
+      setGrayBg("loadingBG");
+    }
+  },[temp])
 
   useEffect(()=>{
     let time = setTimeout(() => {
@@ -1065,7 +1075,7 @@ function DetailPage(){
         let dataset = []
         volumeFlow.forEach((item,index)=>{
           let color = "red";
-          if([...graphPostCount].includes(index)) color = 'blue';
+          if([...graphPostCount].includes(index)) color = 'rgba(1, 136, 190, 1)';
           dataset.push(
             {
               label: "",
@@ -1117,7 +1127,7 @@ function DetailPage(){
         let dataset = []
         timeVolume.forEach((item,index)=>{
           let color = "red";
-          if([...graphPostCount].includes(index)) color = 'blue';
+          if([...graphPostCount].includes(index)) color = 'rgba(1, 136, 190, 1)';
           dataset.push(
             {
               label: "",
@@ -1176,7 +1186,6 @@ function DetailPage(){
       postBtnRef.current.classList += " clickedType"
     }
   },[prePost])
-
   return (
       <div className="result-page-container detail-page-container">
       <div className="nav">
@@ -1214,14 +1223,14 @@ function DetailPage(){
           <button className="detail-btn" onClick={()=>{}}>결과 상세보기</button>
         </div> */}
           <div className="detail-fvc-graph-container">
-            <div className="graph">
+            <div className={"graph "+grayBg}>
               {temp?<div className="title-y">Flow(l/s)</div>:<></>}
-              {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:<p className='loadingG'>화면 조정 중..</p>}
+              {temp?<Scatter ref={chartRef} style={graphStyle} data={graphData} options={graphOption}/>:null}
               {temp?<div className="title-x">Volume(L)</div>:<></>}
             </div>
-            <div className="graph">
+            <div className={"graph "+grayBg}>
               {temp?<div className="title-y">Volume(L)</div>:<></>}
-              {temp?<Scatter style={graphStyle} data={graphData2} options={graphOption2}/>:<p className='loadingG'>화면 조정 중..</p>}
+              {temp?<Scatter style={graphStyle} data={graphData2} options={graphOption2}/>:null}
               {temp?<div className="title-x">Time(s)</div>:<></>}
             </div>
           </div>

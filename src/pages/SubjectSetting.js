@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import Alert from "../components/Alerts.js"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft, faChevronDown } from '@fortawesome/free-solid-svg-icons'
-import { GrView } from "react-icons/gr";
+import { RiEyeFill, RiEyeLine } from "react-icons/ri";
+
 const SubjectSetting = () =>{
   const [psw, setPsw] = useState("");
   const [newPsw, setNewPsw] = useState({
@@ -95,7 +96,11 @@ const SubjectSetting = () =>{
                 type={passType ? "string":"password"} placeholder='현재 비밀번호' name='user-pwd'
                 onChange={(e)=>setPsw(e.target.value)}
               />
-              <GrView className='passViewIcon' onClick={()=>{setPassType(!passType)}}/>
+              {passType ? 
+                <RiEyeFill className='passViewIcon' onClick={()=>{setPassType(!passType)}}/>
+              :
+                <RiEyeLine className='passViewIcon' onClick={()=>{setPassType(!passType)}}/>
+              }
               <div className='password-valition'>
               {
                 pswConfirm === true ?
@@ -112,7 +117,12 @@ const SubjectSetting = () =>{
                 type={newPassType ? "string":"password"} placeholder='변경 할 비밀번호' name='user-pwd'
                 onChange={(e)=>{setNewPsw({...newPsw, newPassword : e.target.value})}}
               />
-              <GrView className='passViewIcon' onClick={()=>{setNewPassType(!newPassType)}}/>
+              {
+                newPassType ?
+                <RiEyeFill className='passViewIcon' onClick={()=>{setNewPassType(!newPassType)}}/>
+                :
+                <RiEyeLine className='passViewIcon' onClick={()=>{setNewPassType(!newPassType)}}/>
+              }
                 <div className='password-valition'>
                 {
                   newPswConfirm === false ?
@@ -136,7 +146,11 @@ const SubjectSetting = () =>{
               type={newPassChkType ? "string":"password"} name='reEnterPassword' placeholder='비밀번호 확인'
               onChange={(e)=>{setNewPsw({...newPsw, confirmPassword : e.target.value})}}
             />
-            <GrView className='passViewIcon' onClick={()=>{setNewPassChkType(!newPassChkType)}}/>
+            {newPassChkType ? 
+              <RiEyeFill className='passViewIcon' onClick={()=>{setNewPassChkType(!newPassChkType)}}/>
+              :
+              <RiEyeLine className='passViewIcon' onClick={()=>{setNewPassChkType(!newPassChkType)}}/>
+            }
             <div className='password-valition'>
               {
                 newPsw.confirmPassword === newPsw.newPassword || newPsw.confirmPassword === ""? 

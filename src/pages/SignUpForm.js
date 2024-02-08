@@ -4,7 +4,7 @@ import Alert from "../components/Alerts.js"
 import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChevronLeft } from '@fortawesome/free-solid-svg-icons'
-import { GrView } from "react-icons/gr";
+import { RiEyeFill, RiEyeLine } from "react-icons/ri";
 
 const SignUpForm = () =>{
   const [values, setValues] = useState({
@@ -490,7 +490,11 @@ const SignUpForm = () =>{
               setValues({...values, manager: copy})}}
             value={values.manager.password}
           />
-          <GrView className='passViewIcon' onClick={()=>{setPassType(!passType)}}/>
+          {passType ? 
+            <RiEyeFill className='passViewIcon' onClick={()=>{setPassType(!passType)}}/>
+          :
+            <RiEyeLine className='passViewIcon' onClick={()=>{setPassType(!passType)}}/>
+          }
         </div>
         <div className="signUp-field">
           <label htmlFor="reEnterPassword">
@@ -509,7 +513,12 @@ const SignUpForm = () =>{
               setValues({...values, manager: copy})}}
             value={values.manager.reEnterPassword}
           />
-          <GrView className='passViewIcon' onClick={()=>{setNewPassType(!newPassType)}}/>
+          {
+            newPassType ?
+            <RiEyeFill className='passViewIcon' onClick={()=>{setNewPassType(!newPassType)}}/>
+            :
+            <RiEyeLine className='passViewIcon' onClick={()=>{setNewPassType(!newPassType)}}/>
+          }
         </div>
         <div className="signUp-field">
           <label htmlFor="tel">전화번호
