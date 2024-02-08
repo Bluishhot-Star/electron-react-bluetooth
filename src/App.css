@@ -793,12 +793,25 @@ text-align: right;
   display: grid;
   grid-template-rows: 1fr 1fr 1fr;
 }
+.bottom-graph-container .compare-svc-graph-container{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
 .bottom-graph-container .compare-graph-container>div{
   display: grid;
   grid-template-columns: 5.5vw 1fr;
   align-items: center;
   width: 100%;
   height: 100%;
+}
+.bottom-graph-container .compare-svc-graph-container>div{
+  display: grid;
+  grid-template-columns: 5.5vw 1fr;
+  align-items: center;
+  width: 100%;
+  height: 33.3%;
 }
 .compare-canvas-container{
   width: 100%;
@@ -2584,6 +2597,7 @@ text-align: right;
 .setting-page-left-container-nav .device-connect svg,
 .setting-page-left-container-nav .device-connect path{
   cursor: default;
+  transform: translateY(3px);
 }
 .connect-info-container{
   display: flex;

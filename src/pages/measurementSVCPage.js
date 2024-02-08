@@ -153,7 +153,6 @@ const MeasurementSVCPage = () =>{
   //그래프 선택
   const selectGraph=(index)=>{
     if(meaStart){return;}
-    console.log("HE!!!!");
     let temp;
     //처음 눌렀을때
     if(svcTrigger == 0){
@@ -1663,6 +1662,15 @@ useEffect(()=>{
     setSvcGraphOnOff([...svcGraphOnOff].fill(0))
   }
 
+  const [backStat, setBackStat] = useState(false);
+  let backConfirmFunc = (val)=>{
+    if(val=="confirm"){
+      navigatorR("/memberList");
+    }
+    else if(val=="cancel"){
+      setBackStat(false);
+    }
+  }
 
   return(
     <div className="measurement-page-container">
@@ -1671,25 +1679,37 @@ useEffect(()=>{
       {saveBAlert ? <Confirm content={`${strongTime}초 이상 강하게 호흡을 불지 않아, 유효하지 않은 검사입니다.\n그대로 검사를 저장하시겠습니까?`} btn={true} onOff={setSaveBAlert} select={selectSave}/> : null}
       {confirmStat ? <Confirm content="검사를 시작하시겠습니까?" btn={true} onOff={setConfirmStat} select={confirmFunc}/> : null}
       {disconnectStat ? <Confirm content={"연결된 Spirokit기기가 없습니다.\n설정 페이지로 이동해서 Spirokit을 연결해주세요."} btn={true} onOff={setDisconnectStat} select={disconnectConfirmFunc}/> : null}
+      {backStat ? <Confirm content={"환자선택 화면으로 돌아가시겠습니까?"} btn={true} onOff={setBackStat} select={backConfirmFunc}/> : null}
       {readyAlert ? <Confirm content={"SpiroKit 동작 준비 중 입니다.\n잠시만 기다려주세요."} btn={false} onOff={setReadyAlert} select={confirmFunc}/> : null}
         <div className="measurement-page-nav" onClick={()=>{console.log()}}>
-          <div className='measurement-page-backBtn' onClick={()=>{navigatorR(-1)}}>
+          <div className='measurement-page-backBtn' onClick={()=>{setBackStat(true)}}>
             <FontAwesomeIcon icon={faChevronLeft} style={{color: "#4b75d6"}} />
           </div>
-          <p onClick={()=>{
-            // console.log(txCharRef.current);
-            // console.log(location.state.info);
-            measurementEnd()
-          }}>{location.state.name}</p>
-          <div ref={blueIconRef} className="device-connect" onClick={()=>{navigatorR("/setting")}}>
-              {
-                noneDevice ?
-                  <p>연결되지 않음</p>
-                  :
-                  <p>연결됨</p>
-              }
-              <FaBluetoothB/>
+          <p onClick={()=>{}}>{location.state.name}</p>
+          <div className='graph-status-container'>
+            <div className='error'>
+                  <span>Error Code </span>
+                  {
+                      <span className='error-data'>{totalData == " " || totalData == "Empty resource" || !totalData  ? '-': totalData.diagnosis.errorCode}</span>
+                  }
+                </div>
+                <div className='grade'>
+                  <span>Grade </span>
+                  {
+                      <span className='grade-data'>{totalData == " " || totalData == "Empty resource" || !totalData  ? '-': totalData.diagnosis.suitability}</span>
+                  }
+                  
+                </div>
+            <div ref={blueIconRef} className="device-connect" onClick={()=>{navigatorR("/setting")}}>
+                {
+                  noneDevice ?
+                    <p>연결되지 않음</p>
+                    :
+                    <p>연결됨</p>
+                }
+                <FaBluetoothB/>
             </div>
+          </div>
         </div>
 
       
@@ -1778,19 +1798,77 @@ useEffect(()=>{
           <div className="measure-msg-container">
             {
             meaPreStart?
-              meaStart? 
-              <p className='measure-msg'>{"편하게 호흡을 시작해주세요."}</p>
+              meaStart?
+                inF == -1 ?
+                  <p className='measure-msg'>{"편하게 호흡을 시작해주세요."}</p>
+                :
+                  <>
+                    {
+                      gaugeContent ?
+                        !timerReady ?
+                            gaugeContent.r2 == "IN"?
+                              <p className='measure-msg'>{"편안히 숨을 들이쉬세요"}</p>
+                              :
+                              <p className='measure-msg'>{"편안히 숨을 내쉬세요"}</p>
+                        :
+                          timerStart ?
+                          <p className='measure-msg'>{"강하게 숨을 내쉬세요"}</p>
+                          :
+                          <p className='measure-msg'>{"크게 숨을 들이쉬세요"}</p>
+                      :
+                        <></>
+                    }
+                  </>
               :
               saveMsg ? <p className='measure-msg'>{saveMsg}</p> : <p className='measure-msg'>{"바람을 불어서 활성화해주세요."}</p>
             :
               notifyDone?
-              // <p className="measure-msg">준비중입니다...</p>
               <p></p>
               :
               <p className='measure-msg'>{noneDevice==false?"SpiroKit 연동이 완료되었습니다.\nSpiroKit 동작버튼을 켜주시고, 마우스피스 입구에 살짝 입김을 불어 검사 시작 버튼을 활성화 해주세요.":"SpiroKit 연동이 필요합니다."}</p>
             }
           </div>
-          <div className='measure-msg-picture'><div></div></div>
+          <div className='measure-msg-picture'>
+            {
+              meaPreStart?
+                meaStart?
+                  inF == -1 ?
+                    <img src={process.env.PUBLIC_URL + '/measOUT.svg'} />
+                  :
+                    <>
+                      {
+                        gaugeContent ?
+                          !timerReady ?
+                              gaugeContent.r2 == "IN"?
+                                <img src={process.env.PUBLIC_URL + '/measIN.svg'} />
+                                :
+                                <img src={process.env.PUBLIC_URL + '/measOUT.svg'} />
+                          :
+                            timerStart?
+                              <img src={process.env.PUBLIC_URL + '/measStrongOUT.svg'} />
+                            :
+                              <img src={process.env.PUBLIC_URL + '/measIN.svg'} />
+                        :
+                          <></>
+                      }
+                    </>
+                :
+                <img src={process.env.PUBLIC_URL + '/measDONE.svg'} />
+                  
+              :
+                notifyDone?
+                  <img src={process.env.PUBLIC_URL + '/measDONE.svg'} />
+                  :
+                    <>
+                      {
+                        noneDevice==false?
+                        <img src={process.env.PUBLIC_URL + '/measDONE.svg'} />
+                        :
+                        <img src={process.env.PUBLIC_URL + '/meas1.svg'} />
+                      }
+                    </>
+            }
+          </div>
         </div>
         <div className="measurement-page-right-container">
           {/* <div className="fvc-graph-container">
