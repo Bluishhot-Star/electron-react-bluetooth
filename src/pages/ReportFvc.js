@@ -15,12 +15,12 @@ let graphOption2YLastGrid;
 let graphOption3XLastGrid;
 let graphOption3YLastGrid;
 
-const ReportFvc = ()=>{
+const ReportFvc = (state)=>{
   ChartJS.register(RadialLinearScale, LineElement, Tooltip, Legend, ...registerables,annotationPlugin);
     let navigatorR = useNavigate();
     const location = useLocation();
     const[volumeFlow,setVolumeFlow] = useState([]);
-    const state = location.state;
+    // const state = location.state;
     const [top,setTop] = useState({
       name : '',
       age : 0,
@@ -196,14 +196,17 @@ useEffect(()=>{
         // top: 21,
         bottom:22,
         
-      }
+      },
+      borderColor:'black'
     },
     maintainAspectRatio: false,
     interaction: false, 
     elements: {
       point: {
         radius: 0,
+
       },
+
     },
     scales: { 
       x: {
@@ -211,11 +214,13 @@ useEffect(()=>{
         // min: 0,
         // max: parseInt(Math.max(...tvMax)),
         backgroundColor : '#fff',
-  
+        suggestedMax:15,
+        
         ticks:{
           color:'black',
           autoSkip: false,
           beginAtZero: false,
+          stepSize:3,
           fontSize :14,
           font: {
             size: 8,
@@ -248,8 +253,11 @@ useEffect(()=>{
         axios: 'y',
         backgroundColor : '#fff',
 
-        grace:"8%",
+        // grace:"8%",
+        suggestedMax:12,
+        suggestedMin:-6,
         ticks: {
+          stepSize:3,
           color:'black',
           major: true,
           beginAtZero: true,
@@ -429,7 +437,7 @@ useEffect(()=>{
         backgroundColor : '#fff',
 
         min: 0,
-        suggestedMax: 3,
+        // suggestedMax: 6,
         ticks:{
           color:'black',
           font: {
@@ -466,7 +474,7 @@ useEffect(()=>{
         min: 0,
         backgroundColor : '#fff',
 
-        suggestedMax:3.3,
+        suggestedMax:9,
         // suggestedMin:-6,
         ticks: {
           color:'black',
@@ -539,9 +547,11 @@ useEffect(()=>{
     scales: { 
       x: {
         axios: 'x',
- 
+        suggestedMax:15,
+
 
         ticks:{
+          stepSize:3,
           color:'black',
           font: {
             size: 8,
@@ -572,7 +582,9 @@ useEffect(()=>{
         },
         axios: 'y',
         // min: -9,
-        grace:"8%",
+        // grace:"8%",
+        suggestedMax:12,
+        suggestedMin:-6,
         ticks: {
           color:'black',
           font: {
@@ -778,7 +790,7 @@ useEffect(()=>{
     }else if(state.data.fvcSvc.diagnosis.condition === 'ASTHMA'){
       result.push(
         <div>
-          천식이 의십됩니다. 의료진에게 상세 진단을 받아 보시길 바랍니다. ASTHMA
+          천식이 의십됩니다. 의료진에게 상세 진단을 받아 보시길 바랍니다.
         </div>
       )
     }else{

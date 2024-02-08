@@ -1069,8 +1069,8 @@ useEffect(()=>{
                     ""
                   :
                     <div onClick={()=>{
-                      // setViewer(!viewer)
-                      navigator('./reportFvc', {state :{data: rep}})
+                      setViewer(!viewer)
+                      // navigator('./reportFvc', {state :{data: rep}})
                     }}><BiSolidFileJpg className='jpgIcon'/>다운로드</div>
                 :
                   totalData.svc === '' || totalData.svc === 'Empty resource'?
