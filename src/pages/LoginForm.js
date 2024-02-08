@@ -4,6 +4,7 @@ import { Cookies, useCookies } from 'react-cookie';
 import Alert from "../components/Alerts.js"
 import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 import { GrView } from "react-icons/gr";
+import { RiEyeFill, RiEyeLine } from "react-icons/ri";
 
 const LoginForm = () =>{
   const [values, setValues] = useState({
@@ -169,7 +170,11 @@ const LoginForm = () =>{
             placeholder='비밀번호'
             value={values.password}
           />
-          <GrView className='passViewIcon' onClick={()=>{setPassType(!passType)}}/>
+          {passType ? 
+            <RiEyeFill className='passViewIcon' onClick={()=>{setPassType(!passType)}}/>
+          :
+            <RiEyeLine className='passViewIcon' onClick={()=>{setPassType(!passType)}}/>
+          }
         </div>
         {error ? <p className='error'>{error}</p> : <p></p>}
         <button type='submit' className='loginBtn'>로그인</button>
