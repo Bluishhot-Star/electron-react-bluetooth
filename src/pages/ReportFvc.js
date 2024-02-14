@@ -744,6 +744,12 @@ useEffect(()=>{
           폐기능 소견상 정상입니다. 항상 호흡기 건강에 유의하시고 자주 검사를 받으시어 지금 상태를 유지하세요.
         </div>
       );
+    }else if(state.data.fvcSvc.diagnosis.condition === 'NORMAL_OBSTRUCTIVE'){
+      result.push(
+        <div>
+          수검자님은 소기도폐쇄가 의심됩니다. 흡연, 간접흡연, 미세먼지등을 피하시고 만성폐쇄성폐질환(천식, 폐기종, 만성기관지염)으로 진행될 가능성이 높으니 폐기능 검사를 자주 받으시고 항상 호흡기 건강에 유의 하시길 바랍니다.
+        </div>
+      )
     }else if(state.data.fvcSvc.diagnosis.condition === 'RESTRICTED'){
       result.push(
         <div>
@@ -790,7 +796,7 @@ useEffect(()=>{
     }else if(state.data.fvcSvc.diagnosis.condition === 'ASTHMA'){
       result.push(
         <div>
-          천식이 의십됩니다. 의료진에게 상세 진단을 받아 보시길 바랍니다.
+          기관지 확장제 양성으로 폐쇄성 폐질환이 의심됩니다. 이에 전문의와 상담 해주시길 바랍니다.
         </div>
       )
     }else{
