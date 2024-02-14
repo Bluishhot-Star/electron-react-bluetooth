@@ -48,8 +48,8 @@ function SerialSetting(props){
     <>
       <div className="serial-bg">
         <div className="serial-container" onClick={(e)=>{e.stopPropagation(); return;}}>
-          <div className="serial-logo"><p>The SpiroKit</p></div>
-          <div></div>
+          <div className="serial-logo"><img src={process.env.PUBLIC_URL + '/spriokit.svg'} /></div>
+          <div className="serial-img-container"><img src={process.env.PUBLIC_URL + '/serialNumGuide.svg'} /></div>
           <div className="serial-msg-container">
             <div>1. Spirokit 디바이스 뒷면 아래에 있는 스티커를 확인해주세요.</div>
             <div>2. 스티커의 아래쪽에 제조번호를 찾아 제조번호 6자리를 입력해주세요.</div>

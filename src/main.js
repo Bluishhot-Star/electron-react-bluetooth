@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain,session } = require('electron')
+
 const { Menu, MenuItem, dialog } = require('@electron/remote/main');
 const path = require('path')
 const url = require('url')
@@ -15,8 +16,26 @@ let callbackForBluetoothEvent = ()=>{};
 
 let mainWindow;
 let splash;
+let internet;
+function createInternet (){
+  let size = mainWindow.getSize();
+  internet = new BrowserWindow({
+    width: size[0],
+    height: size[1]-2,
+    parent: mainWindow,
+    modal: true,
+    frame: false, 
+    alwaysOnTop: true,
+    resizable: false,
+    show: false,
+      // devTools: true,
+    // webviewTag: true,
+  });
+  internet.setPosition(0,0);
+  internet.setWindowButtonVisibility(true);
+  internet.loadURL(`file://${__dirname}/../public/disconnectInternet.html`);
 
-
+}
 function createWindow () {
   return new Promise((resolve, reject) => {
     try{
@@ -129,17 +148,19 @@ function createWindow () {
 
       mainWindow.addListener("resize",(event)=>{
         if(BLEDevicesWindow){
-          console.log("RRR");
           let size = mainWindow.getSize();
           let x = size[0];
           let y = size[1]-30;
           BLEDevicesWindow.setSize(x, y);
         }
+        if(internet){
+          let size = mainWindow.getSize();
+          let x = size[0];
+          let y = size[1]-30;
+          internet.setSize(x, y);
+        }
       })
-
       mainWindow.loadURL("http://localhost:3000") 
-      
-      // resolve(mainWindow);
     }
     catch(error){
       reject(error);
@@ -155,7 +176,7 @@ function createBLEDevicesWindow() {
     width: size[0],
     height: size[1]-2,
     parent: mainWindow,
-    title: "Bluetooth Devices near by",
+    title: "",
     modal: true,
     hasShadow: false,
     resizable: false,
@@ -254,8 +275,23 @@ ipcMain.on('remove-cookies', (event, data)=>{
     console.log(error)
   }
 })
-
+ipcMain.on('online-status-changed', (event, data)=>{
+  try{
+    if (data == 'offline'){
+      createInternet();
+      setTimeout(()=>{
+        internet.show();
+      },3100)
+    }
+    else if(data == 'online'){
+      if (internet){ internet.close();}
+    }
+  }catch(err){
+    console.log(err);
+  }
+})
 // app.on('ready', createWindow);
+
 
 app.whenReady().then(() => {
   createWindow()
