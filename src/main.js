@@ -20,6 +20,7 @@ let internet;
 function createInternet (){
   let size = mainWindow.getSize();
   internet = new BrowserWindow({
+    
     width: size[0],
     height: size[1]-2,
     parent: mainWindow,
@@ -47,6 +48,7 @@ function createWindow () {
         minWidth: 800,
         minHeight: 600,
         show: false,
+        icon: path.join(__dirname, "/spirokit_icon_foreground.ico"),
         webPreferences: {
           nodeIntegration: true,
           contextIsolation: false,
@@ -64,6 +66,7 @@ function createWindow () {
           preload: path.join(__dirname, "/BLEDevicesPreload.js")
         }
       })
+      mainWindow.setMenuBarVisibility(false);
       splash = new BrowserWindow({
         width: 510, 
         height: 310, 

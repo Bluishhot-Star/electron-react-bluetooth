@@ -1,5 +1,6 @@
 {
-  "name": "react-electron",
+  "name": "TheSpiroKit",
+  "icon": "public/spirokit_icon_foreground.ico",
   "version": "1.9.0",
   "private": true,
   "main": "src/main.js",
